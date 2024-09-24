@@ -8,12 +8,19 @@ import {
   HttpCode,
   ConflictException,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger'; 
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { UserRole } from '../schemas/user.schema';
 import { InvestorService } from '../investor/investor.service';
 import { StartupService } from '../startup/startup.service';
 
+@ApiTags('Auth') 
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -24,6 +31,37 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @ApiOperation({ summary: 'Sign up a new user (Investor/Startup)' }) // Description for the endpoint
+  @ApiResponse({ status: 201, description: 'User successfully created.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request - Missing or invalid fields.',
+  })
+  @ApiResponse({ status: 409, description: 'Conflict - Email already in use.' })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error - Something went wrong during signup.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'John Doe' },
+        email: { type: 'string', example: 'john@example.com' },
+        password: { type: 'string', example: 'password123' },
+        role: {
+          type: 'string',
+          example: 'Investor',
+          enum: ['Investor', 'Startup'],
+        },
+        roleSpecificData: {
+          type: 'object',
+          description: 'Role-specific data depending on the user role.',
+        },
+      },
+      required: ['name', 'email', 'password', 'role', 'roleSpecificData'], // Required fields for Swagger
+    },
+  })
   async signup(
     @Body('name') name: string,
     @Body('email') email: string,
@@ -80,7 +118,10 @@ export class AuthController {
       // Return the validated user
       return this.authService.validateUser(email, password);
     } catch (error) {
-      if (error instanceof BadRequestException || error instanceof ConflictException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
         throw error; // Rethrow known error
       }
 
@@ -90,7 +131,27 @@ export class AuthController {
   }
 
   @Post('login')
-  @HttpCode(200) 
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Log in a user and get an access token' }) // Description for the endpoint
+  @ApiResponse({ status: 200, description: 'Login successful.' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid credentials.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error - Something went wrong during login.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'john@example.com' },
+        password: { type: 'string', example: 'password123' },
+      },
+      required: ['email', 'password'], // Required fields for Swagger
+    },
+  })
   async login(
     @Body('email') email: string,
     @Body('password') password: string,
@@ -104,7 +165,7 @@ export class AuthController {
 
       return this.authService.login(user);
     } catch (error) {
-      if (error.message == 'Invalid credentials') {
+      if (error.message === 'Invalid credentials') {
         throw new UnauthorizedException('Invalid credentials');
       }
       console.error('Error during login:', error.message);
