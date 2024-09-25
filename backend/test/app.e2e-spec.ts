@@ -16,22 +16,22 @@ describe('AuthController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close(); // Ensure the app is closed to prevent open handles
+    await app.close();
   });
 
   it('/auth/signup/investor (POST) - investor', async () => {
     const signupData = {
-      name: 'John Doe', // According to CreateInvestorDto
+      name: 'John Doe', 
       email: 'john@example.com',
       password: 'password123',
       profileStatus: 'active',
       preferences: {
-        sectors: ['Tech'], // InvestorPreferencesDto
+        sectors: ['Tech'], 
         regions: ['US'],
         riskTolerance: 'Medium',
       },
       criteria: {
-        minInvestment: 5000, // InvestorCriteriaDto
+        minInvestment: 5000, 
         maxInvestment: 50000,
         investmentHorizon: '5 years',
       },
@@ -40,7 +40,7 @@ describe('AuthController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/signup/investor')
       .send(signupData)
-      .expect(201); // Expect a successful signup
+      .expect(201); 
     expect(response.body.email).toBe(signupData.email);
   });
 
@@ -52,14 +52,13 @@ describe('AuthController (e2e)', () => {
       businessPlan: {
         description: 'A comprehensive plan', 
         industry: 'Tech',
-        team: ['Alice', 'Bob'],
       },
     };
 
     const response = await request(app.getHttpServer())
       .post('/auth/signup/startup')
       .send(signupData)
-      .expect(201); // Expect a successful signup
+      .expect(201); 
 
     expect(response.body.email).toBe(signupData.email);
   });
@@ -85,8 +84,7 @@ describe('AuthController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/signup/investor')
       .send(duplicateSignupData)
-      .expect(409); // Expect Conflict response
-
+      .expect(409); 
     expect(response.body.message).toBe('Email already in use');
   });
 
@@ -98,7 +96,6 @@ describe('AuthController (e2e)', () => {
       businessPlan: {
         description: 'A comprehensive plan', 
         industry: 'Tech',
-        team: ['Alice', 'Bob'],
       },
     };
 
@@ -119,10 +116,10 @@ describe('AuthController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/login/investor')
       .send(loginData)
-      .expect(200); // Expect a successful login
+      .expect(200); 
 
-    expect(response.body).toHaveProperty('access_token'); // Check if the response contains the access token
-    expect(typeof response.body.access_token).toBe('string'); // Ensure the access token is a string
+    expect(response.body).toHaveProperty('access_token'); 
+    expect(typeof response.body.access_token).toBe('string'); 
   });
 
   it('should throw UnauthorizedException for invalid investor login', async () => {

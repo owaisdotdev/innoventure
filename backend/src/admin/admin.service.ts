@@ -5,25 +5,12 @@ import {
   } from '@nestjs/common';
   import { InjectModel } from '@nestjs/mongoose';
   import { isValidObjectId, Model } from 'mongoose';
-  import { Admin } from '../schemas/admin.schema'; // Assuming you have an Admin schema
-  import { CreateAdminDto } from '../dto/createAdmin.dto';
-  import { UpdateAdminDto } from '../dto/updateAdmin.dto';
-  import * as bcrypt from 'bcryptjs';
+  import { Admin } from '../schemas/admin.schema'; 
   
   @Injectable()
   export class AdminService {
     constructor(@InjectModel(Admin.name) private adminModel: Model<Admin>) {}
-  
-    // Create a new admin with hashed password
-    async createAdmin(createAdminDto: CreateAdminDto): Promise<Admin> {
-      const hashedPassword = await bcrypt.hash(createAdminDto.password, 10);
-      const createdAdmin = await this.adminModel.create({
-        ...createAdminDto,
-        password: hashedPassword,
-      });
-      return createdAdmin;
-    }
-  
+
     // Find all admins
     async findAllAdmins(): Promise<Admin[]> {
       return this.adminModel.find().exec();
@@ -41,29 +28,6 @@ import {
       }
   
       return admin;
-    }
-  
-    // Update an admin
-    async updateAdmin(
-      adminId: string,
-      updateAdminDto: UpdateAdminDto,
-    ): Promise<Admin> {
-      if (!isValidObjectId(adminId)) {
-        throw new BadRequestException(`Invalid ID format`);
-      }
-      const updatedAdmin = await this.adminModel
-        .findByIdAndUpdate(
-          adminId,
-          { $set: updateAdminDto },
-          { new: true }, // Return the updated document
-        )
-        .exec();
-  
-      if (!updatedAdmin) {
-        throw new NotFoundException('Admin not found');
-      }
-  
-      return updatedAdmin;
     }
   
     // Delete an admin

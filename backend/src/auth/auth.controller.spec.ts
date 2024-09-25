@@ -56,7 +56,6 @@ describe('AuthController', () => {
           provide: AdminService,
           useValue: {
             findByEmail: jest.fn(),
-            createAdmin: jest.fn(),
           },
         },
       ],
@@ -168,21 +167,7 @@ describe('AuthController', () => {
       businessPlan: {
         description: 'A great startup',
         industry: 'tech',
-        team: ['Alice', 'Bob'],
-      },
-      fundingNeeds: {
-        totalAmount: 1000000,
-        milestones: [
-          {
-            // @ts-ignore
-            milestoneId: '123456', // MilestoneDto uses string for milestoneId
-            description: 'MVP release',
-            dueDate: new Date(),
-            fundingRequired: 500000,
-            status: 'Pending', // Include the status field as required by the schema
-          },
-        ],
-      },
+      }
     };
 
     it('should sign up a startup and return a login token', async () => {
