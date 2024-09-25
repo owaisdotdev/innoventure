@@ -10,7 +10,9 @@ import './css/style.css';
 import './charts/ChartjsConfig';
 
 // Import pages
-import Dashboard from './pages/Dashboard';
+import AdminDashboard from './admin/pages/Dashboard';
+import InvestorDashboard from './investor/pages/Dashboard';
+import StartupDashboard from './startup/pages/Dashboard';
 
 function App() {
 
@@ -25,7 +27,9 @@ function App() {
   return (
     <>
       <Routes>
-        <Route exact path="/" element={<Dashboard />} />
+        <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
+        <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
       </Routes>
     </>
   );
