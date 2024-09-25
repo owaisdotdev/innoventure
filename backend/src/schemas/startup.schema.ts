@@ -22,7 +22,6 @@ export class Startup extends Document {
   businessPlan: {
     description: string;
     industry: string;
-    team: string[];
   };
 
   @Prop({
