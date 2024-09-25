@@ -82,7 +82,7 @@ export class AuthService {
     if (!admin) {
       throw new UnauthorizedException('Admin not found');
     }
-    if (admin && (await bcrypt.compare(password, admin.password))) {
+    if (admin && password === admin.password) {
       return admin;
     }
 

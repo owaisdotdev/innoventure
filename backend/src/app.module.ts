@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { InvestorModule } from './investor/investor.module';
 import { StartupModule } from './startup/startup.module';
-import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AdminModule } from './admin/admin.module';
@@ -24,7 +23,6 @@ import { AdminModule } from './admin/admin.module';
     }),
     InvestorModule,
     StartupModule,
-    UserModule,
     AuthModule,
     AdminModule,
   ],

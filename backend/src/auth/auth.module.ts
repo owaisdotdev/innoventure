@@ -10,6 +10,7 @@ import { Startup, StartupSchema } from '../schemas/startup.schema';
 import { StartupModule } from '../startup/startup.module';
 import { InvestorModule } from '../investor/investor.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     StartupModule,
     InvestorModule,
+    AdminModule,
     MongooseModule.forFeature([
       { name: Investor.name, schema: InvestorSchema },
       { name: Startup.name, schema: StartupSchema },

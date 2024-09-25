@@ -4,13 +4,13 @@ import { Document, Types } from 'mongoose';
 @Schema()
 export class Startup extends Document {
   @Prop({ type: String, required: true })
-  name: string
+  name: string;
 
   @Prop({ type: String, required: true })
-  email: string
+  email: string;
 
   @Prop({ type: String, required: true })
-  password: string
+  password: string;
 
   @Prop({
     type: {
@@ -18,9 +18,7 @@ export class Startup extends Document {
       industry: { type: String, required: true }, // E.g., "Fintech", "EdTech"
       team: { type: [String], required: true }, // List of team members
     },
-    required: true,
   })
-  
   businessPlan: {
     description: string;
     industry: string;
@@ -48,7 +46,6 @@ export class Startup extends Document {
         },
       ],
     },
-    required: true,
   })
   fundingNeeds: {
     totalAmount: number;
@@ -96,6 +93,21 @@ export class Startup extends Document {
     reportDetails: string;
     reportDate: Date;
     status: string;
+  }[];
+
+  @Prop({
+    type: [
+      {
+        type: { type: String },
+        message: { type: String },
+        date: { type: Date },
+      },
+    ],
+  })
+  notifications: {
+    type: string;
+    message: string;
+    date: Date;
   }[];
 }
 
