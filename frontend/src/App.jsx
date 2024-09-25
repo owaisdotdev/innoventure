@@ -4,8 +4,9 @@ import {
   Route,
   useLocation
 } from 'react-router-dom';
-
+import Home from './pages/Home/Home';
 import './css/style.css';
+import Navbar from './components/Navbar';
 
 import './charts/ChartjsConfig';
 
@@ -26,7 +27,11 @@ function App() {
 
   return (
     <>
+    <Navbar/>
       <Routes>
+      
+      <Route exact path="/" element={<Home />} />
+
         <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
         <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
         <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
