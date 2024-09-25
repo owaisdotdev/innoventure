@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { InvestorService } from '../investor/investor.service';
 import { StartupService } from '../startup/startup.service';
+import { AdminService } from '../admin/admin.service';
 import {
   ConflictException,
   InternalServerErrorException,
@@ -12,7 +13,7 @@ import { CreateInvestorDto } from '../dto/createInvestor.dto';
 import { CreateStartupDto } from '../dto/createStartup.dto';
 import { LoginDto } from '../dto/login.dto';
 import { Investor } from '../schemas/investor.schema';
-import { Startup } from 'src/schemas/startup.schema';
+import { Startup } from '../schemas/startup.schema';
 import { Types } from 'mongoose';
 
 describe('AuthController', () => {
@@ -20,6 +21,7 @@ describe('AuthController', () => {
   let authService: AuthService;
   let investorService: InvestorService;
   let startupService: StartupService;
+  let adminService: AdminService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,8 +32,10 @@ describe('AuthController', () => {
           useValue: {
             loginInvestor: jest.fn(),
             loginStartup: jest.fn(),
+            loginAdmin: jest.fn(),
             validateInvestor: jest.fn(),
             validateStartup: jest.fn(),
+            validateAdmin: jest.fn(),
           },
         },
         {
@@ -48,6 +52,13 @@ describe('AuthController', () => {
             createStartup: jest.fn(),
           },
         },
+        {
+          provide: AdminService,
+          useValue: {
+            findByEmail: jest.fn(),
+            createAdmin: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -55,6 +66,7 @@ describe('AuthController', () => {
     authService = module.get<AuthService>(AuthService);
     investorService = module.get<InvestorService>(InvestorService);
     startupService = module.get<StartupService>(StartupService);
+    adminService = module.get<AdminService>(AdminService);
   });
 
   it('should be defined', () => {
@@ -172,7 +184,7 @@ describe('AuthController', () => {
         ],
       },
     };
-    
+
     it('should sign up a startup and return a login token', async () => {
       const startup: Partial<Startup> = {
         ...createStartupDto,
@@ -190,7 +202,7 @@ describe('AuthController', () => {
           ],
         },
       };
-    
+
       jest.spyOn(startupService, 'findByEmail').mockResolvedValue(null);
       jest
         .spyOn(startupService, 'createStartup')
@@ -199,20 +211,21 @@ describe('AuthController', () => {
         access_token: 'login_token',
         startup: startup,
       });
-    
+
       const result = await authController.signupStartup(createStartupDto);
-    
+
       expect(startupService.findByEmail).toHaveBeenCalledWith(
         createStartupDto.email,
       );
-      expect(startupService.createStartup).toHaveBeenCalledWith(createStartupDto);
+      expect(startupService.createStartup).toHaveBeenCalledWith(
+        createStartupDto,
+      );
       expect(authService.loginStartup).toHaveBeenCalledWith(startup);
       expect(result).toEqual({
         access_token: 'login_token',
         startup: startup,
       });
     });
-    
 
     it('should throw a ConflictException if email is already registered', async () => {
       const startup: Partial<Startup> = {
@@ -317,6 +330,41 @@ describe('AuthController', () => {
       jest.spyOn(authService, 'validateStartup').mockResolvedValue(null);
 
       await expect(authController.loginStartup(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+  });
+
+  describe('loginAdmin', () => {
+    const loginDto: LoginDto = {
+      email: 'admin@test.com',
+      password: 'password',
+    };
+
+    it('should login an admin and return a token', async () => {
+      const admin = { id: '12345', email: loginDto.email };
+      jest.spyOn(authService, 'validateAdmin').mockResolvedValue(admin);
+      jest.spyOn(authService, 'loginAdmin').mockResolvedValue({
+        access_token: 'login_token',
+        admin: admin,
+      });
+
+      const result = await authController.loginAdmin(loginDto);
+      expect(authService.validateAdmin).toHaveBeenCalledWith(
+        loginDto.email,
+        loginDto.password,
+      );
+      expect(authService.loginAdmin).toHaveBeenCalledWith(admin);
+      expect(result).toEqual({
+        access_token: 'login_token',
+        admin: admin,
+      });
+    });
+
+    it('should throw UnauthorizedException for invalid credentials', async () => {
+      jest.spyOn(authService, 'validateAdmin').mockResolvedValue(null);
+
+      await expect(authController.loginAdmin(loginDto)).rejects.toThrow(
         UnauthorizedException,
       );
     });

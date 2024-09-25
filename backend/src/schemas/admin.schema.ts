@@ -10,7 +10,7 @@ export class Admin extends Document {
   email: string;
 
   @Prop({ required: true })
-  role: string; 
+  password: string; 
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

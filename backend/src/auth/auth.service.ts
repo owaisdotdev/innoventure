@@ -4,6 +4,7 @@ import * as bcrypt from 'bcryptjs';
 import { InvestorService } from '../investor/investor.service';
 import { StartupService } from '../startup/startup.service';
 import { JwtPayload } from './jwt-payload.interface';
+import { AdminService } from '../admin/admin.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly investorService: InvestorService,
     private readonly startupService: StartupService,
+    private readonly adminService: AdminService,
   ) {}
 
   // Login for Investors
@@ -20,7 +22,7 @@ export class AuthService {
       role: 'investor',
       sub: investor._id,
     };
-    const { password, ...safeInvestor } = investor; 
+    const { password, ...safeInvestor } = investor;
     return {
       access_token: this.jwtService.sign(payload),
       investor: safeInvestor,
@@ -34,10 +36,19 @@ export class AuthService {
       role: 'startup',
       sub: startup._id,
     };
-    const { password, ...safeStartup } = startup; // Exclude password
+    const { password, ...safeStartup } = startup;
     return {
       access_token: this.jwtService.sign(payload),
       startup: safeStartup,
+    };
+  }
+
+  // Login for Admins
+  async loginAdmin(admin: any) {
+    const payload = { email: admin.email, sub: admin.id, role: 'admin' };
+    return {
+      access_token: this.jwtService.sign(payload), // Your JWT logic here
+      admin,
     };
   }
 
@@ -65,7 +76,19 @@ export class AuthService {
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  // Validate JWT token for both Investor and Startup
+  // Admin validation logic
+  async validateAdmin(email: string, password: string): Promise<any> {
+    const admin = await this.adminService.findByEmail(email);
+    if (!admin) {
+      throw new UnauthorizedException('Admin not found');
+    }
+    if (admin && (await bcrypt.compare(password, admin.password))) {
+      return admin;
+    }
+
+    throw new UnauthorizedException('Invalid admin credentials');
+  }
+
   async validateJwtPayload(payload: JwtPayload): Promise<any> {
     if (payload.role === 'investor') {
       const investor = await this.investorService.findInvestorById(payload.sub);
@@ -79,6 +102,12 @@ export class AuthService {
         throw new UnauthorizedException('Invalid JWT Token');
       }
       return startup;
+    } else if (payload.role === 'admin') {
+      const admin = await this.adminService.findAdminById(payload.sub);
+      if (!admin) {
+        throw new UnauthorizedException('Invalid JWT Token');
+      }
+      return admin;
     }
     throw new UnauthorizedException('Invalid JWT Token');
   }

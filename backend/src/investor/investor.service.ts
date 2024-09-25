@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { Investor } from '../schemas/investor.schema';
@@ -82,13 +86,5 @@ export class InvestorService {
   // Find investor by email (used for login and authentication)
   async findByEmail(email: string): Promise<Investor | null> {
     return this.investorModel.findOne({ email }).exec();
-  }
-
-  // Validate investor credentials
-  async validatePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
   }
 }

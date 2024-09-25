@@ -85,12 +85,4 @@ export class StartupService {
   async findByEmail(email: string): Promise<Startup | null> {
     return this.startupModel.findOne({ email }).exec();
   }
-
-  // Validate startup password
-  async validatePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
-  }
 }

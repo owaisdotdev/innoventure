@@ -131,4 +131,22 @@ export class AuthController {
       throw new UnauthorizedException('Invalid login credentials');
     }
   }
+
+  // Login for Admins
+  @Post('login/admin')
+  async loginAdmin(@Body() loginDto: LoginDto) {
+    try {
+      const admin = await this.authService.validateAdmin(
+        loginDto.email,
+        loginDto.password,
+      );
+      if (!admin) {
+        throw new UnauthorizedException('Invalid login credentials');
+      }
+      return this.authService.loginAdmin(admin);
+    } catch (error) {
+      console.error('Error during admin login:', error.stack || error.message);
+      throw new UnauthorizedException('Invalid admin credentials');
+    }
+  }
 }
