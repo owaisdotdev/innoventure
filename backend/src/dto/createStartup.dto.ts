@@ -46,12 +46,17 @@ export class FundingNeedsDto {
 }
 
 export class CreateStartupDto {
-  @IsNotEmpty()
-  userId: Types.ObjectId;
-
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
   businessPlan: BusinessPlanDto;
   fundingNeeds: FundingNeedsDto;

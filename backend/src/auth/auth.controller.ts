@@ -2,174 +2,133 @@ import {
   Controller,
   Post,
   Body,
-  BadRequestException,
-  InternalServerErrorException,
-  UnauthorizedException,
-  HttpCode,
   ConflictException,
+  InternalServerErrorException,
+  HttpCode,
+  UnauthorizedException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-} from '@nestjs/swagger'; 
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
-import { UserRole } from '../schemas/user.schema';
 import { InvestorService } from '../investor/investor.service';
 import { StartupService } from '../startup/startup.service';
+import { CreateInvestorDto } from '../dto/createInvestor.dto';
+import { CreateStartupDto } from '../dto/createStartup.dto';
+import { LoginDto } from '../dto/login.dto';
 
-@ApiTags('Auth') 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private userService: UserService,
     private investorService: InvestorService,
     private startupService: StartupService,
   ) {}
 
-  @Post('signup')
-  @ApiOperation({ summary: 'Sign up a new user (Investor/Startup)' }) // Description for the endpoint
-  @ApiResponse({ status: 201, description: 'User successfully created.' })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request - Missing or invalid fields.',
-  })
-  @ApiResponse({ status: 409, description: 'Conflict - Email already in use.' })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error - Something went wrong during signup.',
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', example: 'John Doe' },
-        email: { type: 'string', example: 'john@example.com' },
-        password: { type: 'string', example: 'password123' },
-        role: {
-          type: 'string',
-          example: 'Investor',
-          enum: ['Investor', 'Startup'],
-        },
-        roleSpecificData: {
-          type: 'object',
-          description: 'Role-specific data depending on the user role.',
-        },
-      },
-      required: ['name', 'email', 'password', 'role', 'roleSpecificData'], // Required fields for Swagger
-    },
-  })
-  async signup(
-    @Body('name') name: string,
-    @Body('email') email: string,
-    @Body('password') password: string,
-    @Body('role') role: UserRole,
-    @Body('roleSpecificData') roleSpecificData: any,
-  ) {
+  @Post('signup/investor')
+  @HttpCode(201) // Explicitly set status code
+  async signupInvestor(@Body() createInvestorDto: CreateInvestorDto) {
     try {
-      if (!name || !email || !password || !role) {
-        throw new BadRequestException('Missing required fields');
-      }
-
-      if (role === UserRole.INVESTOR && !roleSpecificData?.profileStatus) {
-        throw new BadRequestException('Missing required fields');
-      }
-
-      const existingUser = await this.userService.findByEmail(email);
-      if (existingUser) {
+      // Check if the email is already registered
+      const existingInvestor = await this.investorService.findByEmail(
+        createInvestorDto.email,
+      );
+      if (existingInvestor) {
         throw new ConflictException('Email already in use');
       }
 
-      const user = await this.userService.createUser(
-        name,
-        email,
-        password,
-        role,
+      // Create the investor and login
+      const investor =
+        await this.investorService.createInvestor(createInvestorDto);
+      return this.authService.loginInvestor(investor);
+    } catch (error) {
+      console.error(
+        'Error during investor signup:',
+        error.stack || error.message,
       );
 
-      // Role-specific handling
-      if (role === UserRole.INVESTOR) {
-        if (!roleSpecificData)
-          throw new BadRequestException('Investor data is required');
-        await this.investorService.createInvestor({
-          userId: user._id,
-          name,
-          email,
-          password,
-          ...roleSpecificData,
-        });
-      } else if (role === UserRole.STARTUP) {
-        if (!roleSpecificData)
-          throw new BadRequestException('Startup data is required');
-        await this.startupService.createStartup({
-          userId: user._id,
-          name,
-          email,
-          password,
-          ...roleSpecificData,
-        });
-      } else {
-        throw new BadRequestException('Invalid role');
+      // If it's a known error, rethrow it, otherwise throw a generic error
+      if (error instanceof ConflictException) {
+        throw error;
       }
 
-      // Return the validated user
-      return this.authService.validateUser(email, password);
-    } catch (error) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof ConflictException
-      ) {
-        throw error; // Rethrow known error
-      }
-
-      console.error('Error during signup:', error.message);
-      throw new InternalServerErrorException('Signup process failed');
+      throw new InternalServerErrorException(
+        'An error occurred during the signup process',
+      );
     }
   }
 
-  @Post('login')
-  @HttpCode(200)
-  @ApiOperation({ summary: 'Log in a user and get an access token' }) // Description for the endpoint
-  @ApiResponse({ status: 200, description: 'Login successful.' })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - Invalid credentials.',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error - Something went wrong during login.',
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        email: { type: 'string', example: 'john@example.com' },
-        password: { type: 'string', example: 'password123' },
-      },
-      required: ['email', 'password'], // Required fields for Swagger
-    },
-  })
-  async login(
-    @Body('email') email: string,
-    @Body('password') password: string,
-  ) {
+  @Post('signup/startup')
+  @HttpCode(201) // Explicitly set status code
+  async signupStartup(@Body() createStartupDto: CreateStartupDto) {
     try {
-      const user = await this.authService.validateUser(email, password);
-
-      if (!user) {
-        throw new UnauthorizedException('Invalid credentials');
+      // Check if the email is already registered
+      const existingStartup = await this.startupService.findByEmail(
+        createStartupDto.email,
+      );
+      if (existingStartup) {
+        throw new ConflictException('Email already in use');
       }
 
-      return this.authService.login(user);
+      // Create the startup and login
+      const startup = await this.startupService.createStartup(createStartupDto);
+      return this.authService.loginStartup(startup);
     } catch (error) {
-      if (error.message === 'Invalid credentials') {
-        throw new UnauthorizedException('Invalid credentials');
+      console.error(
+        'Error during startup signup:',
+        error.stack || error.message,
+      );
+
+      // If it's a known error, rethrow it, otherwise throw a generic error
+      if (error instanceof ConflictException) {
+        throw error;
       }
-      console.error('Error during login:', error.message);
-      throw new InternalServerErrorException('Login failed');
+
+      throw new InternalServerErrorException(
+        'An error occurred during the signup process',
+      );
+    }
+  }
+
+  // Login for Investors
+  @Post('login/investor')
+  @HttpCode(200)
+  async loginInvestor(@Body() loginDto: LoginDto) {
+    try {
+      const investor = await this.authService.validateInvestor(
+        loginDto.email,
+        loginDto.password,
+      );
+      // Check if investor is null and throw an UnauthorizedException
+      if (!investor) {
+        throw new UnauthorizedException('Invalid login credentials');
+      }
+      return this.authService.loginInvestor(investor);
+    } catch (error) {
+      console.error(
+        'Error during investor login:',
+        error.stack || error.message,
+      );
+      throw new UnauthorizedException('Invalid login credentials');
+    }
+  }
+
+  // Login for Startups
+  @Post('login/startup')
+  @HttpCode(200)
+  async loginStartup(@Body() loginDto: LoginDto) {
+    try {
+      const startup = await this.authService.validateStartup(
+        loginDto.email,
+        loginDto.password,
+      );
+      if (!startup) {
+        throw new UnauthorizedException('Invalid login credentials');
+      }
+      return this.authService.loginStartup(startup);
+    } catch (error) {
+      console.error(
+        'Error during startup login:',
+        error.stack || error.message,
+      );
+      throw new UnauthorizedException('Invalid login credentials');
     }
   }
 }

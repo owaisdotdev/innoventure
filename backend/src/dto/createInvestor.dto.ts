@@ -5,7 +5,6 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
-import { Types } from 'mongoose';
 
 export class InvestorPreferencesDto {
   @IsArray()
@@ -36,9 +35,6 @@ export class InvestorCriteriaDto {
 }
 
 export class CreateInvestorDto {
-  @IsNotEmpty()
-  userId: Types.ObjectId;
-
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -50,7 +46,7 @@ export class CreateInvestorDto {
   @IsString()
   @IsNotEmpty()
   password: string;
-
+  
   @IsString()
   @IsNotEmpty()
   profileStatus: string;

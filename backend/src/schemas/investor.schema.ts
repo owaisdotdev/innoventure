@@ -3,17 +3,20 @@ import { Document, Types } from 'mongoose';
 
 @Schema()
 export class Investor extends Document {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ type: String, required: true })
   email: string;
+
+  @Prop({ type: String, required: true })
+  password: string;
 
   @Prop({
     type: {
-      sectors: { type: [String], required: true },
-      regions: { type: [String], required: true },
-      riskTolerance: { type: String, required: true },
+      sectors: { type: [String] },
+      regions: { type: [String] },
+      riskTolerance: { type: String },
     },
   })
   preferences: {
@@ -24,9 +27,9 @@ export class Investor extends Document {
 
   @Prop({
     type: {
-      minInvestment: { type: Number, required: true },
-      maxInvestment: { type: Number, required: true },
-      investmentHorizon: { type: String, required: true },
+      minInvestment: { type: Number },
+      maxInvestment: { type: Number },
+      investmentHorizon: { type: String },
     },
   })
   criteria: {
@@ -35,7 +38,7 @@ export class Investor extends Document {
     investmentHorizon: string;
   };
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   profileStatus: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Investment' }] })
@@ -44,9 +47,9 @@ export class Investor extends Document {
   @Prop({
     type: [
       {
-        type: { type: String, required: true },
-        message: { type: String, required: true },
-        date: { type: Date, required: true },
+        type: { type: String },
+        message: { type: String },
+        date: { type: Date },
       },
     ],
   })

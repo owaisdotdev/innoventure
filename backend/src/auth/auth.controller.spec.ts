@@ -1,19 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
 import { InvestorService } from '../investor/investor.service';
 import { StartupService } from '../startup/startup.service';
-import { UserRole } from '../schemas/user.schema';
 import {
-  UnauthorizedException,
+  ConflictException,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { CreateInvestorDto } from '../dto/createInvestor.dto';
+import { CreateStartupDto } from '../dto/createStartup.dto';
+import { LoginDto } from '../dto/login.dto';
+import { Investor } from '../schemas/investor.schema';
+import { Startup } from 'src/schemas/startup.schema';
+import { Types } from 'mongoose';
 
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  let userService: UserService;
   let investorService: InvestorService;
   let startupService: StartupService;
 
@@ -24,25 +28,23 @@ describe('AuthController', () => {
         {
           provide: AuthService,
           useValue: {
-            validateUser: jest.fn(),
-            login: jest.fn(),
-          },
-        },
-        {
-          provide: UserService,
-          useValue: {
-            createUser: jest.fn(),
+            loginInvestor: jest.fn(),
+            loginStartup: jest.fn(),
+            validateInvestor: jest.fn(),
+            validateStartup: jest.fn(),
           },
         },
         {
           provide: InvestorService,
           useValue: {
+            findByEmail: jest.fn(),
             createInvestor: jest.fn(),
           },
         },
         {
           provide: StartupService,
           useValue: {
+            findByEmail: jest.fn(),
             createStartup: jest.fn(),
           },
         },
@@ -51,236 +53,272 @@ describe('AuthController', () => {
 
     authController = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);
-    userService = module.get<UserService>(UserService);
     investorService = module.get<InvestorService>(InvestorService);
     startupService = module.get<StartupService>(StartupService);
   });
 
-  describe('signup', () => {
-    it('should sign up an investor and return the validated user', async () => {
-      const mockUser = {
-        _id: '123',
-        email: 'test@example.com',
-        role: UserRole.INVESTOR,
-      };
-      const signupData = {
-        name: 'John',
-        email: 'john@example.com',
-        password: 'password123',
-        role: UserRole.INVESTOR,
-        roleSpecificData: {
-          sectors: ['Tech'],
-          regions: ['US'],
-          riskTolerance: 'Medium',
-        },
+  it('should be defined', () => {
+    expect(authController).toBeDefined();
+  });
+
+  describe('signupInvestor', () => {
+    const createInvestorDto: CreateInvestorDto = {
+      name: 'Test Investor',
+      email: 'investor@test.com',
+      password: 'password',
+      profileStatus: 'active',
+      preferences: {
+        sectors: ['tech'],
+        regions: ['US'],
+        riskTolerance: 'medium',
+      },
+      criteria: {
+        minInvestment: 1000,
+        maxInvestment: 5000,
+        investmentHorizon: '5 years',
+      },
+    };
+
+    it('should sign up an investor and return a login token', async () => {
+      const investor: Partial<Investor> = {
+        _id: '12345',
+        name: createInvestorDto.name,
+        email: createInvestorDto.email,
+        password: createInvestorDto.password,
+        profileStatus: createInvestorDto.profileStatus,
+        preferences: createInvestorDto.preferences,
+        criteria: createInvestorDto.criteria,
       };
 
-      // @ts-ignore
-      jest.spyOn(userService, 'createUser').mockResolvedValue(mockUser);
+      jest.spyOn(investorService, 'findByEmail').mockResolvedValue(null);
       jest
         .spyOn(investorService, 'createInvestor')
-        .mockResolvedValue(undefined);
-      // @ts-ignore
-      jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser);
-
-      const result = await authController.signup(
-        signupData.name,
-        signupData.email,
-        signupData.password,
-        signupData.role,
-        signupData.roleSpecificData,
-      );
-
-      expect(userService.createUser).toHaveBeenCalledWith(
-        signupData.name,
-        signupData.email,
-        signupData.password,
-        signupData.role,
-      );
-      expect(investorService.createInvestor).toHaveBeenCalledWith({
-        userId: mockUser._id,
-        ...signupData.roleSpecificData,
+        .mockResolvedValue(investor as Investor);
+      jest.spyOn(authService, 'loginInvestor').mockResolvedValue({
+        access_token: 'login_token',
+        investor: investor,
       });
-      expect(authService.validateUser).toHaveBeenCalledWith(
-        signupData.email,
-        signupData.password,
+
+      const result = await authController.signupInvestor(createInvestorDto);
+      expect(investorService.findByEmail).toHaveBeenCalledWith(
+        createInvestorDto.email,
       );
-      expect(result).toEqual(mockUser);
+      expect(investorService.createInvestor).toHaveBeenCalledWith(
+        createInvestorDto,
+      );
+      expect(authService.loginInvestor).toHaveBeenCalledWith(investor);
+      expect(result).toEqual({
+        access_token: 'login_token',
+        investor: investor,
+      });
     });
 
-    it('should sign up a startup and return the validated user', async () => {
-      const mockUser = {
-        _id: '123',
-        email: 'startup@example.com',
-        role: UserRole.STARTUP,
-      };
-      const signupData = {
-        name: 'Startup Co',
-        email: 'startup@example.com',
-        password: 'password123',
-        role: UserRole.STARTUP,
-        roleSpecificData: {
-          businessPlan: {
-            description: 'Plan',
-            industry: 'Tech',
-            team: ['Alice', 'Bob'],
-          },
-          fundingNeeds: { totalAmount: 100000, milestones: [] },
-        },
+    it('should throw a ConflictException if email is already registered', async () => {
+      const mockInvestor: Partial<Investor> = {
+        _id: '123456', // Simulated MongoDB ObjectId
+        name: createInvestorDto.name,
+        email: createInvestorDto.email,
+        password: createInvestorDto.password,
+        profileStatus: createInvestorDto.profileStatus,
+        preferences: createInvestorDto.preferences,
+        criteria: createInvestorDto.criteria,
+        investments: [],
+        notifications: [],
       };
 
-      // @ts-ignore
-      jest.spyOn(userService, 'createUser').mockResolvedValue(mockUser);
-      jest.spyOn(startupService, 'createStartup').mockResolvedValue(undefined);
-      // @ts-ignore
-      jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser);
-
-      const result = await authController.signup(
-        signupData.name,
-        signupData.email,
-        signupData.password,
-        signupData.role,
-        signupData.roleSpecificData,
-      );
-
-      expect(userService.createUser).toHaveBeenCalledWith(
-        signupData.name,
-        signupData.email,
-        signupData.password,
-        signupData.role,
-      );
-      expect(startupService.createStartup).toHaveBeenCalledWith({
-        userId: mockUser._id,
-        ...signupData.roleSpecificData,
-      });
-      expect(authService.validateUser).toHaveBeenCalledWith(
-        signupData.email,
-        signupData.password,
-      );
-      expect(result).toEqual(mockUser);
-    });
-
-    it('should throw InternalServerErrorException if creating user fails', async () => {
-      const signupData = {
-        name: 'John',
-        email: 'john@example.com',
-        password: 'password123',
-        role: UserRole.INVESTOR,
-        roleSpecificData: {
-          sectors: ['Tech'],
-          regions: ['US'],
-          riskTolerance: 'Medium',
-        },
-      };
-
+      // Mock `findByEmail` to return an existing investor object
       jest
-        .spyOn(userService, 'createUser')
-        .mockRejectedValue(new Error('User creation failed'));
+        .spyOn(investorService, 'findByEmail')
+        .mockResolvedValue(mockInvestor as Investor);
+
+      // Expect that ConflictException will be thrown
+      await expect(
+        authController.signupInvestor(createInvestorDto),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw an InternalServerErrorException on error', async () => {
+      jest
+        .spyOn(investorService, 'findByEmail')
+        .mockRejectedValue(new Error('Some error'));
 
       await expect(
-        authController.signup(
-          signupData.name,
-          signupData.email,
-          signupData.password,
-          signupData.role,
-          signupData.roleSpecificData,
-        ),
+        authController.signupInvestor(createInvestorDto),
       ).rejects.toThrow(InternalServerErrorException);
-
-      expect(userService.createUser).toHaveBeenCalledWith(
-        signupData.name,
-        signupData.email,
-        signupData.password,
-        signupData.role,
-      );
-      expect(investorService.createInvestor).not.toHaveBeenCalled();
-    });
-
-    it('should throw InternalServerErrorException and rollback if investor creation fails', async () => {
-      const mockUser = {
-        _id: '123',
-        email: 'test@example.com',
-        role: UserRole.INVESTOR,
-      };
-      const signupData = {
-        name: 'John',
-        email: 'john@example.com',
-        password: 'password123',
-        role: UserRole.INVESTOR,
-        roleSpecificData: {
-          sectors: ['Tech'],
-          regions: ['US'],
-          riskTolerance: 'Medium',
-        },
-      };
-
-      // @ts-ignore
-      jest.spyOn(userService, 'createUser').mockResolvedValue(mockUser);
-      jest
-        .spyOn(investorService, 'createInvestor')
-        .mockRejectedValue(new Error('Investor creation failed'));
-
-      await expect(
-        authController.signup(
-          signupData.name,
-          signupData.email,
-          signupData.password,
-          signupData.role,
-          signupData.roleSpecificData,
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
-
-      expect(userService.createUser).toHaveBeenCalledWith(
-        signupData.name,
-        signupData.email,
-        signupData.password,
-        signupData.role,
-      );
-      expect(investorService.createInvestor).toHaveBeenCalledWith({
-        userId: mockUser._id,
-        ...signupData.roleSpecificData,
-      });
     });
   });
 
-  describe('login', () => {
-    it('should return a valid access token for a correct email and password', async () => {
-      const mockUser = {
-        _id: '123',
-        email: 'test@example.com',
-        password: 'hashedPassword',
+  describe('signupStartup', () => {
+    const createStartupDto: CreateStartupDto = {
+      name: 'Test Startup',
+      email: 'startup@test.com',
+      password: 'password',
+      businessPlan: {
+        description: 'A great startup',
+        industry: 'tech',
+        team: ['Alice', 'Bob'],
+      },
+      fundingNeeds: {
+        totalAmount: 1000000,
+        milestones: [
+          {
+            // @ts-ignore
+            milestoneId: '123456', // MilestoneDto uses string for milestoneId
+            description: 'MVP release',
+            dueDate: new Date(),
+            fundingRequired: 500000,
+            status: 'Pending', // Include the status field as required by the schema
+          },
+        ],
+      },
+    };
+    
+    it('should sign up a startup and return a login token', async () => {
+      const startup: Partial<Startup> = {
+        ...createStartupDto,
+        id: '12345',
+        fundingNeeds: {
+          totalAmount: 1000000,
+          milestones: [
+            {
+              milestoneId: new Types.ObjectId(), // Use ObjectId for milestoneId
+              description: 'MVP release',
+              dueDate: new Date(),
+              fundingRequired: 500000,
+              status: 'Pending', // Ensure status is included as per the schema
+            },
+          ],
+        },
       };
-      const mockToken = { access_token: 'jwt_token' };
-
-      // @ts-ignore
-      jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser);
-      jest.spyOn(authService, 'login').mockResolvedValue(mockToken);
-
-      const result = await authController.login(
-        'test@example.com',
-        'validPassword',
+    
+      jest.spyOn(startupService, 'findByEmail').mockResolvedValue(null);
+      jest
+        .spyOn(startupService, 'createStartup')
+        .mockResolvedValue(startup as Startup);
+      jest.spyOn(authService, 'loginStartup').mockResolvedValue({
+        access_token: 'login_token',
+        startup: startup,
+      });
+    
+      const result = await authController.signupStartup(createStartupDto);
+    
+      expect(startupService.findByEmail).toHaveBeenCalledWith(
+        createStartupDto.email,
       );
-
-      expect(authService.validateUser).toHaveBeenCalledWith(
-        'test@example.com',
-        'validPassword',
-      );
-      expect(authService.login).toHaveBeenCalledWith(mockUser);
-      expect(result).toEqual(mockToken);
+      expect(startupService.createStartup).toHaveBeenCalledWith(createStartupDto);
+      expect(authService.loginStartup).toHaveBeenCalledWith(startup);
+      expect(result).toEqual({
+        access_token: 'login_token',
+        startup: startup,
+      });
     });
+    
 
-    it('should throw an UnauthorizedException for invalid credentials', async () => {
-      jest.spyOn(authService, 'validateUser').mockResolvedValue(null); // Simulate invalid credentials
+    it('should throw a ConflictException if email is already registered', async () => {
+      const startup: Partial<Startup> = {
+        ...createStartupDto,
+        id: '12345',
+        fundingNeeds: {
+          totalAmount: 1000000,
+          milestones: [
+            {
+              milestoneId: new Types.ObjectId(), // Use ObjectId for milestoneId
+              description: 'MVP release',
+              dueDate: new Date(),
+              fundingRequired: 500000,
+              status: 'Pending', // Ensure status is included as per the schema
+            },
+          ],
+        },
+      };
+
+      jest
+        .spyOn(startupService, 'findByEmail')
+        .mockResolvedValue(startup as Startup);
 
       await expect(
-        authController.login('invalid@example.com', 'wrongPassword'),
-      ).rejects.toThrow(UnauthorizedException); // This will now correctly expect UnauthorizedException
+        authController.signupStartup(createStartupDto),
+      ).rejects.toThrow(ConflictException);
+    });
 
-      expect(authService.validateUser).toHaveBeenCalledWith(
-        'invalid@example.com',
-        'wrongPassword',
+    it('should throw an InternalServerErrorException on error', async () => {
+      jest
+        .spyOn(startupService, 'findByEmail')
+        .mockRejectedValue(new Error('Some error'));
+
+      await expect(
+        authController.signupStartup(createStartupDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+  });
+
+  describe('loginInvestor', () => {
+    const loginDto: LoginDto = {
+      email: 'investor@test.com',
+      password: 'password',
+    };
+
+    it('should login an investor and return a token', async () => {
+      const investor = { id: '12345', email: loginDto.email };
+      jest.spyOn(authService, 'validateInvestor').mockResolvedValue(investor);
+      jest.spyOn(authService, 'loginInvestor').mockResolvedValue({
+        access_token: 'login_token',
+        investor: investor,
+      });
+
+      const result = await authController.loginInvestor(loginDto);
+      expect(authService.validateInvestor).toHaveBeenCalledWith(
+        loginDto.email,
+        loginDto.password,
       );
-      expect(authService.login).not.toHaveBeenCalled();
+      expect(authService.loginInvestor).toHaveBeenCalledWith(investor);
+      expect(result).toEqual({
+        access_token: 'login_token',
+        investor: investor,
+      });
+    });
+
+    it('should throw UnauthorizedException for invalid credentials', async () => {
+      jest.spyOn(authService, 'validateInvestor').mockResolvedValue(null);
+
+      await expect(authController.loginInvestor(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+  });
+
+  describe('loginStartup', () => {
+    const loginDto: LoginDto = {
+      email: 'startup@test.com',
+      password: 'password',
+    };
+
+    it('should login a startup and return a token', async () => {
+      const startup = { id: '12345', email: loginDto.email };
+      jest.spyOn(authService, 'validateStartup').mockResolvedValue(startup);
+      jest.spyOn(authService, 'loginStartup').mockResolvedValue({
+        access_token: 'login_token',
+        startup: startup,
+      });
+
+      const result = await authController.loginStartup(loginDto);
+      expect(authService.validateStartup).toHaveBeenCalledWith(
+        loginDto.email,
+        loginDto.password,
+      );
+      expect(authService.loginStartup).toHaveBeenCalledWith(startup);
+      expect(result).toEqual({
+        access_token: 'login_token',
+        startup: startup,
+      });
+    });
+
+    it('should throw UnauthorizedException for invalid credentials', async () => {
+      jest.spyOn(authService, 'validateStartup').mockResolvedValue(null);
+
+      await expect(authController.loginStartup(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

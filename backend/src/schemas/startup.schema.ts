@@ -3,8 +3,14 @@ import { Document, Types } from 'mongoose';
 
 @Schema()
 export class Startup extends Document {
-  @Prop({ required: true })
-  name: string;
+  @Prop({ type: String, required: true })
+  name: string
+
+  @Prop({ type: String, required: true })
+  email: string
+
+  @Prop({ type: String, required: true })
+  password: string
 
   @Prop({
     type: {
@@ -14,6 +20,7 @@ export class Startup extends Document {
     },
     required: true,
   })
+  
   businessPlan: {
     description: string;
     industry: string;
