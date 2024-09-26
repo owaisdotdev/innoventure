@@ -16,7 +16,6 @@ export class InvestorService {
     @InjectModel(Investor.name) private investorModel: Model<Investor>,
   ) {}
 
-  // Create a new investor with hashed password
   async createInvestor(
     createInvestorDto: CreateInvestorDto,
   ): Promise<Investor> {
@@ -28,12 +27,10 @@ export class InvestorService {
     return createdInvestor;
   }
 
-  // Find all investors
   async findAllInvestors(): Promise<Investor[]> {
     return this.investorModel.find().exec();
   }
 
-  // Find an investor by ID
   async findInvestorById(investorId: string): Promise<Investor> {
     if (!isValidObjectId(investorId)) {
       throw new BadRequestException(`Invalid ID format`);
@@ -47,7 +44,10 @@ export class InvestorService {
     return investor;
   }
 
-  // Update an investor
+  async findByEmail(email: string): Promise<Investor | null> {
+    return this.investorModel.findOne({ email }).exec();
+  }
+
   async updateInvestor(
     investorId: string,
     updateInvestorDto: UpdateInvestorDto,
@@ -70,8 +70,7 @@ export class InvestorService {
     return updatedInvestor;
   }
 
-  // Delete an investor
-  async deleteInvestor(investorId: string): Promise<void> {
+  async deleteInvestor(investorId: string): Promise<Boolean> {
     if (!isValidObjectId(investorId)) {
       throw new BadRequestException(`Invalid ID format`);
     }
@@ -81,10 +80,50 @@ export class InvestorService {
     if (!result) {
       throw new NotFoundException('Investor not found');
     }
+    return true;
   }
 
-  // Find investor by email (used for login and authentication)
-  async findByEmail(email: string): Promise<Investor | null> {
-    return this.investorModel.findOne({ email }).exec();
+  // Getter Functions
+
+  async findBySector(sector: string): Promise<Investor[]> {
+    return this.investorModel.find({ 'preferences.sectors': sector }).exec();
+  }
+
+  async findByRegion(region: string): Promise<Investor[]> {
+    return this.investorModel.find({ 'preferences.regions': region }).exec();
+  }
+
+  async findByRiskTolerance(riskTolerance: string): Promise<Investor[]> {
+    return this.investorModel
+      .find({ 'preferences.riskTolerance': riskTolerance })
+      .exec();
+  }
+
+  async findByMinInvestment(minInvestment: number): Promise<Investor[]> {
+    return this.investorModel
+      .find({ 'criteria.minInvestment': { $gte: minInvestment } })
+      .exec();
+  }
+
+  async findByMaxInvestment(maxInvestment: number): Promise<Investor[]> {
+    return this.investorModel
+      .find({ 'criteria.maxInvestment': { $lte: maxInvestment } })
+      .exec();
+  }
+
+  async findByInvestmentRange(
+    minInvestment: number,
+    maxInvestment: number,
+  ): Promise<Investor[]> {
+    return this.investorModel
+      .find({
+        'criteria.minInvestment': { $lte: maxInvestment }, // Min investment <= max specified range
+        'criteria.maxInvestment': { $gte: minInvestment }, // Max investment >= min specified range
+      })
+      .exec();
+  }
+
+  async findByProfileStatus(profileStatus: string): Promise<Investor[]> {
+    return this.investorModel.find({ profileStatus }).exec();
   }
 }

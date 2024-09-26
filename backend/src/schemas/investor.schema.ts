@@ -42,7 +42,7 @@ export class Investor extends Document {
   profileStatus: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Investment' }] })
-  investments: Types.ObjectId[]; // List of investments
+  investments: Types.ObjectId[]; 
 
   @Prop({
     type: [
