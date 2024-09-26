@@ -205,7 +205,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="admin/analytics"
+                              to="/admin/analytics"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
@@ -221,7 +221,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="admin/activity"
+                              to="/admin/activity"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
@@ -285,7 +285,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/user-management/investors"
+                            to="/admin/investors"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -301,7 +301,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/user-management/startups"
+                            to="/admin/startups"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -317,7 +317,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/user-management/fydp-projects"
+                            to="/admin/fydp-projects"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -333,7 +333,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/user-management/permissions"
+                            to="/admin/permissions"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -396,7 +396,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investment-management/pending-approvals"
+                            to="/admin/pending-approvals"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -412,7 +412,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investment-management/active-investments"
+                            to="/admin/active-investments"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -428,7 +428,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investment-management/completed-investments"
+                            to="/admin/completed-investments"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -444,7 +444,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investment-management/disputes"
+                            to="/admin/disputes"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -508,7 +508,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/reports-analytics/financial-reports"
+                            to="/admin/financial-reports"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -524,7 +524,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/reports-analytics/user-insights"
+                            to="/admin/user-insights"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -540,7 +540,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/reports-analytics/platform-metrics"
+                            to="/admin/platform-metrics"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -604,7 +604,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/smart-contracts/contract-creation"
+                            to="/admin/contract-creation"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -620,7 +620,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/smart-contracts/contract-management"
+                            to="/admin/contract-management"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -684,7 +684,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/admin/settings/general"
+                              to="/admin/general"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
@@ -700,7 +700,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/admin/settings/security"
+                              to="/admin/security"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
@@ -716,7 +716,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/admin/settings/notifications"
+                              to="/admin/notifications"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
