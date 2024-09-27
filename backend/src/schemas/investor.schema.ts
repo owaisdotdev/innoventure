@@ -42,7 +42,7 @@ export class Investor extends Document {
   profileStatus: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Investment' }] })
-  investments: Types.ObjectId[]; 
+  investments: Types.ObjectId[];
 
   @Prop({
     type: [
@@ -58,6 +58,12 @@ export class Investor extends Document {
     message: string;
     date: Date;
   }[];
+
+  @Prop({ type: String })
+  resetCode: string;
+
+  @Prop({ type: Date })
+  resetCodeExpiration: Date;
 }
 
 export const InvestorSchema = SchemaFactory.createForClass(Investor);

@@ -196,7 +196,6 @@ import { AppModule } from './../src/app.module';
 // });
 
 
-
 describe('InvestorController (e2e)', () => {
   let app: INestApplication;
   let token: string;
@@ -322,7 +321,7 @@ describe('InvestorController (e2e)', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
     expect(
-      JSON.parse(JSON.stringify(response.body))[0].preferences.sectors,
+      response.body[0].preferences.sectors,
     ).toContain('Tech');
   });
 
@@ -334,7 +333,7 @@ describe('InvestorController (e2e)', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
     expect(
-      JSON.parse(JSON.stringify(response.body))[0].preferences.regions,
+      response.body[0].preferences.regions,
     ).toContain('US');
   });
 
@@ -346,7 +345,7 @@ describe('InvestorController (e2e)', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
     expect(
-      JSON.parse(JSON.stringify(response.body))[0].preferences.riskTolerance,
+      response.body[0].preferences.riskTolerance,
     ).toBe('High');
   });
 

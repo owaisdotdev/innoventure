@@ -176,4 +176,27 @@ export class AuthController {
       throw new UnauthorizedException('Invalid admin credentials');
     }
   }
+
+  @Post('request-password-reset')
+  async requestPasswordReset(
+    @Body('email') email: string,
+    @Body('role') role: 'investor' | 'startup' | 'admin',
+  ) {
+    return await this.authService.requestPasswordReset(email, role);
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body('email') email: string,
+    @Body('role') role: 'investor' | 'startup' | 'admin',
+    @Body('resetCode') resetCode: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    return await this.authService.resetPassword(
+      email,
+      role,
+      resetCode,
+      newPassword,
+    );
+  }
 }

@@ -108,6 +108,12 @@ export class Startup extends Document {
     message: string;
     date: Date;
   }[];
+
+  @Prop({ type: String })
+  resetCode: string;
+
+  @Prop({ type: Date })
+  resetCodeExpiration: Date;
 }
 
 export const StartupSchema = SchemaFactory.createForClass(Startup);
