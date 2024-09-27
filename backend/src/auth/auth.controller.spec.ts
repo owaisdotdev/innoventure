@@ -170,7 +170,7 @@ describe('AuthController', () => {
       businessPlan: {
         description: 'A great startup',
         industry: 'tech',
-      }
+      },
     };
 
     it('should sign up a startup and return a login token', async () => {
@@ -359,19 +359,24 @@ describe('AuthController', () => {
       const email = 'test@example.com';
       const role = 'investor';
 
-      await authController.requestPasswordReset(email, role);
+      await authController.requestPasswordReset({ email, role });
 
-      expect(authService.requestPasswordReset).toHaveBeenCalledWith(email, role);
+      expect(authService.requestPasswordReset).toHaveBeenCalledWith(
+        email,
+        role,
+      );
     });
 
     it('should return the result from AuthService', async () => {
       const email = 'test@example.com';
       const role = 'investor';
       const mockResult = { message: 'Reset code sent to your email.' };
-      
-      jest.spyOn(authService, 'requestPasswordReset').mockResolvedValue(mockResult);
 
-      const result = await authController.requestPasswordReset(email, role);
+      jest
+        .spyOn(authService, 'requestPasswordReset')
+        .mockResolvedValue(mockResult);
+
+      const result = await authController.requestPasswordReset({ email, role });
 
       expect(result).toEqual(mockResult);
     });
@@ -384,7 +389,12 @@ describe('AuthController', () => {
       const resetCode = '123456';
       const newPassword = 'newPassword123';
 
-      await authController.resetPassword(email, role, resetCode, newPassword);
+      await authController.resetPassword({
+        email,
+        role,
+        resetCode,
+        newPassword,
+      });
 
       expect(authService.resetPassword).toHaveBeenCalledWith(
         email,
@@ -403,12 +413,12 @@ describe('AuthController', () => {
 
       jest.spyOn(authService, 'resetPassword').mockResolvedValue(mockResult);
 
-      const result = await authController.resetPassword(
+      const result = await authController.resetPassword({
         email,
         role,
         resetCode,
         newPassword,
-      );
+      });
 
       expect(result).toEqual(mockResult);
     });
