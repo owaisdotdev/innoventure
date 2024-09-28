@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ParseIntPipe } from '@nestjs/common';
 import { AdminGuard } from '../guards/role.guard';
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Investor } from 'src/schemas/investor.schema';
+import { Investor } from '../schemas/investor.schema';
 
 @ApiTags('Investors')
 @Controller('investors')

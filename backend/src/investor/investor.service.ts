@@ -59,7 +59,7 @@ export class InvestorService {
       .findByIdAndUpdate(
         investorId,
         { $set: updateInvestorDto },
-        { new: true }, // Return the updated document
+        { new: true }, 
       )
       .exec();
 
