@@ -4,6 +4,7 @@ import {
   IsDate,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { Types } from 'mongoose';
@@ -26,38 +27,6 @@ export class BusinessPlanDto {
   industry: string;
 }
 
-export class MilestoneDto {
-  @ApiProperty({
-    description: 'Unique ID for the milestone',
-    example: '64b4df7e21f0760011acb5b7',
-  })
-  milestoneId: Types.ObjectId;
-
-  @ApiProperty({
-    description: 'Description of the milestone',
-    example: 'Complete MVP by Q4',
-  })
-  @IsString()
-  @IsNotEmpty()
-  description: string;
-
-  @ApiProperty({
-    description: 'Due date for the milestone',
-    example: '2024-12-31',
-  })
-  @IsDate()
-  @IsNotEmpty()
-  dueDate: Date;
-
-  @ApiProperty({
-    description: 'Funding required for this milestone',
-    example: 50000,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  fundingRequired: number;
-}
-
 export class FundingNeedsDto {
   @ApiProperty({
     description: 'Total funding required for the startup',
@@ -69,9 +38,9 @@ export class FundingNeedsDto {
 
   @ApiProperty({
     description: 'List of milestones for the startup',
-    type: [MilestoneDto],
+    type: [Types.ObjectId],
   })
-  milestones: MilestoneDto[];
+  milestones: Types.ObjectId[];
 }
 
 export class CreateStartupDto {
@@ -104,4 +73,11 @@ export class CreateStartupDto {
     type: BusinessPlanDto,
   })
   businessPlan: BusinessPlanDto;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Business plan details',
+    type: FundingNeedsDto,
+  })
+  fundingNeeds: FundingNeedsDto;
 }

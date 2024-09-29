@@ -26,35 +26,13 @@ export class Startup extends Document {
 
   @Prop({
     type: {
-      totalAmount: { type: Number, required: true }, // Total funding required
-      milestones: [
-        {
-          milestoneId: {
-            type: Types.ObjectId,
-            ref: 'Milestone',
-            required: true,
-          },
-          description: { type: String, required: true },
-          dueDate: { type: Date, required: true },
-          fundingRequired: { type: Number, required: true },
-          status: {
-            type: String,
-            enum: ['Pending', 'Completed'],
-            default: 'Pending',
-          },
-        },
-      ],
+      totalAmount: { type: Number, required: true },
+      milestones: [{ type: Types.ObjectId, ref: 'Milestone' }],
     },
   })
   fundingNeeds: {
     totalAmount: number;
-    milestones: {
-      milestoneId: Types.ObjectId;
-      description: string;
-      dueDate: Date;
-      fundingRequired: number;
-      status: string;
-    }[];
+    milestones: Types.ObjectId[];
   };
 
   @Prop({

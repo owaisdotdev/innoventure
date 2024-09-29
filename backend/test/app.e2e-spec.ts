@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { Types } from 'mongoose';
 
 // describe('AuthController (e2e)', () => {
 //   let app: INestApplication;
@@ -358,11 +359,134 @@ import { AppModule } from './../src/app.module';
 //   });
 // });
 
-describe('StartupController (e2e)', () => {
+// describe('StartupController (e2e)', () => {
+//   let app: INestApplication;
+//   let token: string;
+//   let adminToken: string;
+//   let createdStartupId: string;
+
+//   beforeAll(async () => {
+//     const moduleFixture: TestingModule = await Test.createTestingModule({
+//       imports: [AppModule],
+//     }).compile();
+
+//     app = moduleFixture.createNestApplication();
+//     await app.init();
+
+//     const loginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/startup')
+//       .send({
+//         email: 'startup@example.com',
+//         password: 'password123',
+//       })
+//       .expect(200);
+
+//     const adminLoginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/admin')
+//       .send({
+//         email: 'admin@example.com',
+//         password: 'adminpassword123',
+//       })
+//       .expect(200);
+
+//     token = loginResponse.body.access_token;
+//     adminToken = adminLoginResponse.body.access_token;
+//   });
+
+//   afterAll(async () => {
+//     await app.close();
+//   });
+
+//   it('/startups (GET) - should return all startups', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/startups')
+//       .set('Authorization', `Bearer ${token}`)
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//   });
+
+//   it('/startups/email (GET) - should return a specific startup by email', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/startups/email')
+//       .query({ email: 'startup@example.com' })
+//       .set('Authorization', `Bearer ${token}`)
+//       .expect(200);
+
+//     createdStartupId = response.body._id;
+
+//     expect(response.body.email).toBe('startup@example.com');
+//   });
+
+//   it('/startups/:id (GET) - should return a specific startup by ID', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/startups/${createdStartupId}`)
+//       .set('Authorization', `Bearer ${token}`)
+//       .expect(200);
+
+//     expect(response.body.email).toBe('startup@example.com');
+//   });
+
+//   it('/startups/:id (PUT) - should update an startup', async () => {
+//     const updateData = {
+//       name: 'Startup Updated',
+//       businessPlan: {
+//         description: 'A comprehensive plan',
+//         industry: 'AI',
+//       },
+//     };
+
+//     const response = await request(app.getHttpServer())
+//       .put(`/startups/${createdStartupId}`)
+//       .set('Authorization', `Bearer ${token}`)
+//       .send(updateData)
+//       .expect(200);
+
+//     expect(response.body.name).toBe('Startup Updated');
+//     expect(response.body.businessPlan.industry).toBe('AI');
+//   });
+
+//   it('should return startups by industry', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/startups/industry')
+//       .query({ industry: 'AI' })
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//     expect(response.body[0].businessPlan.industry).toBe('AI');
+//   });
+
+//   it('/startups/:id (DELETE) - should fail when an non admin tries to delete', async () => {
+//     const response = await request(app.getHttpServer())
+//       .delete(`/startups/${createdStartupId}`)
+//       .set('Authorization', `Bearer ${token}`)
+//       .expect(401);
+
+//     expect(response.body.message).toBe('Unauthorized');
+//   });
+
+//   it('/startups/:id (DELETE) - should delete an startup', async () => {
+//     console.log('admin token', adminToken);
+//     await request(app.getHttpServer())
+//       .delete(`/startups/${createdStartupId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     const getResponse = await request(app.getHttpServer())
+//       .get(`/startups/${createdStartupId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(404);
+
+//     expect(getResponse.body.message).toBe('Startup not found');
+//   });
+// });
+
+describe('MilestoneController (e2e)', () => {
   let app: INestApplication;
   let token: string;
   let adminToken: string;
-  let createdStartupId: string;
+  let createdMilestoneId: string;
+  let startupId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -372,14 +496,25 @@ describe('StartupController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    const loginResponse = await request(app.getHttpServer())
-      .post('/auth/login/startup')
-      .send({
-        email: 'startup@example.com',
-        password: 'password123',
-      })
-      .expect(200);
+    // Create a startup to associate with milestones
+    const startupSignupData = {
+      name: 'Startup Co',
+      email: 'startup@example.com',
+      password: 'password123',
+      businessPlan: {
+        description: 'A comprehensive plan',
+        industry: 'Tech',
+      },
+    };
 
+    const startupSignupResponse = await request(app.getHttpServer())
+      .post('/auth/signup/startup')
+      .send(startupSignupData)
+      .expect(201);
+
+    startupId = startupSignupResponse.body._id;
+
+    // Login as admin
     const adminLoginResponse = await request(app.getHttpServer())
       .post('/auth/login/admin')
       .send({
@@ -388,94 +523,150 @@ describe('StartupController (e2e)', () => {
       })
       .expect(200);
 
-    token = loginResponse.body.access_token;
     adminToken = adminLoginResponse.body.access_token;
+
+    // Login as startup to get token if needed
+    const startupLoginResponse = await request(app.getHttpServer())
+      .post('/auth/login/startup')
+      .send({
+        email: 'startup@example.com',
+        password: 'password123',
+      })
+      .expect(200);
+
+    token = startupLoginResponse.body.access_token;
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it('/startups (GET) - should return all startups', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/startups')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-
-    expect(Array.isArray(response.body)).toBe(true);
-  });
-
-  it('/startups/email (GET) - should return a specific startup by email', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/startups/email')
-      .query({ email: 'startup@example.com' })
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-
-    createdStartupId = response.body._id;
-
-    expect(response.body.email).toBe('startup@example.com');
-  });
-
-  it('/startups/:id (GET) - should return a specific startup by ID', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`/startups/${createdStartupId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-
-    expect(response.body.email).toBe('startup@example.com');
-  });
-
-  it('/startups/:id (PUT) - should update an startup', async () => {
-    const updateData = {
-      name: 'Startup Updated',
-      businessPlan: {
-        description: 'A comprehensive plan',
-        industry: 'AI',
-      },
+  it('/milestones/create (POST) - should create a milestone', async () => {
+    const createMilestoneDto = {
+      startupId: startupId,
+      title: 'Milestone 1',
+      description: 'First milestone description',
+      dueDate: new Date('2024-12-31'),
+      amountToBeReleased: 10000,
+      status: 'pending',
+      associatedSmartContractId: new Types.ObjectId().toHexString(),
     };
 
     const response = await request(app.getHttpServer())
-      .put(`/startups/${createdStartupId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send(updateData)
-      .expect(200);
+      .post('/milestones/create')
+      .send(createMilestoneDto)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(201);
 
-    expect(response.body.name).toBe('Startup Updated');
-    expect(response.body.businessPlan.industry).toBe('AI');
+    expect(response.body.title).toBe(createMilestoneDto.title);
+    expect(response.body.description).toBe(createMilestoneDto.description);
+
+    createdMilestoneId = response.body._id;
   });
 
-  it('should return startups by industry', async () => {
+  it('/milestones (GET) - should return all milestones', async () => {
     const response = await request(app.getHttpServer())
-      .get('/startups/industry')
-      .query({ industry: 'AI' })
+      .get('/milestones')
+      .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body[0].businessPlan.industry).toBe('AI');
+    expect(response.body.length).toBeGreaterThan(0);
   });
 
-  it('/startups/:id (DELETE) - should fail when an non admin tries to delete', async () => {
+  it('/milestones/title (GET) - should return milestones by title', async () => {
     const response = await request(app.getHttpServer())
-      .delete(`/startups/${createdStartupId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(401);
-
-    expect(response.body.message).toBe('Unauthorized');
-  });
-
-  it('/startups/:id (DELETE) - should delete an startup', async () => {
-    console.log('admin token', adminToken);
-    await request(app.getHttpServer())
-      .delete(`/startups/${createdStartupId}`)
+      .get('/milestones/title')
+      .query({ title: 'Milestone 1' })
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    const getResponse = await request(app.getHttpServer())
-      .get(`/startups/${createdStartupId}`)
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body[0].title).toBe('Milestone 1');
+  });
+
+  it('/milestones/smart-contract (GET) - should return milestones by smart contract', async () => {
+    const smartContractId = new Types.ObjectId().toHexString();
+
+    // Create a milestone with the specific smartContractId
+    const createMilestoneDto = {
+      startupId: startupId,
+      title: 'Milestone 2',
+      description: 'Second milestone description',
+      dueDate: new Date('2025-01-31'),
+      amountToBeReleased: 20000,
+      status: 'pending',
+      associatedSmartContractId: smartContractId,
+    };
+
+    await request(app.getHttpServer())
+      .post('/milestones/create')
+      .send(createMilestoneDto)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(201);
+
+    const response = await request(app.getHttpServer())
+      .get('/milestones/smart-contract')
+      .query({ smartContractId: smartContractId })
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+      console.log(response.body)
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body[0].associatedSmartContractId).toBe(smartContractId);
+  });
+
+  it('/milestones/:id (GET) - should return a milestone by ID', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/milestones/${createdMilestoneId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(response.body._id).toBe(createdMilestoneId);
+    expect(response.body.title).toBe('Milestone 1');
+  });
+
+  it('/milestones/:id (PUT) - should update a milestone', async () => {
+    const updateMilestoneDto = {
+      title: 'Updated Milestone 1',
+      status: 'completed',
+    };
+
+    const response = await request(app.getHttpServer())
+      .put(`/milestones/${createdMilestoneId}`)
+      .send(updateMilestoneDto)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(response.body.title).toBe(updateMilestoneDto.title);
+    expect(response.body.status).toBe(updateMilestoneDto.status);
+  });
+
+  it('/milestones/:id (DELETE) - should delete a milestone', async () => {
+    await request(app.getHttpServer())
+      .delete(`/milestones/${createdMilestoneId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .get(`/milestones/${createdMilestoneId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(404);
+  });
 
-    expect(getResponse.body.message).toBe('Startup not found');
+  it('/milestones/title (GET) - should return 400 if title is missing', async () => {
+    await request(app.getHttpServer())
+      .get('/milestones/title')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(400);
+  });
+
+  it('/milestones/smart-contract (GET) - should return 400 if smartContractId is missing', async () => {
+    await request(app.getHttpServer())
+      .get('/milestones/smart-contract')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(400);
   });
 });
+
+

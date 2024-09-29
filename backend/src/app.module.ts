@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AdminModule } from './admin/admin.module';
 import { EmailModule } from './email/email.module';
+import { MilestoneModule } from './milestone/milestone.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EmailModule } from './email/email.module';
     AuthModule,
     AdminModule,
     EmailModule,
+    MilestoneModule,
   ],
   controllers: [AppController],
   providers: [AppService],

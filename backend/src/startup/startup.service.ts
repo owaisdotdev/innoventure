@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId } from 'mongoose';
+import { Model, Types, isValidObjectId } from 'mongoose';
 import { Startup } from '../schemas/startup.schema';
 import { CreateStartupDto } from '../dto/createStartup.dto';
 import { UpdateStartupDto } from '../dto/updateStartup.dto';
@@ -67,6 +67,17 @@ export class StartupService {
     }
 
     return updatedStartup;
+  }
+
+  async addMilestoneToStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void> {
+    const result = await this.startupModel.updateOne(
+      { _id: startupId },
+      { $push: { 'fundingNeeds.milestones': milestoneId } },
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundException(`Startup with ID ${startupId} not found`);
+    }
   }
 
   async deleteStartup(id: string): Promise<Boolean> {

@@ -171,6 +171,10 @@ describe('AuthController', () => {
         description: 'A great startup',
         industry: 'tech',
       },
+      fundingNeeds: {
+        milestones: [],
+        totalAmount: 1000
+      }
     };
 
     it('should sign up a startup and return a login token', async () => {
@@ -179,15 +183,7 @@ describe('AuthController', () => {
         id: '12345',
         fundingNeeds: {
           totalAmount: 1000000,
-          milestones: [
-            {
-              milestoneId: new Types.ObjectId(), // Use ObjectId for milestoneId
-              description: 'MVP release',
-              dueDate: new Date(),
-              fundingRequired: 500000,
-              status: 'Pending', // Ensure status is included as per the schema
-            },
-          ],
+          milestones: [new Types.ObjectId()],
         },
       };
 
@@ -218,13 +214,7 @@ describe('AuthController', () => {
         fundingNeeds: {
           totalAmount: 1000000,
           milestones: [
-            {
-              milestoneId: new Types.ObjectId(), // Use ObjectId for milestoneId
-              description: 'MVP release',
-              dueDate: new Date(),
-              fundingRequired: 500000,
-              status: 'Pending', // Ensure status is included as per the schema
-            },
+            new Types.ObjectId(), 
           ],
         },
       };
