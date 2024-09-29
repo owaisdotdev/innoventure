@@ -18,14 +18,19 @@ export class MilestoneService {
   ) {}
 
   async createMilestone(createMilestoneDto: CreateMilestoneDto): Promise<Milestone> {
-    const { associatedSmartContractId, ...rest } = createMilestoneDto;
-    const milestoneData = {
-      ...rest,
-      associatedSmartContractId: new Types.ObjectId(associatedSmartContractId),
-    };
-
-    const createdMilestone = new this.milestoneModel(milestoneData);
-    return createdMilestone.save();
+    if(createMilestoneDto.associatedSmartContractId) {
+      const { associatedSmartContractId, ...rest } = createMilestoneDto;
+      const milestoneData = {
+        ...rest,
+        associatedSmartContractId: new Types.ObjectId(associatedSmartContractId),
+      };
+  
+      const createdMilestone = new this.milestoneModel(milestoneData);
+      return createdMilestone.save();
+    } else {
+      const createdMilestone = new this.milestoneModel(createMilestoneDto);
+      return createdMilestone.save();
+    }
   }
 
   async findAllMilestones(): Promise<Milestone[]> {
@@ -65,6 +70,17 @@ export class MilestoneService {
     }
 
     return updatedmilestone;
+  }
+
+  async addSmartContractToMilestone(milestonId: string, smartContractId: Types.ObjectId): Promise<void> {
+    const result = await this.startupModel.updateOne(
+      { _id: milestonId },
+      { $push: { 'fundingNeeds.associatedSmartContractId': smartContractId } },
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundException(`Startup with ID ${milestonId} not found`);
+    }
   }
 
   async deleteMilestone(milestoneId: string): Promise<Boolean> {

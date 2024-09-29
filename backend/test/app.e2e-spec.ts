@@ -548,8 +548,7 @@ describe('MilestoneController (e2e)', () => {
       description: 'First milestone description',
       dueDate: new Date('2024-12-31'),
       amountToBeReleased: 10000,
-      status: 'pending',
-      associatedSmartContractId: new Types.ObjectId().toHexString(),
+      status: 'pending'
     };
 
     const response = await request(app.getHttpServer())

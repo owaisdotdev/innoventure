@@ -4,7 +4,7 @@ import { Document, Types } from 'mongoose';
 @Schema()
 export class SmartContract extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Investment', required: true })
-  investmentId: Types.ObjectId; // Reference to Investment
+  investmentId: Types.ObjectId; 
 
   @Prop({
     type: {

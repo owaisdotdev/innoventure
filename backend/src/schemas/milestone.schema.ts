@@ -18,7 +18,7 @@ export class Milestone extends Document {
   @Prop({ default: 'pending' })
   status: string; 
 
-  @Prop({ type: Types.ObjectId, ref: 'SmartContract', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'SmartContract' })
   associatedSmartContractId: Types.ObjectId;
 }
 

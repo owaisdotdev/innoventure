@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AdminModule } from './admin/admin.module';
 import { EmailModule } from './email/email.module';
 import { MilestoneModule } from './milestone/milestone.module';
+import { SmartContractModule } from './smart-contract/smart-contract.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MilestoneModule } from './milestone/milestone.module';
     AdminModule,
     EmailModule,
     MilestoneModule,
+    SmartContractModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,6 +3,7 @@ import {
   IsDate,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { Types } from 'mongoose';
@@ -40,7 +41,7 @@ export class CreateMilestoneDto {
 
   @ApiProperty({ description: 'Associated Smart Contract ID', type: String })
   @IsString()
-  @IsNotEmpty()
-  associatedSmartContractId: string;
+  @IsOptional()
+  associatedSmartContractId?: string;
 }
 
