@@ -29,6 +29,7 @@ const LandingPage = () => {
             alt="Chart"
             className="rounded-md"
           />
+          {/* Diagonally aligned divs for the investment platform */}
           <div className="absolute md:bottom-1 left-1 -bottom-5 md:-left-7  ">
             <div className="bg-gray-200 shadow-2xl shadow-gray-800/80 rounded-lg  p-3 md:w-48 md:p-4 w-40   mb-1">
               <h3 className="text-xs font-semibold text-gray-900">Total Investment</h3>
