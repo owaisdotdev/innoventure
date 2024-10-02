@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsOptional } from 'class-validator';
 import { Document, Types } from 'mongoose';
 
 @Schema()
 export class SmartContract extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'Investment', required: true })
-  investmentId: Types.ObjectId; 
+  @IsOptional()
+  @Prop({ type: Types.ObjectId, ref: 'Investment' })
+  investmentId?: Types.ObjectId;
 
   @Prop({
     type: {
@@ -19,18 +21,16 @@ export class SmartContract extends Document {
   };
 
   @Prop({
-    type: [
-      {
-        milestoneId: { type: Types.ObjectId, ref: 'Milestone', required: true }, // Reference to Milestone
-        status: { type: String, enum: ['Achieved', 'Pending'], required: true }, // E.g., "Achieved", "Pending"
-      },
-    ],
+    type: {
+      milestoneId: { type: Types.ObjectId, ref: 'Milestone', required: true },
+      status: { type: String, enum: ['Achieved', 'Pending'], required: true },
+    },
     required: true,
   })
   milestoneStatus: {
     milestoneId: Types.ObjectId;
     status: string;
-  }[];
+  };
 
   @Prop({ required: true })
   escrowAmount: number; // Amount in escrow
@@ -39,4 +39,4 @@ export class SmartContract extends Document {
   status: string; // E.g., "Active", "Completed"
 }
 
-export const InvestmentTermsSchema = SchemaFactory.createForClass(SmartContract);
+export const SmartContractSchema = SchemaFactory.createForClass(SmartContract);
