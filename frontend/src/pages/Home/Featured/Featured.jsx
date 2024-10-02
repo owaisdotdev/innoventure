@@ -34,7 +34,7 @@ const FeaturedStartups = () => {
   return (
     <div className="bg-white pt-20 p-6">
       <div className="max-w-screen-lg mx-auto">
-        <h1 className="text-5xl font-bold mb-2">Featured Startups</h1>
+        <h1 className="text-5xl text-black font-bold mb-2">Featured Startups</h1>
         <p className="text-gray-600 mb-8">
           Exploring breakthrough success and innovation of the featured startups.
         </p>
@@ -42,7 +42,7 @@ const FeaturedStartups = () => {
           {startups.map((startup, index) => (
             <div
               key={index}
-              className="border rounded-lg p-6 shadow-sm hover:shadow-lg transition-shadow flex"
+              className="border rounded-lg p-6 shadow-xl hover:shadow-lg transition-shadow flex"
             >
               {/* Logo on the left side */}
               <div className="flex-none w-16 h-16 bg-blue-900 rounded-full flex items-center justify-center text-white text-3xl font-bold">
@@ -51,8 +51,8 @@ const FeaturedStartups = () => {
               
               {/* Content on the right side */}
               <div className="ml-6 flex-grow">
-                <h2 className="text-2xl font-semibold mb-2">{startup.name}</h2>
-                <p className="text-sm text-gray-500 mb-4">{startup.location} • {startup.year}</p> {/* Location and Year */}
+                <h2 className="text-2xl font-semibold ">{startup.name}</h2>
+                <p className="text-sm text-gray-500 mb-2">{startup.location} • {startup.year}</p> {/* Location and Year */}
                 <p className="text-gray-700 mb-4">{startup.description}</p>
                 <div className="flex flex-wrap space-x-4 text-sm mb-2">
                   <span className="bg-green-100 text-green-800 px-2 py-1 rounded">{startup.fundingType}</span>

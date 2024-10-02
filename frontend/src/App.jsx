@@ -31,8 +31,9 @@ function App() {
       <Routes>
       
       <Route exact path="/" element={<Home />} />
-
         <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/investor/salman" element={<InvestorDashboard />} />
+
         <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
         <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
       </Routes>
