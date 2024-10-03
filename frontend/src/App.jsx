@@ -14,6 +14,10 @@ import './charts/ChartjsConfig';
 import AdminDashboard from './admin/pages/Dashboard';
 import InvestorDashboard from './investor/pages/Dashboard';
 import StartupDashboard from './startup/pages/Dashboard';
+import UserActivity from './admin/pages/UserActivity';
+import Investors from './admin/pages/Investors';
+import Startups from './admin/pages/Startups';
+import Fydps from './admin/pages/Fydps';
 
 function App() {
 
@@ -32,6 +36,10 @@ function App() {
       
       <Route exact path="/" element={<Home />} />
         <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route exact path="/admin/activity" element={<UserActivity />} />
+        <Route exact path="/admin/investors" element={<Investors />} />
+        <Route exact path="/admin/startups" element={<Startups />} />
+        <Route exact path="/admin/fydp-projects" element={<Fydps />} />
         <Route path="/investor/salman" element={<InvestorDashboard />} />
 
         <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
