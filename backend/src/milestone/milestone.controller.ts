@@ -38,6 +38,7 @@ export class MilestoneController {
   ) {}
 
   @Post('create')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(201)
   @ApiOperation({ summary: 'Create a milestone' })
   @ApiResponse({
