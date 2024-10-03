@@ -1,10 +1,23 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { InvestorService } from '../investor/investor.service';
 import { StartupService } from '../startup/startup.service';
 import { JwtPayload } from './jwt-payload.interface';
 import { AdminService } from '../admin/admin.service';
+import { EmailService } from '../email/email.service';
+
+function generateResetCode(length = 6) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    code += characters[randomIndex];
+  }
+
+  return code;
+}
 
 @Injectable()
 export class AuthService {
@@ -13,6 +26,7 @@ export class AuthService {
     private readonly investorService: InvestorService,
     private readonly startupService: StartupService,
     private readonly adminService: AdminService,
+    private readonly emailService: EmailService,
   ) {}
 
   // Login for Investors
@@ -110,5 +124,82 @@ export class AuthService {
       return admin;
     }
     throw new UnauthorizedException('Invalid JWT Token');
+  }
+
+   async requestPasswordReset(email: string, role: 'investor' | 'startup' | 'admin') {
+    let user: any;
+
+    if (role === 'investor') {
+      user = await this.investorService.findByEmail(email);
+    } else if (role === 'startup') {
+      user = await this.startupService.findByEmail(email);
+    } else if (role === 'admin') {
+      user = await this.adminService.findByEmail(email);
+    }
+
+    if (!user) {
+      throw new NotFoundException(`No user found with email ${email}`);
+    }
+
+    const resetCode = generateResetCode(); 
+    const resetCodeExpiration = new Date();
+    resetCodeExpiration.setMinutes(resetCodeExpiration.getMinutes() + 15); 
+
+    user.resetCode = resetCode;
+    user.resetCodeExpiration = resetCodeExpiration;
+
+    if (role === 'investor') {
+      await this.investorService.updateInvestor(user._id, user);
+    } else if (role === 'startup') {
+      await this.startupService.updateStartup(user._id, user);
+    } 
+
+    // Send email with the reset code (via EmailService)
+    await this.emailService.sendResetPasswordEmail(email, resetCode);
+
+    return { message: 'Reset code sent to your email.' };
+  }
+
+  // Method to verify reset code and update password
+  async resetPassword(
+    email: string,
+    role: 'investor' | 'startup' | 'admin',
+    resetCode: string,
+    newPassword: string,
+  ) {
+    let user: any;
+
+    // Fetch user by role
+    if (role === 'investor') {
+      user = await this.investorService.findByEmail(email);
+    } else if (role === 'startup') {
+      user = await this.startupService.findByEmail(email);
+    } 
+
+    if (!user) {
+      throw new NotFoundException(`No user found with email ${email}`);
+    }
+
+    // Verify reset code and expiration
+    if (user.resetCode !== resetCode || new Date() > user.resetCodeExpiration) {
+      throw new BadRequestException('Invalid or expired reset code');
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password and clear reset code fields
+    user.password = hashedPassword;
+    user.resetCode = null;
+    user.resetCodeExpiration = null;
+
+    // Update user in the database
+    if (role === 'investor') {
+      await this.investorService.updateInvestor(user._id, user);
+    } else if (role === 'startup') {
+      await this.startupService.updateStartup(user._id, user);
+    }
+
+    return { message: 'Password updated successfully.' };
   }
 }

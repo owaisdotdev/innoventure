@@ -13,12 +13,12 @@ export class Milestone extends Document {
   dueDate: Date;
 
   @Prop({ required: true })
-  amountToBeReleased: number; // Amount released when this milestone is achieved
+  amountToBeReleased: number; 
 
   @Prop({ default: 'pending' })
-  status: string; // Status of the milestone
+  status: string; 
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'SmartContract' }] })
+  @Prop({ type: Types.ObjectId, ref: 'SmartContract' })
   associatedSmartContractId: Types.ObjectId;
 }
 
