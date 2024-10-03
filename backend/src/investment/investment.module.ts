@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { InvestmentService } from './investment.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Investment, InvestmentSchema } from 'src/schemas/investment.schema';
-import { Investor, InvestorSchema } from 'src/schemas/investor.schema';
-import { Startup, StartupSchema } from 'src/schemas/startup.schema';
+import { Investment, InvestmentSchema } from '../schemas/investment.schema';
 
 @Module({
   imports: [
