@@ -9,6 +9,7 @@ import {
   HttpStatus,
   BadRequestException,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { SmartContractService } from './smart-contract.service';
 import { CreateSmartContractDto } from '../dto/createSmartContract.dto';
@@ -23,11 +24,12 @@ import {
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { MilestoneService } from '../milestone/milestone.service';
 
 @ApiTags('SmartContracts')
 @Controller('smart-contracts')
 export class SmartContractController {
-  constructor(private readonly smartContractService: SmartContractService) {}
+  constructor(private readonly smartContractService: SmartContractService, private readonly mileStoneServive: MilestoneService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -53,9 +55,21 @@ export class SmartContractController {
   async createSmartContract(
     @Body() createSmartContractDto: CreateSmartContractDto,
   ): Promise<SmartContract> {
-    return this.smartContractService.createsmartContract(
+    const milestone = await this.mileStoneServive.findMilestoneById(
+      createSmartContractDto.milestoneStatus.milestoneId.toString(),
+    );
+
+    if (!milestone) {
+      throw new NotFoundException(`Milestone with ID ${createSmartContractDto.milestoneStatus.milestoneId} not found`);
+    }
+
+    const smartContract = await this.smartContractService.createsmartContract(
       createSmartContractDto,
     );
+
+    await this.mileStoneServive.addSmartContractToMilestone(milestone._id.toString(), new Types.ObjectId(smartContract._id.toString()))
+  
+    return smartContract;
   }
 
   @Get()

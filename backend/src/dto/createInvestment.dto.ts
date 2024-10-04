@@ -6,8 +6,59 @@ import {
   IsString,
   IsDate,
   IsEnum,
+  ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import { Type } from 'class-transformer';
+
+class TermsDto {
+  @ApiProperty({
+    description: 'Percentage of equity',
+    type: Number,
+    example: 10,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  equity: number;
+
+  @ApiProperty({
+    description: 'Conditions of the investment',
+    type: String,
+    example: 'Investor holds 10% equity with no voting rights',
+  })
+  @IsNotEmpty()
+  @IsString()
+  conditions: string;
+}
+
+class EscrowStatusDto {
+  @ApiProperty({
+    description: 'Amount held in escrow',
+    type: Number,
+    example: 25000,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  amount: number;
+
+  @ApiProperty({
+    description: 'Date the escrow amount will be released',
+    type: Date,
+    example: '2024-12-31T00:00:00.000Z',
+  })
+  @IsNotEmpty()
+  @IsDate()
+  releaseDate: Date;
+
+  @ApiProperty({
+    description: 'Status of the escrow funds',
+    enum: ['In escrow', 'Released'],
+    example: 'In escrow',
+  })
+  @IsNotEmpty()
+  @IsEnum(['In escrow', 'Released'])
+  status: string;
+}
 
 export class CreateInvestmentDto {
   @ApiProperty({
@@ -38,49 +89,22 @@ export class CreateInvestmentDto {
   amount: number;
 
   @ApiProperty({
-    description: 'Percentage of equity',
-    type: Number,
-    example: 10,
+    description: 'Terms of the investment',
+    type: TermsDto,
   })
   @IsNotEmpty()
-  @IsNumber()
-  equity: number;
+  @ValidateNested()
+  @Type(() => TermsDto)
+  terms: TermsDto;
 
   @ApiProperty({
-    description: 'Conditions of the investment',
-    type: String,
-    example: 'Investor holds 10% equity with no voting rights',
+    description: 'Escrow status details',
+    type: EscrowStatusDto,
   })
   @IsNotEmpty()
-  @IsString()
-  conditions: string;
-
-  @ApiProperty({
-    description: 'Amount held in escrow',
-    type: Number,
-    example: 25000,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  escrowAmount: number;
-
-  @ApiProperty({
-    description: 'Date the escrow amount will be released',
-    type: Date,
-    example: '2024-12-31T00:00:00.000Z',
-  })
-  @IsNotEmpty()
-  @IsDate()
-  escrowReleaseDate: Date;
-
-  @ApiProperty({
-    description: 'Status of the escrow funds',
-    enum: ['In escrow', 'Released'],
-    example: 'In escrow',
-  })
-  @IsNotEmpty()
-  @IsEnum(['In escrow', 'Released'])
-  escrowStatus: string;
+  @ValidateNested()
+  @Type(() => EscrowStatusDto)
+  escrowStatus: EscrowStatusDto;
 
   @ApiProperty({
     description: 'ID of the associated smart contract',
@@ -92,15 +116,6 @@ export class CreateInvestmentDto {
   contractId: Types.ObjectId;
 
   @ApiProperty({
-    description: 'Date the contract was signed',
-    type: Date,
-    example: '2024-01-01T00:00:00.000Z',
-  })
-  @IsNotEmpty()
-  @IsDate()
-  signedDate: Date;
-
-  @ApiProperty({
     description: 'Percentage of equity held',
     type: Number,
     example: 10,
@@ -108,4 +123,13 @@ export class CreateInvestmentDto {
   @IsNotEmpty()
   @IsNumber()
   equityDistribution: number;
+
+  @ApiProperty({
+    description: 'Investment date',
+    type: Date,
+    example: '2024-01-01T00:00:00.000Z',
+  })
+  @IsNotEmpty()
+  @IsDate()
+  investmentDate: Date;
 }

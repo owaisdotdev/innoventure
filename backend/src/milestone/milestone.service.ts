@@ -73,13 +73,13 @@ export class MilestoneService {
   }
 
   async addSmartContractToMilestone(milestonId: string, smartContractId: Types.ObjectId): Promise<void> {
-    const result = await this.startupModel.updateOne(
+    const result = await this.milestoneModel.updateOne(
       { _id: milestonId },
-      { $push: { 'fundingNeeds.associatedSmartContractId': smartContractId } },
+      { $set: { 'associatedSmartContractId': smartContractId } },
     ).exec();
 
     if (result.modifiedCount === 0) {
-      throw new NotFoundException(`Startup with ID ${milestonId} not found`);
+      throw new NotFoundException(`Milestone with ID ${milestonId} not found`);
     }
   }
 

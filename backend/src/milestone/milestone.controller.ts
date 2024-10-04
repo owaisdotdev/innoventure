@@ -28,6 +28,7 @@ import {
 import { Milestone } from '../schemas/milestone.schema';
 import { CreateMilestoneDto } from '../dto/createMilestone.dto';
 import { StartupService } from '../startup/startup.service';
+import { Types } from 'mongoose';
 
 @ApiTags('Milestones')
 @Controller('milestones')
@@ -55,18 +56,22 @@ export class MilestoneController {
   async createMilestone(@Body() createMilestoneDto: CreateMilestoneDto): Promise<Milestone> {
     try {
       const startup = await this.startupService.findStartupById(
-        createMilestoneDto.startupId,
+        createMilestoneDto.startupId.toString(),
       );
 
       if (!startup) {
         throw new NotFoundException(`Startup with ID ${createMilestoneDto.startupId} not found`);
       }
 
-      const milestone =
-        await this.milestoneService.createMilestone(createMilestoneDto);
+      const updatedDto = {
+        ...createMilestoneDto,
+        startupId: new Types.ObjectId(createMilestoneDto.startupId.toString())
+      }
 
-      // @ts-ignore
-      await this.startupService.addMilestoneToStartup(createMilestoneDto.startupId, milestone._id);
+      const milestone =
+        await this.milestoneService.createMilestone(updatedDto);
+
+      await this.startupService.addMilestoneToStartup(createMilestoneDto.startupId.toString(), new Types.ObjectId(milestone._id.toString()));
   
       return milestone;
     } catch (error) {
@@ -299,12 +304,18 @@ export class MilestoneController {
   })
   async deleteMilestone(@Param('id') id: string) {
     try {
-      const result = await this.milestoneService.deleteMilestone(id);
+      const result = await this.milestoneService.findMilestoneById(id);
       if (!result) {
         throw new NotFoundException(`Milestone with ID ${id} not found`);
       }
+
+      await this.startupService.removeMilestoneFromStartup(result.startupId._id.toString(), new Types.ObjectId(result._id.toString()))
+
+      await this.milestoneService.deleteMilestone(id);
+
       return true;
     } catch (error) {
+      console.log(error)
       throw new InternalServerErrorException('Error deleting milestone', error);
     }
   }

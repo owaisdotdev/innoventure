@@ -83,11 +83,11 @@ export class SmartContractService {
     smartContractId: string,
     investmentId: Types.ObjectId,
   ): Promise<void> {
-    const result = await this.startupModel
+    const result = await this.smartContractModel
       .updateOne(
         { _id: smartContractId },
         {
-          $push: { 'investmentId': investmentId },
+          $set: { 'investmentId': investmentId },
         },
       )
       .exec();

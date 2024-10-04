@@ -11,8 +11,6 @@ import { EmailModule } from './email/email.module';
 import { MilestoneModule } from './milestone/milestone.module';
 import { SmartContractModule } from './smart-contract/smart-contract.module';
 import { InvestmentModule } from './investment/investment.module';
-// import { ServeStaticModule } from '@nestjs/serve-static';
-// import { join } from 'path';
 
 @Module({
   imports: [
@@ -27,10 +25,6 @@ import { InvestmentModule } from './investment/investment.module';
         uri: configService.get<string>('MONGODB_URI'), 
       }),
     }),
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'swagger-static'),
-    //   serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
-    // }),
     InvestorModule,
     StartupModule,
     AuthModule,

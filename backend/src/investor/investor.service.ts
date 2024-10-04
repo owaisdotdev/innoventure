@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model } from 'mongoose';
+import { isValidObjectId, Model, Types } from 'mongoose';
 import { Investor } from '../schemas/investor.schema';
 import { CreateInvestorDto } from '../dto/createInvestor.dto';
 import { UpdateInvestorDto } from '../dto/updateInvestor.dto';
@@ -68,6 +68,24 @@ export class InvestorService {
     }
 
     return updatedInvestor;
+  }
+
+  async addInvestmentToInvestor(
+    investorId: string,
+    investmentId: Types.ObjectId,
+  ): Promise<void> {
+    const result = await this.investorModel
+      .updateOne(
+        { _id: investorId },
+        {
+          $push: { 'investments': investmentId },
+        },
+      )
+      .exec();
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundException(`Investor with ID ${investorId} not found`);
+    }
   }
 
   async deleteInvestor(investorId: string): Promise<Boolean> {
