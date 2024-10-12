@@ -19,7 +19,7 @@ export class StartupService {
 
   async createStartup(createStartupDto: CreateStartupDto): Promise<Startup> {
     try {
-      const hashedPassword = await bcrypt.hash(createStartupDto.password, 10);
+        const hashedPassword = await bcrypt.hash(createStartupDto.password, 10);
       const createdStartup = await this.startupModel.create({
         ...createStartupDto,
         password: hashedPassword,
@@ -73,6 +73,28 @@ export class StartupService {
     const result = await this.startupModel.updateOne(
       { _id: startupId },
       { $push: { 'fundingNeeds.milestones': milestoneId } },
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundException(`Startup with ID ${startupId} not found`);
+    }
+  }
+
+  async addInvestorToStartup(startupId: string, investorId: Types.ObjectId): Promise<void> {
+    const result = await this.startupModel.updateOne(
+      { _id: startupId },
+      { $push: { 'investors': investorId } },
+    ).exec();
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundException(`Startup with ID ${startupId} not found`);
+    }
+  }
+
+  async removeMilestoneFromStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void> {
+    const result = await this.startupModel.updateOne(
+      { _id: startupId },
+      { $pull: { 'fundingNeeds.milestones': milestoneId } },
     ).exec();
 
     if (result.modifiedCount === 0) {

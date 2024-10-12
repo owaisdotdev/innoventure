@@ -10,6 +10,7 @@ import { AdminModule } from './admin/admin.module';
 import { EmailModule } from './email/email.module';
 import { MilestoneModule } from './milestone/milestone.module';
 import { SmartContractModule } from './smart-contract/smart-contract.module';
+import { InvestmentModule } from './investment/investment.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SmartContractModule } from './smart-contract/smart-contract.module';
     EmailModule,
     MilestoneModule,
     SmartContractModule,
+    InvestmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

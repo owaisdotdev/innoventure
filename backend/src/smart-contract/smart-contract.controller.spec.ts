@@ -5,10 +5,13 @@ import { CreateSmartContractDto } from '../dto/createSmartContract.dto';
 import { UpdateSmartContractDto } from '../dto/updateSmartContract.dto';
 import { Types } from 'mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { MilestoneService } from '../milestone/milestone.service';
+import { SmartContract } from 'src/schemas/smartContract.schema';
 
 describe('SmartContractController', () => {
   let controller: SmartContractController;
   let service: SmartContractService;
+  let milestoneService: MilestoneService;
 
   const mockSmartContract = {
     _id: '60c72b2f9b1d8e1a4c8e4b3a',
@@ -29,6 +32,11 @@ describe('SmartContractController', () => {
     findByInvestmentId: jest.fn().mockResolvedValue([mockSmartContract]),
   };
 
+  const mockMilestoneService = {
+    findMilestoneById: jest.fn(),
+    addSmartContractToMilestone: jest.fn()
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SmartContractController],
@@ -37,11 +45,16 @@ describe('SmartContractController', () => {
           provide: SmartContractService,
           useValue: mockSmartContractService,
         },
+        {
+          provide: MilestoneService,
+          useValue: mockMilestoneService
+        }
       ],
     }).compile();
 
     controller = module.get<SmartContractController>(SmartContractController);
     service = module.get<SmartContractService>(SmartContractService);
+    milestoneService = module.get<MilestoneService>(MilestoneService);
   });
 
   it('should be defined', () => {
@@ -62,6 +75,20 @@ describe('SmartContractController', () => {
         escrowAmount: 10000,
         status: 'Active',
       };
+
+      const milestone = {
+        _id: '60c72b2f9b1d8e1a4c8e4b3b',
+        startupId: 'startup-id', 
+        title: 'New Milestone',  
+        description: 'Test milestone description',  
+        dueDate: new Date('2024-12-31'),  
+        amountToBeReleased: 10000,  
+        status: 'pending',  
+        associatedSmartContractId: '64c1234abc5678def90ab123', 
+      };
+
+      // @ts-ignore
+      jest.spyOn(milestoneService, 'findMilestoneById').mockResolvedValue(milestone);
 
       const result = await controller.createSmartContract(dto);
       expect(result).toEqual(mockSmartContract);

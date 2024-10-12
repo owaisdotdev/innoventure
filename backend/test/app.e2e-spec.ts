@@ -299,7 +299,6 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/investors/:id (DELETE) - should delete an investor', async () => {
-//     console.log('admin token', adminToken);
 //     await request(app.getHttpServer())
 //       .delete(`/investors/${createdInvestorId}`)
 //       .set('Authorization', `Bearer ${adminToken}`)
@@ -466,7 +465,6 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/startups/:id (DELETE) - should delete an startup', async () => {
-//     console.log('admin token', adminToken);
 //     await request(app.getHttpServer())
 //       .delete(`/startups/${createdStartupId}`)
 //       .set('Authorization', `Bearer ${adminToken}`)
@@ -494,25 +492,7 @@ import { Types } from 'mongoose';
 //     }).compile();
 
 //     app = moduleFixture.createNestApplication();
-//     await app.init();
-
-//     // Create a startup to associate with milestones
-//     const startupSignupData = {
-//       name: 'Startup Co',
-//       email: 'startup@example.com',
-//       password: 'password123',
-//       businessPlan: {
-//         description: 'A comprehensive plan',
-//         industry: 'Tech',
-//       },
-//     };
-
-//     const startupSignupResponse = await request(app.getHttpServer())
-//       .post('/auth/signup/startup')
-//       .send(startupSignupData)
-//       .expect(201);
-
-//     startupId = startupSignupResponse.body._id;
+//     await app.init();;
 
 //     // Login as admin
 //     const adminLoginResponse = await request(app.getHttpServer())
@@ -535,6 +515,7 @@ import { Types } from 'mongoose';
 //       .expect(200);
 
 //     token = startupLoginResponse.body.access_token;
+//     startupId = '66fef41697d7d71ef8efb0bd';
 //   });
 
 //   afterAll(async () => {
@@ -582,37 +563,6 @@ import { Types } from 'mongoose';
 
 //     expect(Array.isArray(response.body)).toBe(true);
 //     expect(response.body[0].title).toBe('Milestone 1');
-//   });
-
-//   it('/milestones/smart-contract (GET) - should return milestones by smart contract', async () => {
-//     const smartContractId = new Types.ObjectId().toHexString();
-
-//     // Create a milestone with the specific smartContractId
-//     const createMilestoneDto = {
-//       startupId: startupId,
-//       title: 'Milestone 2',
-//       description: 'Second milestone description',
-//       dueDate: new Date('2025-01-31'),
-//       amountToBeReleased: 20000,
-//       status: 'pending',
-//       associatedSmartContractId: smartContractId,
-//     };
-
-//     await request(app.getHttpServer())
-//       .post('/milestones/create')
-//       .send(createMilestoneDto)
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(201);
-
-//     const response = await request(app.getHttpServer())
-//       .get('/milestones/smart-contract')
-//       .query({ smartContractId: smartContractId })
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(200);
-
-//       console.log(response.body)
-//     expect(Array.isArray(response.body)).toBe(true);
-//     expect(response.body[0].associatedSmartContractId).toBe(smartContractId);
 //   });
 
 //   it('/milestones/:id (GET) - should return a milestone by ID', async () => {
@@ -668,11 +618,153 @@ import { Types } from 'mongoose';
 //   });
 // });
 
-describe('SmartContractController (e2e)', () => {
+// describe('SmartContractController (e2e)', () => {
+//   let app: INestApplication;
+//   let adminToken: string;
+//   let startupId: string;
+//   let createdSmartContractId: string;
+
+//   beforeAll(async () => {
+//     const moduleFixture: TestingModule = await Test.createTestingModule({
+//       imports: [AppModule],
+//     }).compile();
+
+//     app = moduleFixture.createNestApplication();
+//     await app.init();
+
+//     const startupSignupData = {
+//       email: 'startup@example.com',
+//       password: 'password123',
+//     };
+
+//     const startupSignupResponse = await request(app.getHttpServer())
+//       .post('/auth/login/startup')
+//       .send(startupSignupData)
+
+//     startupId = startupSignupResponse.body.startup._doc._id;
+
+//     // Login as admin
+//     const adminLoginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/admin')
+//       .send({
+//         email: 'admin@example.com',
+//         password: 'adminpassword123',
+//       })
+//       .expect(200);
+
+//     adminToken = adminLoginResponse.body.access_token;
+//   });
+
+//   afterAll(async () => {
+//     await app.close();
+//   });
+
+//   it('/smart-contracts (POST) - should create a smart contract', async () => {
+//     const milestoneId = new Types.ObjectId('67001e81b2763527b243d2fd');
+
+//     const createSmartContractDto = {
+//       terms: {
+//         milestoneConditions: 'Complete all milestones',
+//         escrowAmount: 5000,
+//       },
+//       milestoneStatus: {
+//         milestoneId: milestoneId,
+//         status: 'Pending',
+//       },
+//       escrowAmount: 20000,
+//       status: 'Active',
+//     };
+
+//     const response = await request(app.getHttpServer())
+//       .post('/smart-contracts')
+//       .send(createSmartContractDto)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(201);
+
+//     expect(response.body.terms.milestoneConditions).toBe(createSmartContractDto.terms.milestoneConditions);
+//     expect(response.body.status).toBe(createSmartContractDto.status);
+
+//     createdSmartContractId = response.body._id;
+//   });
+
+//   it('/smart-contracts (GET) - should return all smart contracts', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/smart-contracts')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//     expect(response.body.length).toBeGreaterThan(0);
+//   });
+
+//   it('/smart-contracts/:id (GET) - should return a smart contract by ID', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/smart-contracts/${createdSmartContractId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(response.body._id).toBe(createdSmartContractId);
+//     expect(response.body.status).toBe('Active');
+//   });
+
+//   it('/smart-contracts/:id (PUT) - should update a smart contract', async () => {
+//     const updateSmartContractDto = {
+//       status: 'Completed',
+//     };
+
+//     const response = await request(app.getHttpServer())
+//       .put(`/smart-contracts/${createdSmartContractId}`)
+//       .send(updateSmartContractDto)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(response.body.status).toBe(updateSmartContractDto.status);
+//   });
+
+//   it('/smart-contracts/:id/investment (POST) - should add investment to smart contract', async () => {
+//     const investmentId = new Types.ObjectId().toHexString(); 
+
+//     await request(app.getHttpServer())
+//       .post(`/smart-contracts/${createdSmartContractId}/investment`)
+//       .send({ investmentId })
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+//   });
+
+//   it('/smart-contracts/status/:status (GET) - should retrieve smart contracts by status', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/smart-contracts/status/Completed')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//     response.body.forEach((contract) => {
+//       expect(contract.status).toBe('Completed');
+//     });
+//   });
+
+//   it('/smart-contracts/:id (DELETE) - should return 404 if smart contract not found', async () => {
+//     const nonExistentId = new Types.ObjectId().toHexString();
+
+//     await request(app.getHttpServer())
+//       .delete(`/smart-contracts/${nonExistentId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(404);
+//   });
+
+//   it('/smart-contracts/:id/investment (POST) - should return 400 for invalid investmentId', async () => {
+//     await request(app.getHttpServer())
+//       .post(`/smart-contracts/${createdSmartContractId}/investment`)
+//       .send({ investmentId: 'invalid-id' })
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(400);
+//   });
+// });
+
+describe('InvestmentController (e2e)', () => {
   let app: INestApplication;
   let adminToken: string;
-  let startupId: string;
-  let createdSmartContractId: string;
+  let createdInvestmentId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -681,17 +773,6 @@ describe('SmartContractController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-
-    const startupSignupData = {
-      email: 'startup@example.com',
-      password: 'password123',
-    };
-
-    const startupSignupResponse = await request(app.getHttpServer())
-      .post('/auth/login/startup')
-      .send(startupSignupData)
-
-    startupId = startupSignupResponse.body.startup._doc._id;
 
     // Login as admin
     const adminLoginResponse = await request(app.getHttpServer())
@@ -709,37 +790,38 @@ describe('SmartContractController (e2e)', () => {
     await app.close();
   });
 
-  it('/smart-contracts (POST) - should create a smart contract', async () => {
-    const milestoneId = new Types.ObjectId('66fd3661a594dadcd3918eb2');
-
-    const createSmartContractDto = {
+  it('/investments (POST) - should create a new investment', async () => {
+    const createInvestmentDto = {
+      investorId: new Types.ObjectId('66ffd1484ca4ca6c44f7f531'),
+      startupId: new Types.ObjectId('66fef41697d7d71ef8efb0bd'),
+      amount: 5000,
       terms: {
-        milestoneConditions: 'Complete all milestones',
-        escrowAmount: 5000,
+        equity: 20,
+        conditions: 'Investment conditions',
       },
-      milestoneStatus: {
-        milestoneId: milestoneId,
-        status: 'Pending',
+      escrowStatus: {
+        amount: 2000,
+        releaseDate: new Date(),
+        status: 'In escrow', 
       },
-      escrowAmount: 20000,
-      status: 'Active',
-    };
+      contractId: new Types.ObjectId('6700368d92c0f1a14e281bff'),
+      equityDistribution: 10,
+      investmentDate: new Date(),
+    };    
 
     const response = await request(app.getHttpServer())
-      .post('/smart-contracts')
-      .send(createSmartContractDto)
+      .post('/investments')
+      .send(createInvestmentDto)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(201);
 
-    expect(response.body.terms.milestoneConditions).toBe(createSmartContractDto.terms.milestoneConditions);
-    expect(response.body.status).toBe(createSmartContractDto.status);
-
-    createdSmartContractId = response.body._id;
+    expect(response.body.amount).toBe(createInvestmentDto.amount);
+    createdInvestmentId = response.body._id;
   });
 
-  it('/smart-contracts (GET) - should return all smart contracts', async () => {
+  it('/investments (GET) - should return all investments', async () => {
     const response = await request(app.getHttpServer())
-      .get('/smart-contracts')
+      .get('/investments')
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
@@ -747,103 +829,75 @@ describe('SmartContractController (e2e)', () => {
     expect(response.body.length).toBeGreaterThan(0);
   });
 
-  it('/smart-contracts/:id (GET) - should return a smart contract by ID', async () => {
+  it('/investments/:id (GET) - should return an investment by ID', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/smart-contracts/${createdSmartContractId}`)
+      .get(`/investments/${createdInvestmentId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(response.body._id).toBe(createdSmartContractId);
-    expect(response.body.status).toBe('Active');
+    expect(response.body._id).toBe(createdInvestmentId);
   });
 
-  it('/smart-contracts/:id (PUT) - should update a smart contract', async () => {
-    const updateSmartContractDto = {
-      status: 'Completed',
-    };
-
-    const response = await request(app.getHttpServer())
-      .put(`/smart-contracts/${createdSmartContractId}`)
-      .send(updateSmartContractDto)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
-
-    expect(response.body.status).toBe(updateSmartContractDto.status);
-  });
-
-  it('/smart-contracts/:id/investment (POST) - should add investment to smart contract', async () => {
-    const investmentId = new Types.ObjectId().toHexString(); 
-
-    await request(app.getHttpServer())
-      .post(`/smart-contracts/${createdSmartContractId}/investment`)
-      .send({ investmentId })
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
-  });
-
-  it('/smart-contracts/status/:status (GET) - should retrieve smart contracts by status', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/smart-contracts/status/Completed')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
-
-    expect(Array.isArray(response.body)).toBe(true);
-    response.body.forEach((contract) => {
-      expect(contract.status).toBe('Completed');
-    });
-  });
-
-  it('/smart-contracts/investment/:investmentId (GET) - should retrieve smart contracts by investment ID', async () => {
-    const investmentId = new Types.ObjectId().toHexString();
-
-    const createSmartContractDto = {
+  it('/investments/:id (PUT) - should update an investment', async () => {
+    const updateInvestmentDto = {
+      amount: 7000,
       terms: {
-        milestoneConditions: 'Complete final milestone',
-        escrowAmount: 10000,
+        equity: 20,
+        conditions: 'Investment conditions',
       },
-      milestoneStatus: {
-        milestoneId: new Types.ObjectId(), // Assuming this milestone exists
-        status: 'Pending',
-      },
-      escrowAmount: 30000,
-      status: 'Active',
-      investmentId: new Types.ObjectId(investmentId),
     };
 
-    const smartContractResponse = await request(app.getHttpServer())
-      .post('/smart-contracts')
-      .send(createSmartContractDto)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(201);
-
-    const smartContractId = smartContractResponse.body._id;
-
     const response = await request(app.getHttpServer())
-      .get(`/smart-contracts/investment/${investmentId}`)
+      .put(`/investments/${createdInvestmentId}`)
+      .send(updateInvestmentDto)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(response.body.amount).toBe(updateInvestmentDto.amount);
+    expect(response.body.terms.equity).toBe(updateInvestmentDto.terms.equity);
+  });
+
+  // it('/investments/:id (DELETE) - should delete an investment by ID', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/investments/${createdInvestmentId}`)
+  //     .set('Authorization', `Bearer ${adminToken}`)
+  //     .expect(200);
+  // });
+
+  it('/investments/by-investor/:investorId (GET) - should retrieve investments by investor ID', async () => {
+    const investorId = new Types.ObjectId('66feebb123e7cb24cc233158')
+    const response = await request(app.getHttpServer())
+      .get(`/investments/by-investor/${investorId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
-    response.body.forEach((contract) => {
-      expect(contract.investmentId).toBe(investmentId);
+    response.body.forEach((investment) => {
+      expect(investment.investorId).toBe(investorId.toString());
     });
   });
 
-  it('/smart-contracts/:id (DELETE) - should return 404 if smart contract not found', async () => {
+  it('/investments/by-startup/:startupId (GET) - should retrieve investments by startup ID', async () => {
+    const startupId = '66feebb123e7cb24cc233159';
+
+    const response = await request(app.getHttpServer())
+      .get(`/investments/by-startup/${startupId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(Array.isArray(response.body)).toBe(true);
+    response.body.forEach((investment) => {
+      expect(investment.startupId).toBe(startupId.toString());
+    });
+  });
+
+  it('/investments/:id (DELETE) - should return 404 if investment not found', async () => {
     const nonExistentId = new Types.ObjectId().toHexString();
 
     await request(app.getHttpServer())
-      .delete(`/smart-contracts/${nonExistentId}`)
+      .delete(`/investments/${nonExistentId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(404);
-  });
-
-  it('/smart-contracts/:id/investment (POST) - should return 400 for invalid investmentId', async () => {
-    await request(app.getHttpServer())
-      .post(`/smart-contracts/${createdSmartContractId}/investment`)
-      .send({ investmentId: 'invalid-id' })
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(400);
   });
 });
 

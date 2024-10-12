@@ -12,7 +12,7 @@ export class CreateMilestoneDto {
   @ApiProperty({ description: 'Startup Id' })
   @IsString()
   @IsNotEmpty()
-  startupId: string;
+  startupId: string | Types.ObjectId;
 
   @ApiProperty({ description: 'Title of the milestone' })
   @IsString()

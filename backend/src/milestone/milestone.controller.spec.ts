@@ -86,14 +86,6 @@ describe('MilestoneController', () => {
         associatedSmartContractId: new Types.ObjectId('64c1234abc5678def90ab123'), 
       };
   
-      const updatedStartup = {
-        ...startup,
-        fundingNeeds: {
-          ...startup.fundingNeeds,
-          milestones: [milestone._id],
-        },
-      };
-  
       jest.spyOn(service, 'createMilestone').mockResolvedValue(milestone as Milestone);
       // @ts-ignore
       jest.spyOn(startupService, 'findStartupById').mockResolvedValue(startup);

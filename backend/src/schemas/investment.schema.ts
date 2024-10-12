@@ -39,16 +39,10 @@ export class Investment extends Document {
   };
 
   @Prop({
-    type: {
-      contractId: { type: Types.ObjectId, required: true }, // Reference to Smart Contract
-      signedDate: { type: Date, required: true },
-    },
+    type: Types.ObjectId,
     required: true,
   })
-  contractDetails: {
-    contractId: Types.ObjectId;
-    signedDate: Date;
-  };
+  contractId: Types.ObjectId;
 
   @Prop({ required: true })
   equityDistribution: number; // Percentage of equity held
