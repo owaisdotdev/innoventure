@@ -3,9 +3,19 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { createWriteStream } from 'fs';
 import { get } from 'http';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const corsOptions: CorsOptions = {
+    origin: ['http://localhost:5173/', 'https://your-frontend-url.com'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true, 
+  };
+
+  app.enableCors(corsOptions);
 
   // Set up Swagger
   const config = new DocumentBuilder()
@@ -15,6 +25,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document, {
     customSiteTitle: 'Backend Generator',

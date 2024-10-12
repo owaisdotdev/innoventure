@@ -11,6 +11,7 @@ import { EmailModule } from './email/email.module';
 import { MilestoneModule } from './milestone/milestone.module';
 import { SmartContractModule } from './smart-contract/smart-contract.module';
 import { InvestmentModule } from './investment/investment.module';
+import { DaoModule } from './dao/dao.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { InvestmentModule } from './investment/investment.module';
     MilestoneModule,
     SmartContractModule,
     InvestmentModule,
+    DaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
