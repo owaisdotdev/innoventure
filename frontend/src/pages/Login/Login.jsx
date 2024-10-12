@@ -1,16 +1,13 @@
-"use client";
 import { useEffect, useState, useContext } from "react";
-import "./style.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { login as apiLogin } from "@/utils/api";
+import { login as apiLogin } from "@/api/api.js";
 import { useDispatch } from "react-redux";
 import { login as reduxLogin } from "@/redux/slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useNavigate  } from "react-router-dom";
 import { AuthContext } from "@/contexts/AuthContext";
-import jwt from "jsonwebtoken";
-import "./style.css";
-import Link from "next/link";
+import * as jose from 'jose'
+import {Link} from "react-router-dom";
 
 function Loader() {
     return (
@@ -39,10 +36,16 @@ function Loader() {
     );
 }
 
-function Page() {
+function Login() {
     const dispatch = useDispatch();
-    const router = useRouter();
+    const navigate = useNavigate();
     const { login } = useContext(AuthContext);
+    const [activeTab, setActiveTab] = useState('investor'); // Set default tab to 'investor'
+    
+    const handleTabClick = (tab) => {
+        setActiveTab(tab); // Change active tab
+    };
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -51,7 +54,7 @@ function Page() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        document.title = "Blocklance | Log in";
+        document.title = "Innoventures | Log in";
     }, []);
 
     const handleChange = (e) => {
@@ -64,15 +67,15 @@ function Page() {
         e.preventDefault();
         try {
             const res = await apiLogin(formData);
-            const decodedUser = jwt.decode(res.token);
+            const decodedUser = jose.decode(res.token);
             localStorage.setItem("token", res.token);
             localStorage.setItem("user", res.user._id);
             dispatch(reduxLogin(res.user));
             login(decodedUser, res.token);
             if (res.user.isSeller) {
-                router.push("/seller-dashboard");
+                navigate("/seller-dashboard");
             } else {
-                router.push("/all-categories");
+                navigate("/all-categories");
             }
             toast.success("Logged in Successfully!");
         } catch (error) {
@@ -89,13 +92,36 @@ function Page() {
         <div className="min-h-screen h-screen bg-gray-100 text-gray-900 flex justify-center">
             <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
                 <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-                    <div className="flex justify-center items-center pt-10">
-                        <h1 className="h1 heading text-3xl">Start your freelancing journey</h1>
+                    <div className="flex justify-center items-center pt-2">
+                        <h1 className="h1 heading text-2xl pb-4">Login To Innoventures</h1>
                     </div>
                     {isLoading ? (
                         <Loader />
                     ) : (
                         <div className="mt-3 flex flex-col items-center">
+                               <div className="w-full mb-5">
+                <div className="flex justify-center space-x-4 border-b">
+                    <button
+                        className={`py-2 px-4 font-medium ${activeTab === 'investor' ? 'border-b-2 border-blue-500' : ''}`}
+                        onClick={() => handleTabClick('investor')}
+                    >
+                        Investor
+                    </button>
+                    <button
+                        className={`py-2 px-4 font-medium ${activeTab === 'admin' ? 'border-b-2 border-blue-500' : ''}`}
+                        onClick={() => handleTabClick('admin')}
+                    >
+                        Admin
+                    </button>
+                    <button
+                        className={`py-2 px-4 font-medium ${activeTab === 'startup' ? 'border-b-2 border-blue-500' : ''}`}
+                        onClick={() => handleTabClick('startup')}
+                    >
+                        Startup/FYP
+                    </button>
+                </div>
+            </div>
+
                             <div className="w-full flex-1 mt-3">
                                 <form onSubmit={handleSubmit}>
                                     <div className="mx-auto max-w-xs">
@@ -143,7 +169,7 @@ function Page() {
                                             )}
                                         </button>
                                         <p className="mt-6 text-sm text-gray-600 text-center">
-                                            Not a member? <Link className="text-blue-500" href="/signup"> Sign up</Link>  now! 
+                                            Not a member? <Link className="text-blue-500" to="/signup"> Sign up</Link>  now! 
                                         </p>
                                         <p className="mt-6 text-xs text-gray-600 text-center">
                                             I agree to abide by Blocklance &nbsp;
@@ -161,16 +187,22 @@ function Page() {
                         </div>
                     )}
                 </div>
-                <div className="flex-1 bg-blue-100 text-center hidden lg:flex">
-                    <div
-                        className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-                        style={{ backgroundImage: "url('how.png')" }}
-                    ></div>
-                </div>
+                <div
+  style={{
+    background: "url('https://coinfomania.com/wp-content/uploads/Blockchain-investment.jpg')",
+    backgroundSize: 'fill', // Adjust this based on your needs (cover or contain)
+    backgroundPosition: 'center', // Center the background image
+    backgroundRepeat: 'no-repeat', // Prevent the image from repeating
+  }}
+  className="flex-1 bg-blue-100 text-center hidden lg:flex"
+>
+  <div className="m-12 xl:m-16 w-full"></div>
+</div>
+
             </div>
             <ToastContainer />
         </div>
     );
 }
 
-export default Page;
+export default Login;

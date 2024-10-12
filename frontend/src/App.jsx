@@ -7,7 +7,6 @@ import {
 import Home from './pages/Home/Home';
 import './css/style.css';
 import Navbar from './components/Navbar';
-
 import './charts/ChartjsConfig';
 
 // Import pages
@@ -18,6 +17,8 @@ import UserActivity from './admin/pages/UserActivity';
 import Investors from './admin/pages/Investors';
 import Startups from './admin/pages/Startups';
 import Fydps from './admin/pages/Fydps';
+import Login from './pages/Login/Login.jsx';
+import SignUp from './pages/Signup/Signup.jsx';
 
 function App() {
 
@@ -33,7 +34,9 @@ function App() {
     <>
     <Navbar/>
       <Routes>
-      
+      <Route exact path="/login" element={<Login />} />
+      <Route exact path="/signup" element={<SignUp />} />
+
       <Route exact path="/" element={<Home />} />
         <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
         <Route exact path="/admin/activity" element={<UserActivity />} />
