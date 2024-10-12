@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import Layout from './Layout';
+import { FaPencil } from 'react-icons/fa6';
+import { FaTrash } from 'react-icons/fa';
+
 
 function Fydps() {
   const [customers, setCustomers] = useState([
@@ -92,13 +95,13 @@ function Fydps() {
                         onClick={() => handleOpenModal(customer)}
                         className="text-yellow-500 hover:text-yellow-600 mr-2"
                       >
-                        Edit
+                       <FaPencil/> 
                       </button>
                       <button
                         onClick={() => handleDeleteCustomer(customer.id)}
                         className="text-red-500 hover:text-red-600"
                       >
-                        Delete
+                       <FaTrash/> 
                       </button>
                     </td>
                   </tr>
