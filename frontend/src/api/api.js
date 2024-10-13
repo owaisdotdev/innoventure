@@ -1,38 +1,21 @@
 import axios from "axios";
 
-const devUrl = "http://localhost:8000/";
+const devUrl = "http://localhost:3001/";
 const mainUrl = "https://innoventure-api.vercel.app/";
-const baseURL = process.env.NODE_ENV === "production" ? mainUrl : devUrl;
 
-const API = axios.create({ baseURL });
+const API = axios.create({ baseURL: mainUrl });
 
 API.interceptors.request.use((req) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        req.headers.Authorization = `Bearer ${token}`;
-    }
+    req.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
     return req;
 });
-
-const handleError = (error) => {
-    if (error.response) {
-        console.error("API Response Error:", error.response.data);
-        throw new Error(error.response.data.message || "Something went wrong!");
-    } else if (error.request) {
-        console.error("No response from API:", error.request);
-        throw new Error("No response from server. Please try again later.");
-    } else {
-        console.error("Error:", error.message);
-        throw new Error(error.message);
-    }
-};
 
 export const register = async (user) => {
     try {
         const response = await API.post(`/auth/register`, user);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
 
@@ -41,9 +24,11 @@ export const login = async (user) => {
         const response = await API.post(`/auth/login`, user);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
+
+// New Auth Endpoints
 
 export const signupInvestor = async (investorData) => {
     try {
@@ -51,7 +36,8 @@ export const signupInvestor = async (investorData) => {
         console.log(response);
         return response.data;
     } catch (error) {
-        handleError(error);
+        console.log(error);
+        throw new Error(error);
     }
 };
 
@@ -60,7 +46,7 @@ export const signupStartup = async (startupData) => {
         const response = await API.post(`/auth/signup/startup`, startupData);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
 
@@ -69,7 +55,7 @@ export const loginInvestor = async (loginData) => {
         const response = await API.post(`/auth/login/investor`, loginData);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
 
@@ -78,7 +64,7 @@ export const loginStartup = async (loginData) => {
         const response = await API.post(`/auth/login/startup`, loginData);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
 
@@ -87,29 +73,26 @@ export const loginAdmin = async (loginData) => {
         const response = await API.post(`/auth/login/admin`, loginData);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
-
-// User Endpoints
+    
 
 export const getUserById = async (id) => {
     try {
         const response = await API.get(`/auth/users/${id}`);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
 
 export const getUserByEmail = async (email) => {
     try {
-        const response = await API.get(`/auth/getUserByEmail`, {
-            params: { email },
-        });
+        const response = await API.get(`/auth/getUserByEmail/${email}`);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
 
@@ -118,6 +101,8 @@ export const updateUserById = async (details) => {
         const response = await API.post(`/auth/updateUser`, details);
         return response.data;
     } catch (error) {
-        handleError(error);
+        throw new Error(error);
     }
 };
+
+
