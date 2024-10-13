@@ -130,9 +130,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
             <ul className="mt-3">
               {/* Dashboard */}
               <SidebarLinkGroup
-                activecondition={
-                  pathname === "/" || pathname.includes("dashboard")
+                 activecondition={
+                  pathname === "/" ||
+                  pathname.includes("dashboard") ||
+                  pathname.includes("activity")
                 }
+              
               >
                 {(handleClick, open) => {
                   return (
@@ -153,12 +156,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <svg
-                              className={`shrink-0 fill-current ${
-                                pathname === "/" ||
-                                pathname.includes("dashboard")
-                                  ? "text-violet-500"
-                                  : "text-gray-400 dark:text-gray-500"
-                              }`}
+                             className={`shrink-0 fill-current ${
+                              pathname === "/" ||
+                              pathname.includes("dashboard") ||
+                              pathname.includes("activity")
+                                ? "text-violet-500"
+                                : "text-gray-400 dark:text-gray-500"
+                            }`}
                               xmlns="http://www.w3.org/2000/svg"
                               width="16"
                               height="16"
@@ -226,7 +230,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                 }}
               </SidebarLinkGroup>
               <SidebarLinkGroup
-                activecondition={pathname.includes("user-management")}
+                activecondition={
+                  pathname.includes("user-management") ||
+                  pathname.includes("investors") ||
+                  pathname.includes("startups") ||
+                  pathname.includes("fydp-projects") ||
+                  pathname.includes("permissions")
+                }
               >
                 {(handleClick, open) => (
                   <React.Fragment>
@@ -246,11 +256,15 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <FaUsers
-                            className={`shrink-0 ${
-                              pathname.includes("user-management")
-                                ? "text-violet-500"
-                                : "text-gray-400 dark:text-gray-500"
-                            }`}
+                           className={`shrink-0 ${
+                            pathname.includes("user-management") ||
+                            pathname.includes("investors") ||
+                            pathname.includes("startups") ||
+                            pathname.includes("fydp-projects") ||
+                            pathname.includes("permissions")
+                              ? "text-violet-500"
+                              : "text-gray-400 dark:text-gray-500"
+                          }`}
                           />
                           <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                             User Management
@@ -337,14 +351,22 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                 )}
               </SidebarLinkGroup>
               <SidebarLinkGroup
-                activecondition={pathname.includes("investment-management")}
+                activecondition={
+                  pathname.includes("investment-management") ||
+                  pathname.includes("pending-approvals") ||
+                  pathname.includes("active-investments") ||
+                  pathname.includes("completed-investments")
+                }
               >
                 {(handleClick, open) => (
                   <React.Fragment>
                     <a
                       href="#0"
                       className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                        pathname.includes("investment-management")
+                        pathname.includes("investment-management") ||
+                        pathname.includes("pending-approvals") ||
+                        pathname.includes("active-investments") ||
+                        pathname.includes("completed-investments")
                           ? ""
                           : "hover:text-gray-900 dark:hover:text-white"
                       }`}
@@ -357,11 +379,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <FaRegMoneyBillAlt
-                            className={`shrink-0 ${
-                              pathname.includes("investment-management")
-                                ? "text-violet-500"
-                                : "text-gray-400 dark:text-gray-500"
-                            }`}
+                           className={`shrink-0 ${
+                            pathname.includes("investment-management") ||
+                            pathname.includes("pending-approvals") ||
+                            pathname.includes("active-investments") ||
+                            pathname.includes("completed-investments")
+                              ? "text-violet-500"
+                              : "text-gray-400 dark:text-gray-500"
+                          }`}
                           />
                           <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                             Investment Management
