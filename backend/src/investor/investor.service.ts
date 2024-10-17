@@ -56,11 +56,7 @@ export class InvestorService {
       throw new BadRequestException(`Invalid ID format`);
     }
     const updatedInvestor = await this.investorModel
-      .findByIdAndUpdate(
-        investorId,
-        { $set: updateInvestorDto },
-        { new: true }, 
-      )
+      .findByIdAndUpdate(investorId, { $set: updateInvestorDto }, { new: true })
       .exec();
 
     if (!updatedInvestor) {
@@ -78,7 +74,7 @@ export class InvestorService {
       .updateOne(
         { _id: investorId },
         {
-          $push: { 'investments': investmentId },
+          $push: { investments: investmentId },
         },
       )
       .exec();
@@ -143,5 +139,17 @@ export class InvestorService {
 
   async findByProfileStatus(profileStatus: string): Promise<Investor[]> {
     return this.investorModel.find({ profileStatus }).exec();
+  }
+
+  async getRecentInvestors(days: number = 30): Promise<Investor[]> {
+    const dateFrom = new Date();
+    dateFrom.setDate(dateFrom.getDate() - days); // Calculate the date `days` ago from today
+
+    // Query investors where `createdAt` is greater than or equal to `dateFrom`
+    return this.investorModel
+      .find({
+        createdAt: { $gte: dateFrom },
+      })
+      .exec();
   }
 }

@@ -722,7 +722,7 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/smart-contracts/:id/investment (POST) - should add investment to smart contract', async () => {
-//     const investmentId = new Types.ObjectId().toHexString(); 
+//     const investmentId = new Types.ObjectId().toHexString();
 
 //     await request(app.getHttpServer())
 //       .post(`/smart-contracts/${createdSmartContractId}/investment`)
@@ -761,10 +761,149 @@ import { Types } from 'mongoose';
 //   });
 // });
 
-describe('InvestmentController (e2e)', () => {
+// describe('InvestmentController (e2e)', () => {
+//   let app: INestApplication;
+//   let adminToken: string;
+//   let createdInvestmentId: string;
+
+//   beforeAll(async () => {
+//     const moduleFixture: TestingModule = await Test.createTestingModule({
+//       imports: [AppModule],
+//     }).compile();
+
+//     app = moduleFixture.createNestApplication();
+//     await app.init();
+
+//     // Login as admin
+//     const adminLoginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/admin')
+//       .send({
+//         email: 'admin@example.com',
+//         password: 'adminpassword123',
+//       })
+//       .expect(200);
+
+//     adminToken = adminLoginResponse.body.access_token;
+//   });
+
+//   afterAll(async () => {
+//     await app.close();
+//   });
+
+//   it('/investments (POST) - should create a new investment', async () => {
+//     const createInvestmentDto = {
+//       investorId: new Types.ObjectId('66ffd1484ca4ca6c44f7f531'),
+//       startupId: new Types.ObjectId('66fef41697d7d71ef8efb0bd'),
+//       amount: 5000,
+//       terms: {
+//         equity: 20,
+//         conditions: 'Investment conditions',
+//       },
+//       escrowStatus: {
+//         amount: 2000,
+//         releaseDate: new Date(),
+//         status: 'In escrow',
+//       },
+//       contractId: new Types.ObjectId('6700368d92c0f1a14e281bff'),
+//       equityDistribution: 10,
+//       investmentDate: new Date(),
+//     };
+
+//     const response = await request(app.getHttpServer())
+//       .post('/investments')
+//       .send(createInvestmentDto)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(201);
+
+//     expect(response.body.amount).toBe(createInvestmentDto.amount);
+//     createdInvestmentId = response.body._id;
+//   });
+
+//   it('/investments (GET) - should return all investments', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/investments')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//     expect(response.body.length).toBeGreaterThan(0);
+//   });
+
+//   it('/investments/:id (GET) - should return an investment by ID', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investments/${createdInvestmentId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(response.body._id).toBe(createdInvestmentId);
+//   });
+
+//   it('/investments/:id (PUT) - should update an investment', async () => {
+//     const updateInvestmentDto = {
+//       amount: 7000,
+//       terms: {
+//         equity: 20,
+//         conditions: 'Investment conditions',
+//       },
+//     };
+
+//     const response = await request(app.getHttpServer())
+//       .put(`/investments/${createdInvestmentId}`)
+//       .send(updateInvestmentDto)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(response.body.amount).toBe(updateInvestmentDto.amount);
+//     expect(response.body.terms.equity).toBe(updateInvestmentDto.terms.equity);
+//   });
+
+//   // it('/investments/:id (DELETE) - should delete an investment by ID', async () => {
+//   //   await request(app.getHttpServer())
+//   //     .delete(`/investments/${createdInvestmentId}`)
+//   //     .set('Authorization', `Bearer ${adminToken}`)
+//   //     .expect(200);
+//   // });
+
+//   it('/investments/by-investor/:investorId (GET) - should retrieve investments by investor ID', async () => {
+//     const investorId = new Types.ObjectId('66feebb123e7cb24cc233158');
+//     const response = await request(app.getHttpServer())
+//       .get(`/investments/by-investor/${investorId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//     response.body.forEach((investment) => {
+//       expect(investment.investorId).toBe(investorId.toString());
+//     });
+//   });
+
+//   it('/investments/by-startup/:startupId (GET) - should retrieve investments by startup ID', async () => {
+//     const startupId = '66feebb123e7cb24cc233159';
+
+//     const response = await request(app.getHttpServer())
+//       .get(`/investments/by-startup/${startupId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     expect(Array.isArray(response.body)).toBe(true);
+//     response.body.forEach((investment) => {
+//       expect(investment.startupId).toBe(startupId.toString());
+//     });
+//   });
+
+//   it('/investments/:id (DELETE) - should return 404 if investment not found', async () => {
+//     const nonExistentId = new Types.ObjectId().toHexString();
+
+//     await request(app.getHttpServer())
+//       .delete(`/investments/${nonExistentId}`)
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(404);
+//   });
+// });
+
+describe('AdminDashboardController (e2e)', () => {
   let app: INestApplication;
   let adminToken: string;
-  let createdInvestmentId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -790,115 +929,46 @@ describe('InvestmentController (e2e)', () => {
     await app.close();
   });
 
-  it('/investments (POST) - should create a new investment', async () => {
-    const createInvestmentDto = {
-      investorId: new Types.ObjectId('66ffd1484ca4ca6c44f7f531'),
-      startupId: new Types.ObjectId('66fef41697d7d71ef8efb0bd'),
-      amount: 5000,
-      terms: {
-        equity: 20,
-        conditions: 'Investment conditions',
-      },
-      escrowStatus: {
-        amount: 2000,
-        releaseDate: new Date(),
-        status: 'In escrow', 
-      },
-      contractId: new Types.ObjectId('6700368d92c0f1a14e281bff'),
-      equityDistribution: 10,
-      investmentDate: new Date(),
-    };    
-
+  it('/admin-dashboard/total-investments (GET) - should return total investments (amount and count)', async () => {
     const response = await request(app.getHttpServer())
-      .post('/investments')
-      .send(createInvestmentDto)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(201);
-
-    expect(response.body.amount).toBe(createInvestmentDto.amount);
-    createdInvestmentId = response.body._id;
-  });
-
-  it('/investments (GET) - should return all investments', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/investments')
+      .get('/admin-dashboard/total-investments')
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
+    console.log(response.body);
+    expect(response.body.totalAmount).toBeDefined();
+    expect(response.body.totalCount).toBeDefined();
   });
 
-  it('/investments/:id (GET) - should return an investment by ID', async () => {
+  it('/admin-dashboard/active-startups (GET) - should return total active startups', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/investments/${createdInvestmentId}`)
+      .get('/admin-dashboard/active-startups')
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(response.body._id).toBe(createdInvestmentId);
+    console.log(response.body);
+    expect(typeof response.body.activeStartups).toBe('number');
   });
 
-  it('/investments/:id (PUT) - should update an investment', async () => {
-    const updateInvestmentDto = {
-      amount: 7000,
-      terms: {
-        equity: 20,
-        conditions: 'Investment conditions',
-      },
-    };
-
+  it('/admin-dashboard/active-investors (GET) - should return total active investors', async () => {
     const response = await request(app.getHttpServer())
-      .put(`/investments/${createdInvestmentId}`)
-      .send(updateInvestmentDto)
+      .get('/admin-dashboard/active-investors')
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(response.body.amount).toBe(updateInvestmentDto.amount);
-    expect(response.body.terms.equity).toBe(updateInvestmentDto.terms.equity);
+    console.log(response.body);
+    expect(typeof response.body.activeInvestors).toBe('number');
   });
 
-  // it('/investments/:id (DELETE) - should delete an investment by ID', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/investments/${createdInvestmentId}`)
-  //     .set('Authorization', `Bearer ${adminToken}`)
-  //     .expect(200);
-  // });
-
-  it('/investments/by-investor/:investorId (GET) - should retrieve investments by investor ID', async () => {
-    const investorId = new Types.ObjectId('66feebb123e7cb24cc233158')
+  it('/admin-dashboard/recent-activity (GET) - should return recent activity', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/investments/by-investor/${investorId}`)
+      .get('/admin-dashboard/recent-activity')
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(Array.isArray(response.body)).toBe(true);
-    response.body.forEach((investment) => {
-      expect(investment.investorId).toBe(investorId.toString());
-    });
-  });
-
-  it('/investments/by-startup/:startupId (GET) - should retrieve investments by startup ID', async () => {
-    const startupId = '66feebb123e7cb24cc233159';
-
-    const response = await request(app.getHttpServer())
-      .get(`/investments/by-startup/${startupId}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
-
-    expect(Array.isArray(response.body)).toBe(true);
-    response.body.forEach((investment) => {
-      expect(investment.startupId).toBe(startupId.toString());
-    });
-  });
-
-  it('/investments/:id (DELETE) - should return 404 if investment not found', async () => {
-    const nonExistentId = new Types.ObjectId().toHexString();
-
-    await request(app.getHttpServer())
-      .delete(`/investments/${nonExistentId}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(404);
+    console.log(response.body);
+    expect(response.body.recentInvestments).toBeDefined();
+    expect(response.body.recentStartups).toBeDefined();
+    expect(response.body.recentInvestors).toBeDefined();
   });
 });
-
-

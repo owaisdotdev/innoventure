@@ -50,9 +50,8 @@ export class InvestmentService {
     }
   }
 
-  
   // GETTER FUNCTIONS
-  
+
   async findInvestmentsByInvestor(investorId: string): Promise<Investment[]> {
     return this.investmentModel.find({ investorId }).exec();
   }
@@ -69,5 +68,17 @@ export class InvestmentService {
 
   async findInvestmentsByDate(investmentDate: Date): Promise<Investment[]> {
     return this.investmentModel.find({ investmentDate }).exec();
+  }
+
+  async getRecentInvestments(days: number = 30): Promise<Investment[]> {
+    const dateFrom = new Date();
+    dateFrom.setDate(dateFrom.getDate() - days); // Calculate the date `days` ago from today
+
+    // Query investments where investmentDate is greater than or equal to `dateFrom`
+    return this.investmentModel
+      .find({
+        investmentDate: { $gte: dateFrom },
+      })
+      .exec();
   }
 }

@@ -19,7 +19,7 @@ export class StartupService {
 
   async createStartup(createStartupDto: CreateStartupDto): Promise<Startup> {
     try {
-        const hashedPassword = await bcrypt.hash(createStartupDto.password, 10);
+      const hashedPassword = await bcrypt.hash(createStartupDto.password, 10);
       const createdStartup = await this.startupModel.create({
         ...createStartupDto,
         password: hashedPassword,
@@ -69,33 +69,45 @@ export class StartupService {
     return updatedStartup;
   }
 
-  async addMilestoneToStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void> {
-    const result = await this.startupModel.updateOne(
-      { _id: startupId },
-      { $push: { 'fundingNeeds.milestones': milestoneId } },
-    ).exec();
+  async addMilestoneToStartup(
+    startupId: string,
+    milestoneId: Types.ObjectId,
+  ): Promise<void> {
+    const result = await this.startupModel
+      .updateOne(
+        { _id: startupId },
+        { $push: { 'fundingNeeds.milestones': milestoneId } },
+      )
+      .exec();
 
     if (result.modifiedCount === 0) {
       throw new NotFoundException(`Startup with ID ${startupId} not found`);
     }
   }
 
-  async addInvestorToStartup(startupId: string, investorId: Types.ObjectId): Promise<void> {
-    const result = await this.startupModel.updateOne(
-      { _id: startupId },
-      { $push: { 'investors': investorId } },
-    ).exec();
+  async addInvestorToStartup(
+    startupId: string,
+    investorId: Types.ObjectId,
+  ): Promise<void> {
+    const result = await this.startupModel
+      .updateOne({ _id: startupId }, { $push: { investors: investorId } })
+      .exec();
 
     if (result.modifiedCount === 0) {
       throw new NotFoundException(`Startup with ID ${startupId} not found`);
     }
   }
 
-  async removeMilestoneFromStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void> {
-    const result = await this.startupModel.updateOne(
-      { _id: startupId },
-      { $pull: { 'fundingNeeds.milestones': milestoneId } },
-    ).exec();
+  async removeMilestoneFromStartup(
+    startupId: string,
+    milestoneId: Types.ObjectId,
+  ): Promise<void> {
+    const result = await this.startupModel
+      .updateOne(
+        { _id: startupId },
+        { $pull: { 'fundingNeeds.milestones': milestoneId } },
+      )
+      .exec();
 
     if (result.modifiedCount === 0) {
       throw new NotFoundException(`Startup with ID ${startupId} not found`);
@@ -118,5 +130,17 @@ export class StartupService {
 
   async findByIndustry(industry: string): Promise<Startup[]> {
     return this.startupModel.find({ 'businessPlan.industry': industry }).exec();
+  }
+
+  async getRecentStartups(days: number = 30): Promise<Startup[]> {
+    const dateFrom = new Date();
+    dateFrom.setDate(dateFrom.getDate() - days); // Calculate the date `days` ago from today
+
+    // Query startups where `createdAt` is greater than or equal to `dateFrom`
+    return this.startupModel
+      .find({
+        createdAt: { $gte: dateFrom },
+      })
+      .exec();
   }
 }
