@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { ConnectKitButton } from "connectkit";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,10 +19,8 @@ const Navbar = () => {
   const shouldShowNavbar = ["invest", "how-it-works"].includes(activeLink);
 
   return (
-    <>
-      {shouldShowNavbar && ( // Conditional rendering
-        <header className="bg-white w-full py-6 px-4 flex justify-between items-center">
-          <div className="text-2xl font-black">Innoventure</div>
+    <header className="bg-white w-full py-6 px-4 flex justify-between items-center">
+      <div className="text-2xl font-black"><Link to="/">Innoventure</Link></div>
 
           <div className="md:hidden">
             <button onClick={toggleMenu} className="focus:outline-none">
@@ -42,64 +42,46 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Render the navbar only if the selected link is in the list of links to show */}
-          <nav className={`hidden md:flex space-x-8`}>
-            <a
-              href="#invest"
-              className={`text-gray-700 hover:text-black ${activeLink === "invest" ? "font-bold" : ""}`}
-              onClick={() => handleLinkClick("invest")}
-            >
-              Invest
-            </a>
-            <a
-              href="#how-it-works"
-              className={`text-gray-700 hover:text-black ${activeLink === "how-it-works" ? "font-bold" : ""}`}
-              onClick={() => handleLinkClick("how-it-works")}
-            >
-              How it works
-            </a>
-            <a
-              href="#about"
-              className={`text-gray-700 hover:text-black ${activeLink === "about" ? "font-bold" : ""}`}
-              onClick={() => handleLinkClick("about")}
-            >
-              About us
-            </a>
-          </nav>
+      <nav className={`hidden md:flex space-x-8`}>
+        <Link to="/invest" className="text-gray-700 hover:text-black">
+          Invest
+        </Link>
+        <Link to="/how-it-works" className="text-gray-700 hover:text-black">
+          How it works
+        </Link>
+        <Link to="/about" className="text-gray-700 hover:text-black">
+          About us
+        </Link>
+      </nav>
 
-          {isOpen && (
-            <nav className="absolute top-16 left-0 w-full bg-white flex flex-col items-center md:hidden">
-              <a
-                href="#invest"
-                className="text-gray-700 hover:text-black py-2"
-                onClick={() => handleLinkClick("invest")}
-              >
-                Invest
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-gray-700 hover:text-black py-2"
-                onClick={() => handleLinkClick("how-it-works")}
-              >
-                How it works
-              </a>
-              <a
-                href="#about"
-                className="text-gray-700 hover:text-black py-2"
-                onClick={() => handleLinkClick("about")}
-              >
-                About us
-              </a>
-            </nav>
-          )}
-
-          <div className="space-x-4 hidden md:flex">
-            <button className="px-4 py-2 text-gray-700 hover:text-black">Login</button>
-            <button className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900">Sign Up</button>
-          </div>
-        </header>
+      {isOpen && (
+        <nav className="absolute top-16 left-0 w-full bg-white flex flex-col items-center md:hidden">
+          <Link to="/invest" className="text-gray-700 hover:text-black py-2">
+            Invest
+          </Link>
+          <Link to="/how-it-works" className="text-gray-700 hover:text-black py-2">
+            How it works
+          </Link>
+          <Link to="/about" className="text-gray-700 hover:text-black py-2">
+            About us
+          </Link>
+        </nav>
       )}
-    </>
+
+      <div className="space-x-4 hidden md:flex">
+      
+      <ConnectKitButton/>
+        <Link to="/login" className="px-4 py-2 text-gray-700 hover:text-black">
+          Login
+        </Link>
+        <Link
+          to="/signup"
+          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+        >
+          Sign Up
+        </Link>
+      </div>
+    </header>
   );
 };
 

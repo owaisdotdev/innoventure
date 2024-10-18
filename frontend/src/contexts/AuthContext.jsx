@@ -10,7 +10,9 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            const decodedUser = jose.decode(token);
+            
+            const decodedUser = jose.decodeJwt(token);
+            console.log(decodedUser);
             setCurrentUser(decodedUser);
         }
     }, []);

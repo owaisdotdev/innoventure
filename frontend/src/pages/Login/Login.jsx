@@ -1,13 +1,13 @@
 import { useEffect, useState, useContext } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { login as apiLogin } from "@/api/api.js";
+import { loginInvestor, loginStartup, loginAdmin } from "@/api/api.js"; // Import your specific login APIs
 import { useDispatch } from "react-redux";
 import { login as reduxLogin } from "@/redux/slices/authSlice";
-import { useNavigate  } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "@/contexts/AuthContext";
-import * as jose from 'jose'
-import {Link} from "react-router-dom";
+import * as jose from 'jose';
+import { Link } from "react-router-dom";
 
 function Loader() {
     return (
@@ -61,28 +61,53 @@ function Login() {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
-
     const handleSubmit = async (e) => {
         setIsLoading(true);
         e.preventDefault();
         try {
-            const res = await apiLogin(formData);
-            const decodedUser = jose.decode(res.token);
-            localStorage.setItem("token", res.token);
-            localStorage.setItem("user", res.user._id);
-            dispatch(reduxLogin(res.user));
-            login(decodedUser, res.token);
-            if (res.user.isSeller) {
-                navigate("/seller-dashboard");
-            } else {
-                navigate("/all-categories");
+            let res;
+            if (activeTab === 'investor') {
+                res = await loginInvestor(formData);
+            } else if (activeTab === 'startup') {
+                res = await loginStartup(formData);
+            } else if (activeTab === 'admin') {
+                res = await loginAdmin(formData);
             }
-            toast.success("Logged in Successfully!");
+    
+            console.log("API Response:", res); // Log the entire response
+    
+            // Check the response based on the activeTab
+            const decodedUser = jose.decodeJwt(res.access_token);
+            localStorage.setItem("token", res.access_token);
+            
+            if (activeTab === 'investor' && res.investor && res.investor._doc) {
+                console.log(res.investor, res.investor._doc._id);
+                localStorage.setItem("user", res.investor._doc._id);
+                dispatch(reduxLogin(res.access_token));
+                    navigate("/investor/dashboard");
+                toast.success("Logged in Successfully!");
+            } else if (activeTab === 'startup' && res.startup && res.startup._doc) {
+                console.log(res.startup, res.startup._doc._id);
+                localStorage.setItem("user", res.startup._doc._id);
+                dispatch(reduxLogin(res.access_token));
+                navigate("/startup/dashboard"); // Navigate to the startup dashboard
+                toast.success("Logged in Successfully!");
+            } else if (activeTab === 'admin' && res.admin && res.admin._doc) {
+                console.log(res.admin, res.admin._doc._id);
+                localStorage.setItem("user", res.admin._doc._id);
+                dispatch(reduxLogin(res.access_token));
+                navigate("/admin/dashboard"); // Navigate to the admin dashboard
+                toast.success("Logged in Successfully!");
+            } else {
+                throw new Error("User data not found in response");
+            }
         } catch (error) {
+            console.error("Login error:", error); // Log the error for debugging
             toast.error(error.message);
         }
         setIsLoading(false);
     };
+    
 
     const toggleShowPassword = () => {
         setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -99,28 +124,28 @@ function Login() {
                         <Loader />
                     ) : (
                         <div className="mt-3 flex flex-col items-center">
-                               <div className="w-full mb-5">
-                <div className="flex justify-center space-x-4 border-b">
-                    <button
-                        className={`py-2 px-4 font-medium ${activeTab === 'investor' ? 'border-b-2 border-blue-500' : ''}`}
-                        onClick={() => handleTabClick('investor')}
-                    >
-                        Investor
-                    </button>
-                    <button
-                        className={`py-2 px-4 font-medium ${activeTab === 'admin' ? 'border-b-2 border-blue-500' : ''}`}
-                        onClick={() => handleTabClick('admin')}
-                    >
-                        Admin
-                    </button>
-                    <button
-                        className={`py-2 px-4 font-medium ${activeTab === 'startup' ? 'border-b-2 border-blue-500' : ''}`}
-                        onClick={() => handleTabClick('startup')}
-                    >
-                        Startup/FYP
-                    </button>
-                </div>
-            </div>
+                            <div className="w-full mb-5">
+                                <div className="flex justify-center space-x-4 border-b">
+                                    <button
+                                        className={`py-2 px-4 font-medium ${activeTab === 'investor' ? 'border-b-2 border-blue-500' : ''}`}
+                                        onClick={() => handleTabClick('investor')}
+                                    >
+                                        Investor
+                                    </button>
+                                    <button
+                                        className={`py-2 px-4 font-medium ${activeTab === 'admin' ? 'border-b-2 border-blue-500' : ''}`}
+                                        onClick={() => handleTabClick('admin')}
+                                    >
+                                        Admin
+                                    </button>
+                                    <button
+                                        className={`py-2 px-4 font-medium ${activeTab === 'startup' ? 'border-b-2 border-blue-500' : ''}`}
+                                        onClick={() => handleTabClick('startup')}
+                                    >
+                                        Startup/FYP
+                                    </button>
+                                </div>
+                            </div>
 
                             <div className="w-full flex-1 mt-3">
                                 <form onSubmit={handleSubmit}>
@@ -183,22 +208,33 @@ function Login() {
                                         </p>
                                     </div>
                                 </form>
+                                <div className="flex justify-center mt-4 space-x-4">
+                                    <button
+                                        className="py-2 px-4 bg-blue-400 text-white rounded-lg text-xs hover:bg-blue-500"
+                                        onClick={() => setFormData({ email: 'investor@test.com', password: 'password123' })}
+                                    >
+                                        Login with Test Investor
+                                    </button>
+                                    <button
+                                        className="py-2 px-4 bg-green-400 text-white rounded-lg text-xs hover:bg-green-500"
+                                        onClick={() => setFormData({ email: 'startup@test.com', password: 'password123' })}
+                                    >
+                                        Login with Test Startup
+                                    </button>
+                                    <button
+                                        className="py-2 px-4 bg-red-400 text-white rounded-lg text-xs hover:bg-red-500"
+                                        onClick={() => setFormData({ email: 'admin@test.com', password: 'password123' })}
+                                    >
+                                        Login with Test Admin
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
                 </div>
-                <div
-  style={{
-    background: "url('https://coinfomania.com/wp-content/uploads/Blockchain-investment.jpg')",
-    backgroundSize: 'fill', // Adjust this based on your needs (cover or contain)
-    backgroundPosition: 'center', // Center the background image
-    backgroundRepeat: 'no-repeat', // Prevent the image from repeating
-  }}
-  className="flex-1 bg-blue-100 text-center hidden lg:flex"
->
-  <div className="m-12 xl:m-16 w-full"></div>
-</div>
-
+                <div className="hidden lg:flex flex-1">
+                    <img src="https://coinfomania.com/wp-content/uploads/Blockchain-investment.jpg" alt="Background" className="object-cover w-full h-full rounded-r-lg" />
+                </div>
             </div>
             <ToastContainer />
         </div>

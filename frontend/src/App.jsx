@@ -23,7 +23,8 @@ import PendingApprovals from './admin/pages/PendingApprovals';
 import ActiveInvestments from './admin/pages/ActiveInvestments';
 import CompletedInvestments from './admin/pages/CompletedInvestments';
 import SmartContracts from './admin/pages/SmartContracts';
-
+import { AuthContextProvider } from './contexts/AuthContext';
+import AuthGuard from './AuthGuard';
 function App() {
 
   const location = useLocation();
@@ -36,26 +37,30 @@ function App() {
 
   return (
     <>
-    <Navbar/>
+    <AuthContextProvider>
+      <Navbar />
       <Routes>
-      <Route exact path="/login" element={<Login />} />
-      <Route exact path="/signup" element={<SignUp />} />
-
-      <Route exact path="/" element={<Home />} />
-        <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route exact path="/admin/activity" element={<UserActivity />} />
-        <Route exact path="/admin/investors" element={<Investors />} />
-        <Route exact path="/admin/startups" element={<Startups />} />
-        <Route exact path="/admin/fydp-projects" element={<Fydps />} />
-        <Route exact path="/admin/pending-approvals" element={<PendingApprovals />} />
-        <Route exact path="/admin/active-investments" element={<ActiveInvestments/>} />
-        <Route exact path="/admin/completed-investments" element={<CompletedInvestments />} />
-        <Route exact path="/admin/smart-contracts" element={<SmartContracts />} />
-        <Route path="/investor/salman" element={<InvestorDashboard />} />
-
-        <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
-        <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
+        <Route exact path="/login" element={<Login />} />
+        <Route exact path="/signup" element={<SignUp />} />
+        <Route exact path="/" element={<Home />} />
+        
+        {/* Protect these routes with AuthContextProvider */}
+        <Route element={<AuthGuard />}>
+          <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route exact path="/admin/activity" element={<UserActivity />} />
+          <Route exact path="/admin/investors" element={<Investors />} />
+          <Route exact path="/admin/startups" element={<Startups />} />
+          <Route exact path="/admin/fydp-projects" element={<Fydps />} />
+          <Route exact path="/admin/pending-approvals" element={<PendingApprovals />} />
+          <Route exact path="/admin/active-investments" element={<ActiveInvestments />} />
+          <Route exact path="/admin/completed-investments" element={<CompletedInvestments />} />
+          <Route exact path="/admin/smart-contracts" element={<SmartContracts />} />
+          <Route path="/investor/salman" element={<InvestorDashboard />} />
+          <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
+          <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
+        </Route>
       </Routes>
+      </AuthContextProvider>
     </>
   );
 }
