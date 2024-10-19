@@ -44,8 +44,7 @@ function App() {
         <Route exact path="/signup" element={<SignUp />} />
         <Route exact path="/" element={<Home />} />
         
-        {/* Protect these routes with AuthContextProvider */}
-        <Route element={<AuthGuard />}>
+        <Route >
           <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
           <Route exact path="/admin/activity" element={<UserActivity />} />
           <Route exact path="/admin/investors" element={<Investors />} />

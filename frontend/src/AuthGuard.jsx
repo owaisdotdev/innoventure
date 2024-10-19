@@ -4,13 +4,13 @@ import { AuthContext } from './contexts/AuthContext';
 
 const AuthGuard = ({ children }) => {
     const { currentUser } = useContext(AuthContext);
-console.log(typeOf(currentUser));
-    // If there's no currentUser, redirect to the login page
+    console.log(typeof currentUser);  
     if (!currentUser) {
-        return <Navigate to="/login" />;
+        console.log("object");
+        // return <Navigate to="/login" />;
     }
 
-    return children; // Render the children if the user is authenticated
+    return children; 
 };
 
 export default AuthGuard;
