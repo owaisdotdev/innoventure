@@ -23,7 +23,9 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       '@tailwindConfig',
-    ]
+      
+    ],
+    exclude: ['js-big-decimal']
   }, 
   build: {
     commonjsOptions: {
