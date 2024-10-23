@@ -33,6 +33,8 @@ function Startups() {
 
   return (
     <Layout>
+
+{/* test */}
       {loading ? <Loader/> : <> 
         <div className="col-span-full xl:col-span-6 bg-white dark:bg-gray-800 shadow-sm rounded-xl">
         <header className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/60">
