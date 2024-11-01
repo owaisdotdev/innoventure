@@ -92,6 +92,9 @@ export class Startup extends Document {
 
   @Prop({ type: Date })
   resetCodeExpiration: Date;
+
+  @Prop({ type: Boolean, default: false }) 
+  isFydp: boolean;
 }
 
 export const StartupSchema = SchemaFactory.createForClass(Startup);

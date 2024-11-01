@@ -143,4 +143,8 @@ export class StartupService {
       })
       .exec();
   }
+
+  async findFydpStartups() {
+    return this.startupModel.find({ isFydp: true }).exec();
+  }
 }
