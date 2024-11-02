@@ -4,19 +4,19 @@ import Sidebar from '../components/Sidebar';
 import Header from '../../partials/Header';
 import FilterButton from '../../components/DropdownFilter';
 import Datepicker from '../../components/Datepicker';
-import DashboardCard01 from '../../partials/dashboard/DashboardCard01';
-import DashboardCard02 from '../../partials/dashboard/DashboardCard02';
-import DashboardCard03 from '../../partials/dashboard/DashboardCard03';
-import DashboardCard04 from '../../partials/dashboard/DashboardCard04';
-import DashboardCard05 from '../../partials/dashboard/DashboardCard05';
-import DashboardCard06 from '../../partials/dashboard/DashboardCard06';
-import DashboardCard07 from '../../partials/dashboard/DashboardCard07';
-import DashboardCard08 from '../../partials/dashboard/DashboardCard08';
-import DashboardCard09 from '../../partials/dashboard/DashboardCard09';
-import DashboardCard10 from '../../partials/dashboard/DashboardCard10';
-import DashboardCard11 from '../../partials/dashboard/DashboardCard11';
-import DashboardCard12 from '../../partials/dashboard/DashboardCard12';
-import DashboardCard13 from '../../partials/dashboard/DashboardCard13';
+import DashboardCard01 from './../dashboard/DashboardCard01';
+import DashboardCard02 from './../dashboard/DashboardCard02';
+import DashboardCard03 from './../dashboard/DashboardCard03';
+import DashboardCard04 from './../dashboard/DashboardCard04';
+import DashboardCard05 from './../dashboard/DashboardCard05';
+import DashboardCard06 from './../dashboard/DashboardCard06';
+import DashboardCard07 from './../dashboard/DashboardCard07';
+import DashboardCard08 from './../dashboard/DashboardCard08';
+import DashboardCard09 from './../dashboard/DashboardCard09';
+import DashboardCard10 from './../dashboard/DashboardCard10';
+import DashboardCard11 from './../dashboard/DashboardCard11';
+import DashboardCard12 from './../dashboard/DashboardCard12';
+import DashboardCard13 from './../dashboard/DashboardCard13';
 
 
 function Dashboard() {
@@ -43,7 +43,7 @@ function Dashboard() {
 
               {/* Left: Title */}
               <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Dashboard</h1>
+                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Investor Dashboard</h1>
               </div>
 
               {/* Right: Actions */}
