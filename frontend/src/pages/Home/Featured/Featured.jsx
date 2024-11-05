@@ -11,7 +11,7 @@ const FeaturedStartups = () => {
       fundingStage: 'Post-Revenue',
       fundingType: 'VC-backed',
     },
-    {
+    {  
       name: 'Opento',
       description: 'Our mission is to inspire and empower students to become compassionate, confident, and responsible global citizens, who actively contribute to society and make a positive impact.',
       location: 'Madrid',

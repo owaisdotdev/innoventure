@@ -6,12 +6,13 @@ export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
-
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
             const decodedUser = jose.decodeJwt(token);
             console.log(decodedUser);
+            setIsAuthenticated(true);
             setCurrentUser(decodedUser);
         }
     }, []);
@@ -27,7 +28,7 @@ export const AuthContextProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ currentUser, login, logout }}>
+        <AuthContext.Provider value={{isAuthenticated, currentUser, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

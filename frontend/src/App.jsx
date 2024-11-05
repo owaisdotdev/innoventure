@@ -8,7 +8,7 @@ import Home from './pages/Home/Home';
 import './css/style.css';
 import Navbar from './components/Navbar';
 import './charts/ChartjsConfig';
-
+import StartupRoutes from './startup/routes/startupRoutes';
 // Import pages
 import AdminDashboard from './admin/pages/Dashboard';
 import InvestorDashboard from './investor/pages/Dashboard';
@@ -28,6 +28,8 @@ import AuthGuard from './AuthGuard';
 function App() {
 
   const location = useLocation();
+  // Show the Navbar only on '/' and '/about' routes
+  const showNavbar = location.pathname === '/' || location.pathname === '/about';
 
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto'
@@ -38,27 +40,32 @@ function App() {
   return (
     <>
     <AuthContextProvider>
-      <Navbar />
-      <Routes>
-        <Route exact path="/login" element={<Login />} />
-        <Route exact path="/signup" element={<SignUp />} />
-        <Route exact path="/" element={<Home />} />
+    {showNavbar && <Navbar />}
+    <Routes>
+        <Route  path="/login" element={<Login />} />
+        <Route  path="/signup" element={<SignUp />} />
+        <Route  path="/" element={<Home />} />
         
-        <Route >
-          <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route exact path="/admin/activity" element={<UserActivity />} />
-          <Route exact path="/admin/investors" element={<Investors />} />
-          <Route exact path="/admin/startups" element={<Startups />} />
-          <Route exact path="/admin/fydp-projects" element={<Fydps />} />
-          <Route exact path="/admin/pending-approvals" element={<PendingApprovals />} />
-          <Route exact path="/admin/active-investments" element={<ActiveInvestments />} />
-          <Route exact path="/admin/completed-investments" element={<CompletedInvestments />} />
-          <Route exact path="/admin/smart-contracts" element={<SmartContracts />} />
-          <Route path="/investor/salman" element={<InvestorDashboard />} />
-          <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
-          <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
-        </Route>
-      </Routes>
+        {/* Protect these routes with AuthContextProvider */}
+          {/* Protected Admin Routes */}
+          <Route path="/admin/dashboard" element={<><AdminDashboard /></>} />
+          <Route path="/admin/activity" element={<><UserActivity /></>} />
+          <Route path="/admin/investors" element={<><Investors /></>} />
+          <Route path="/admin/startups" element={<><Startups /></>} />
+          <Route path="/admin/fydp-projects" element={<><Fydps /></>} />
+          <Route path="/admin/pending-approvals" element={<><PendingApprovals /></>} />
+          <Route path="/admin/active-investments" element={<><ActiveInvestments /></>} />
+          <Route path="/admin/completed-investments" element={<><CompletedInvestments /></>} />
+          <Route path="/admin/smart-contracts" element={<><SmartContracts /></>} />
+          
+          {/* Protected Investor and Startup Routes */}
+          <Route path="/investor/salman" element={<><InvestorDashboard /></>} />
+          <Route path="/investor/dashboard" element={<><InvestorDashboard /></>} />
+          <Route path="/startup/dashboard" element={<><StartupDashboard /></>} />
+        </Routes>
+
+        {/* EFFICIENT ROUTING */}
+        <StartupRoutes/>
       </AuthContextProvider>
     </>
   );
