@@ -40,4 +40,41 @@ export class AdminDashboardService {
     const recentInvestors = await this.investorService.getRecentInvestors();
     return { recentInvestments, recentStartups, recentInvestors };
   }
+
+  async getCountOfInvestorsAndStartups() {
+    const activeInvestors = (await this.investorService.findAllInvestors())
+      .length;
+    const activeStartups = (await this.startupService.findAllStartups()).length;
+    return { activeInvestors, activeStartups };
+  }
+
+  async getRecentInvestmentsWithDetails() {
+    const recentInvestments =
+      await this.investmentService.getRecentInvestmentsWithDetails();
+    return recentInvestments;
+  }
+
+  async getFydpStartups() {
+    return await this.startupService.findFydpStartups();
+  }
+
+  async getPendingInvestments() {
+    return this.investmentService.findInvestmentsByStatus('pending');
+  }
+
+  async getApprovedInvestments() {
+    return this.investmentService.findInvestmentsByStatus('approved');
+  }
+
+  async getRejectedInvestments() {
+    return this.investmentService.findInvestmentsByStatus('rejected');
+  }
+
+  async approveInvestment(investmentId: string) {
+    return this.investmentService.updateInvestmentStatus(investmentId, 'approved');
+  }
+
+  async rejectInvestment(investmentId: string) {
+    return this.investmentService.updateInvestmentStatus(investmentId, 'rejected');
+  }
 }

@@ -49,6 +49,13 @@ export class Investment extends Document {
 
   @Prop({ default: Date.now })
   investmentDate: Date; // Investment date
+
+  @Prop({
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
+  })
+  status: string;
 }
 
 export const InvestmentSchema = SchemaFactory.createForClass(Investment);

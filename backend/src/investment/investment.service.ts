@@ -81,4 +81,24 @@ export class InvestmentService {
       })
       .exec();
   }
+
+  async getRecentInvestmentsWithDetails() {
+    return this.investmentModel
+      .find()
+      .sort({ investmentDate: -1 }) // Sort by recent date
+      .limit(10) // Retrieve the 10 most recent investments
+      .populate('investorId', 'name email') // Populate investor details (adjust fields as necessary)
+      .populate('startupId', 'name industry') // Populate startup details (adjust fields as necessary)
+      .exec();
+  }
+
+  async findInvestmentsByStatus(status: string) {
+    return this.investmentModel.find({ status }).exec();
+  }
+
+  async updateInvestmentStatus(investmentId: string, status: string) {
+    return this.investmentModel
+      .findByIdAndUpdate(investmentId, { status }, { new: true })
+      .exec();
+  }
 }
