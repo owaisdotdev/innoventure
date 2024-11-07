@@ -45,7 +45,7 @@ function App() {
          {adminRoutes}
           <Route path="/investor/salman" element={<InvestorDashboard />} />
           <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
-          <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
+          {/* <Route exact path="/startup/dashboard" element={<StartupDashboard />} /> */}
         </Route>
       </Routes>
       <StartupRoutes/>
