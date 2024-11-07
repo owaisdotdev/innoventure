@@ -2,7 +2,7 @@ import React from 'react';
 
 const AboutUs = () => {
   return (
-    <section className="py-16 bg-gray-900 px-8">
+    <section className="py-16 bg-slate-900 px-8">
       {/* Text at the top */}
       <div className="text-center mt-12 mb-20">
         <h2 className="text-3xl font-bold text-white mb-4">
@@ -13,9 +13,7 @@ const AboutUs = () => {
         </p>
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left Side - 2 Features */}
         <div className="flex flex-col space-y-20 justify-center">
-          {/* Feature 1 */}
           <div className="flex items-start space-x-4">
             <div className="bg-indigo-700 p-3 rounded-full">
               <svg
@@ -68,8 +66,8 @@ const AboutUs = () => {
         </div>
 
         {/* Middle - Image */}
-        <div className="flex justify-center">
-          <div className="h-[70vh] w-full rounded-lg overflow-hidden">
+        <div className="flex  justify-center">
+          <div className="h-[80vh] w-full rounded-lg overflow-hidden">
             <img
               src="https://miro.medium.com/v2/resize:fit:1400/1*4-ZMRssGThgE6iMtAEmZAw.jpeg"
               alt="Blockchain platform interface"
