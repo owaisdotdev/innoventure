@@ -8,26 +8,23 @@ import Home from './pages/Home/Home';
 import './css/style.css';
 import Navbar from './components/Navbar';
 import './charts/ChartjsConfig';
-
+import StartupRoutes from './startup/routes/startupRoutes';
 // Import pages
-import AdminDashboard from './admin/pages/Dashboard';
+
 import InvestorDashboard from './investor/pages/Dashboard';
 import StartupDashboard from './startup/pages/Dashboard';
-import UserActivity from './admin/pages/UserActivity';
-import Investors from './admin/pages/Investors';
-import Startups from './admin/pages/Startups';
-import Fydps from './admin/pages/Fydps';
+
 import Login from './pages/Login/Login.jsx';
 import SignUp from './pages/Signup/Signup.jsx';
-import PendingApprovals from './admin/pages/PendingApprovals';
-import ActiveInvestments from './admin/pages/ActiveInvestments';
-import CompletedInvestments from './admin/pages/CompletedInvestments';
-import SmartContracts from './admin/pages/SmartContracts';
+
 import { AuthContextProvider } from './contexts/AuthContext';
 import AuthGuard from './AuthGuard';
+import adminRoutes from './admin/pages/adminRoutes';
 function App() {
 
   const location = useLocation();
+  // Show the Navbar only on '/' and '/about' routes
+  const showNavbar = location.pathname === '/' || location.pathname === '/about';
 
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto'
@@ -38,27 +35,21 @@ function App() {
   return (
     <>
     <AuthContextProvider>
-      <Navbar />
-      <Routes>
-        <Route exact path="/login" element={<Login />} />
-        <Route exact path="/signup" element={<SignUp />} />
-        <Route exact path="/" element={<Home />} />
+    {showNavbar && <Navbar />}
+    <Routes>
+        <Route  path="/login" element={<Login />} />
+        <Route  path="/signup" element={<SignUp />} />
+        <Route  path="/" element={<Home />} />
         
         <Route >
-          <Route exact path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route exact path="/admin/activity" element={<UserActivity />} />
-          <Route exact path="/admin/investors" element={<Investors />} />
-          <Route exact path="/admin/startups" element={<Startups />} />
-          <Route exact path="/admin/fydp-projects" element={<Fydps />} />
-          <Route exact path="/admin/pending-approvals" element={<PendingApprovals />} />
-          <Route exact path="/admin/active-investments" element={<ActiveInvestments />} />
-          <Route exact path="/admin/completed-investments" element={<CompletedInvestments />} />
-          <Route exact path="/admin/smart-contracts" element={<SmartContracts />} />
+         {adminRoutes}
           <Route path="/investor/salman" element={<InvestorDashboard />} />
           <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
-          <Route exact path="/startup/dashboard" element={<StartupDashboard />} />
+          {/* <Route exact path="/startup/dashboard" element={<StartupDashboard />} /> */}
         </Route>
       </Routes>
+      <StartupRoutes/>
+
       </AuthContextProvider>
     </>
   );

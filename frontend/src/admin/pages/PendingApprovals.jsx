@@ -39,12 +39,11 @@ function PendingApprovals() {
     handleCloseModal();
   };
 
-  const handleReject = (id) => {
-    // Reject investment logic here
-    setApprovals(approvals.filter(approval => approval.id !== id));
-    console.log(`Investment with id ${id} rejected`);
-    handleCloseModal();
-  };
+    const handleReject = (id) => {
+      setApprovals(approvals.filter(approval => approval.id !== id));
+      console.log(`Investment with id ${id} rejected`);
+      handleCloseModal();
+    };
 
   return (
     <Layout>

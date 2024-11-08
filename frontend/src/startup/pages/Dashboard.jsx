@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 
 import Sidebar from '../components/Sidebar';
-import Header from '../../partials/Header';
+import Header from '../partials/Header';
 import FilterButton from '../../components/DropdownFilter';
 import Datepicker from '../../components/Datepicker';
-import DashboardCard01 from '../../partials/dashboard/DashboardCard01';
-import DashboardCard02 from '../../partials/dashboard/DashboardCard02';
-import DashboardCard03 from '../../partials/dashboard/DashboardCard03';
-import DashboardCard04 from '../../partials/dashboard/DashboardCard04';
-import DashboardCard05 from '../../partials/dashboard/DashboardCard05';
-import DashboardCard06 from '../../partials/dashboard/DashboardCard06';
-import DashboardCard07 from '../../partials/dashboard/DashboardCard07';
-import DashboardCard08 from '../../partials/dashboard/DashboardCard08';
-import DashboardCard09 from '../../partials/dashboard/DashboardCard09';
-import DashboardCard10 from '../../partials/dashboard/DashboardCard10';
-import DashboardCard11 from '../../partials/dashboard/DashboardCard11';
-import DashboardCard12 from '../../partials/dashboard/DashboardCard12';
-import DashboardCard13 from '../../partials/dashboard/DashboardCard13';
+import DashboardCard01 from '../partials/dashboard/DashboardCard01';
+// import DashboardCard02 from '../partials/dashboard/DashboardCard02';
+// import DashboardCard03 from '../partials/dashboard/DashboardCard03';
+// import DashboardCard04 from '../partials/dashboard/DashboardCard04';
+// import DashboardCard05 from '../partials/dashboard/DashboardCard05';
+// import DashboardCard06 from '../partials/dashboard/DashboardCard06';
+// import DashboardCard07 from '../partials/dashboard/DashboardCard07';
+// import DashboardCard08 from '../partials/dashboard/DashboardCard08';
+// import DashboardCard09 from '../partials/dashboard/DashboardCard09';
+// import DashboardCard10 from '../partials/dashboard/DashboardCard10';
+// import DashboardCard11 from '../partials/dashboard/DashboardCard11';
+// import DashboardCard12 from '../partials/dashboard/DashboardCard12';
+// import DashboardCard13 from '../partials/dashboard/DashboardCard13';
 
 
-function Dashboard() {
+function Dashboard({startup}) {
 
+
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -62,38 +64,104 @@ function Dashboard() {
               </div>
 
             </div>
+            <div className="grid grid-cols-12 gap-8">
+  {/* Startup Information Card */}
+  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-3xl text-gray-800 font-bold mb-6">Startup Information</h2>
+      <p className="text-xl"><strong>Name:</strong> {startup?.name}</p>
+      <p className="text-xl"><strong>Email:</strong> {startup?.email}</p>
+      <p className="text-xl"><strong>Industry:</strong> {startup?.industry}</p>
+      <p className="text-xl"><strong>Location:</strong> {startup?.location}</p>
+      <p className="text-xl"><strong>Established:</strong> {startup?.established}</p>
+      <p className="text-xl"><strong>FYDP Status:</strong> {startup?.isFydp ? 'Yes' : 'No'}</p>
+    </div>
+  </div>
 
-            {/* Cards */}
-            <div className="grid grid-cols-12 gap-6">
+  {/* Funding Card */}
+  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-4xl text-gray-800 font-bold mb-6">Funding</h2>
+      <p className="text-xl"><strong>Industry:</strong> {startup?.industry}</p>
+      <p className="text-xl"><strong>Location:</strong> {startup?.location}</p>
+      <p className="text-xl"><strong>Established:</strong> {startup?.established}</p>
+      <p className="text-xl"><strong>FYDP Status:</strong> {startup?.isFydp ? 'Yes' : 'No'}</p>
+    </div>
+  </div>
 
-              {/* Line chart (Acme Plus) */}
-              <DashboardCard01 />
-              {/* Line chart (Acme Advanced) */}
-              <DashboardCard02 />
-              {/* Line chart (Acme Professional) */}
-              <DashboardCard03 />
-              {/* Bar chart (Direct vs Indirect) */}
-              <DashboardCard04 />
-              {/* Line chart (Real Time Value) */}
-              <DashboardCard05 />
-              {/* Doughnut chart (Top Countries) */}
-              <DashboardCard06 />
-              {/* Table (Top Channels) */}
-              <DashboardCard07 />
-              {/* Line chart (Sales Over Time) */}
-              <DashboardCard08 />
-              {/* Stacked bar chart (Sales VS Refunds) */}
-              <DashboardCard09 />
-              {/* Card (Customers) */}
-              <DashboardCard10 />
-              {/* Card (Reasons for Refunds) */}
-              <DashboardCard11 />
-              {/* Card (Recent Activity) */}
-              <DashboardCard12 />
-              {/* Card (Income/Expenses) */}
-              <DashboardCard13 />
-              
-            </div>
+  {/* Funding Amount Card */}
+  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-4xl text-gray-800 font-bold mb-6">Total Funding</h2>
+      <p className="text-5xl font-bold text-blue-900">${startup?.funding?.toLocaleString()}</p>
+    </div>
+  </div>
+
+  {/* Documents Card */}
+  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Documents</h2>
+      {startup?.documents.length > 0 ? (
+        <ul>
+          {startup?.documents.map((doc, index) => (
+            <li key={index} className="text-xl">{doc}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xl text-gray-700">No documents available.</p>
+      )}
+    </div>
+  </div>
+
+  {/* Investors Card */}
+  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Investors</h2>
+      {startup?.investors.length > 0 ? (
+        <ul>
+          {startup?.investors.map((investor, index) => (
+            <li key={index} className="text-xl">{investor}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xl text-gray-700">No investors added yet.</p>
+      )}
+    </div>
+  </div>
+
+  {/* Progress Reports Card */}
+  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Progress Reports</h2>
+      {startup?.progressReports.length > 0 ? (
+        <ul>
+          {startup?.progressReports.map((report, index) => (
+            <li key={index} className="text-xl">{report}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xl text-gray-700">No progress reports available.</p>
+      )}
+    </div>
+  </div>
+
+  {/* Notifications Card */}
+  <div className="col-span-12 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notifications</h2>
+      {startup?.notifications.length > 0 ? (
+        <ul>
+          {startup?.notifications.map((notification, index) => (
+            <li key={index} className="text-xl">{notification}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xl text-gray-700">No notifications yet.</p>
+      )}
+    </div>
+  </div>
+</div>
+
 
           </div>
         </main>

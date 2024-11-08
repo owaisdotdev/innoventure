@@ -11,7 +11,7 @@ const FeaturedStartups = () => {
       fundingStage: 'Post-Revenue',
       fundingType: 'VC-backed',
     },
-    {
+    {  
       name: 'Opento',
       description: 'Our mission is to inspire and empower students to become compassionate, confident, and responsible global citizens, who actively contribute to society and make a positive impact.',
       location: 'Madrid',
@@ -32,10 +32,10 @@ const FeaturedStartups = () => {
   ];
 
   return (
-    <div className="bg-white pt-20 p-6">
+    <div className=" py-20 my-20 p-6">
       <div className="max-w-screen-lg mx-auto">
-        <h1 className="text-5xl text-black font-bold mb-2">Featured Startups</h1>
-        <p className="text-gray-600 mb-8">
+        <h1 className="text-5xl text-center text-black font-bold mb-2">Featured Startups</h1>
+        <p className="text-gray-600 mb-8 text-center">
           Exploring breakthrough success and innovation of the featured startups.
         </p>
         <div className="space-y-10">
@@ -63,9 +63,11 @@ const FeaturedStartups = () => {
             </div>
           ))}
         </div>
-        <button className="mt-8 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
+        <div className='flex justify-center items-center'>
+        <button className="mt-8 bg-blue-900 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
           See all startups
         </button>
+        </div>
       </div>
     </div>
   );
