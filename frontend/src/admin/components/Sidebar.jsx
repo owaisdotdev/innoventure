@@ -329,7 +329,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             </span>
                           </NavLink>
                         </li>
-                        <li className="mb-1 last:mb-0">
+                        {/* <li className="mb-1 last:mb-0">
                           <NavLink
                             end
                             to="/admin/permissions"
@@ -344,7 +344,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               Permissions
                             </span>
                           </NavLink>
-                        </li>
+                        </li> */}
                       </ul>
                     </div>
                   </React.Fragment>

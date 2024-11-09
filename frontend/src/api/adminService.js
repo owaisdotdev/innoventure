@@ -129,3 +129,23 @@ export const rejectInvestment = async (id) => {
     return null;
   }
 };
+export const getInvestorById = async (id) => {
+  try {
+    const response = await API.patch(`/investors/${id}`);
+    console.log(response)
+    return response?.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
+};
+export const getStartupById = async (id) => {
+  try {
+    const response = await API.patch(`/startups/${id}`);
+    console.log(response)
+    return response?.data;
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
+};
