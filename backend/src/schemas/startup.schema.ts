@@ -95,6 +95,9 @@ export class Startup extends Document {
 
   @Prop({ type: Boolean, default: false }) 
   isFydp: boolean;
+
+  @Prop({ type: String, default: "" })
+  description: string;
 }
 
 export const StartupSchema = SchemaFactory.createForClass(Startup);
