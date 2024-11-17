@@ -20,6 +20,22 @@ import DashboardCard13 from './../dashboard/DashboardCard13';
 
 
 function Dashboard() {
+  const summaryData = {
+    totalInvestments: 10,
+    totalReturns: "$25,000",
+    activeProjects: 5,
+  };
+
+  const opportunities = [
+    { id: 1, name: "Startup A", description: "An innovative tech startup" },
+    { id: 2, name: "Project B", description: "A renewable energy project" },
+  ];
+
+  const platformActivity = [
+    { id: 1, activity: "Investment in Startup A", date: "2024-11-15" },
+    { id: 2, activity: "Withdrawal from Project B", date: "2024-11-10" },
+    { id: 3, activity: "New Opportunity: Venture C", date: "2024-11-05" },
+  ];
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -64,36 +80,76 @@ function Dashboard() {
             </div>
 
             {/* Cards */}
-            <div className="grid grid-cols-12 gap-6">
+            <div className="p-6 bg-gray-100 space-y-6 rounded-lg shadow-md">
+      {/* Summary Card */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Summary of Investments</h2>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg text-center">
+            <p className="text-gray-600">Total Investments</p>
+            <h3 className="text-2xl font-bold">{summaryData.totalInvestments}</h3>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg text-center">
+            <p className="text-gray-600">Total Returns</p>
+            <h3 className="text-2xl font-bold">{summaryData.totalReturns}</h3>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg text-center">
+            <p className="text-gray-600">Active Projects</p>
+            <h3 className="text-2xl font-bold">{summaryData.activeProjects}</h3>
+          </div>
+        </div>
+      </div>
 
-              {/* Line chart (Acme Plus) */}
-              <DashboardCard01 />
-              {/* Line chart (Acme Advanced) */}
-              <DashboardCard02 />
-              {/* Line chart (Acme Professional) */}
-              <DashboardCard03 />
-              {/* Bar chart (Direct vs Indirect) */}
-              <DashboardCard04 />
-              {/* Line chart (Real Time Value) */}
-              <DashboardCard05 />
-              {/* Doughnut chart (Top Countries) */}
-              <DashboardCard06 />
-              {/* Table (Top Channels) */}
-              <DashboardCard07 />
-              {/* Line chart (Sales Over Time) */}
-              <DashboardCard08 />
-              {/* Stacked bar chart (Sales VS Refunds) */}
-              <DashboardCard09 />
-              {/* Card (Customers) */}
-              <DashboardCard10 />
-              {/* Card (Reasons for Refunds) */}
-              <DashboardCard11 />
-              {/* Card (Recent Activity) */}
-              <DashboardCard12 />
-              {/* Card (Income/Expenses) */}
-              <DashboardCard13 />
-              
-            </div>
+      {/* Opportunities Table */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Available Opportunities</h2>
+        <table className="table-auto w-full text-left border-collapse border border-gray-200">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border border-gray-200 px-4 py-2">Opportunity</th>
+              <th className="border border-gray-200 px-4 py-2">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {opportunities.map((opportunity) => (
+              <tr key={opportunity.id} className="odd:bg-gray-50">
+                <td className="border border-gray-200 px-4 py-2">
+                  {opportunity.name}
+                </td>
+                <td className="border border-gray-200 px-4 py-2">
+                  {opportunity.description}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Platform Activity Table */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Platform Activity</h2>
+        <table className="table-auto w-full text-left border-collapse border border-gray-200">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border border-gray-200 px-4 py-2">Activity</th>
+              <th className="border border-gray-200 px-4 py-2">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {platformActivity.map((activity) => (
+              <tr key={activity.id} className="odd:bg-gray-50">
+                <td className="border border-gray-200 px-4 py-2">
+                  {activity.activity}
+                </td>
+                <td className="border border-gray-200 px-4 py-2">
+                  {activity.date}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
           </div>
         </main>

@@ -133,9 +133,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
             <ul className="mt-3">
               {/* Dashboard */}
               <SidebarLinkGroup
-                activecondition={
-                  pathname === "/" || pathname.includes("dashboard")
+                 activecondition={
+                  pathname === "/" ||
+                  pathname.includes("dashboard") ||
+                  pathname.includes("activity")
                 }
+              
               >
                 {(handleClick, open) => {
                   return (
@@ -156,13 +159,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <svg
-                              className={`shrink-0 fill-current ${
-                                pathname === "/" ||
-                                pathname.includes("dashboard")
-                                  ? "text-violet-500"
-                                  : "text-gray-400 dark:text-gray-500"
-                              }`}
-                              xmlns="http:/www.w3.org/2000/svg"
+                             className={`shrink-0 fill-current ${
+                              pathname === "/" ||
+                              pathname.includes("dashboard") ||
+                              pathname.includes("activity")
+                                ? "text-violet-500"
+                                : "text-gray-400 dark:text-gray-500"
+                            }`}
+                              xmlns="http://www.w3.org/2000/svg"
                               width="16"
                               height="16"
                               viewBox="0 0 16 16"
@@ -192,7 +196,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="/investor/overview"
+                              to="/investor/dashboard"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " +
                                 (isActive
@@ -201,10 +205,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               }
                             >
                               <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                                Overview
+                                Overview & Analytics
                               </span>
                             </NavLink>
                           </li>
+                        
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
@@ -217,23 +222,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               }
                             >
                               <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Investment Portfolio
-                              </span>
-                            </NavLink>
-                          </li>
-                          <li className="mb-1 last:mb-0">
-                            <NavLink
-                              end
-                              to="/investor/notifications"
-                              className={({ isActive }) =>
-                                "block transition duration-150 truncate " +
-                                (isActive
-                                  ? "text-violet-500"
-                                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                              }
-                            >
-                              <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                                Notifications
+                                Investment Portfolio
                               </span>
                             </NavLink>
                           </li>
