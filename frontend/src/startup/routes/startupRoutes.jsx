@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Route,Routes } from 'react-router-dom';
 import StartupDashboard from '../pages/Dashboard';
+
 // Add other startup-related components
 import StartupService from '../api/api';
 import ActiveProject from '../pages/ActiveProject/ActiveProject';
+import Investors from '../pages/GetInvestors/Investors';
+import InvestorDetail from '../pages/GetInvestors/InvestorDetail.jsx';
 const StartupRoutes = () => {
   const [startup, setStartup] = useState(null); // Single startup fetched by ID
   const [loading, setLoading] = useState(true);
@@ -35,6 +38,10 @@ const StartupRoutes = () => {
     <Routes>
       <Route path="/startup/dashboard" element={<StartupDashboard startup={startup} />} />
       <Route path="/startup/active-projects" element={<ActiveProject />} />
+      <Route path="/startup/find-investors" element={<Investors startup={startup} />} />
+      <Route path="/startup/find-investors" element={<Investors startup={startup} />} />
+      <Route path="/startup/find-investors/:id" element={<InvestorDetail startup={startup} />} />
+
 
     </Routes>
   );

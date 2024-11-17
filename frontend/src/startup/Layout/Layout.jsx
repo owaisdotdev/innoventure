@@ -25,7 +25,7 @@ function Layout({ children }) {
 
               {/* Left: Title */}
               <div className="mb-4 sm:mb-0">
-                <h1 className="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-bold">Admin Dashboard</h1>
+                <h1 className="text-xl md:text-2xl text-gray-800 dark:text-gray-100 font-bold">Startup Dashboard</h1>
               </div>
 
               {/* Right: Actions */}

@@ -9,6 +9,7 @@ import './css/style.css';
 import Navbar from './components/Navbar';
 import './charts/ChartjsConfig';
 import StartupRoutes from './startup/routes/startupRoutes';
+import Floating from './components/Floating';
 // Import pages
 
 import InvestorDashboard from './investor/pages/Dashboard';
@@ -34,6 +35,7 @@ function App() {
 
   return (
     <>
+    <Floating/>
     <AuthContextProvider>
     {showNavbar && <Navbar />}
     <Routes>
