@@ -9,7 +9,6 @@ import {
   FaChartLine,
   FaProjectDiagram,
   FaHandshake,
-  
 } from "react-icons/fa";
 import { MdInsights, MdOutlineExplore } from "react-icons/md";
 import SidebarLinkGroup from "./SidebarLinkGroup";
@@ -133,12 +132,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
             <ul className="mt-3">
               {/* Dashboard */}
               <SidebarLinkGroup
-                 activecondition={
+                activecondition={
                   pathname === "/" ||
                   pathname.includes("dashboard") ||
-                  pathname.includes("activity")
+                  pathname.includes("activity") ||
+                  pathname.includes("investor") ||
+                  pathname.includes("investment-portfolio")
                 }
-              
               >
                 {(handleClick, open) => {
                   return (
@@ -159,13 +159,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <svg
-                             className={`shrink-0 fill-current ${
-                              pathname === "/" ||
-                              pathname.includes("dashboard") ||
-                              pathname.includes("activity")
-                                ? "text-violet-500"
-                                : "text-gray-400 dark:text-gray-500"
-                            }`}
+                              className={`shrink-0 fill-current ${
+                                pathname === "/" ||
+                                pathname.includes("dashboard") ||
+                                pathname.includes("investment-portfolio")
+                                  ? "text-violet-500"
+                                  : "text-gray-400 dark:text-gray-500"
+                              }`}
                               xmlns="http://www.w3.org/2000/svg"
                               width="16"
                               height="16"
@@ -209,7 +209,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               </span>
                             </NavLink>
                           </li>
-                        
+
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
@@ -232,101 +232,108 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                   );
                 }}
               </SidebarLinkGroup>
+
               <SidebarLinkGroup
-                activecondition={pathname.includes("my-projects")}
-              >
-                {(handleClick, open) => (
-                  <React.Fragment>
-                    <a
-                      href="#0"
-                      className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                        pathname.includes("my-projects")
-                          ? ""
-                          : "hover:text-gray-900 dark:hover:text-white"
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <MdOutlineExplore
-                            className={`shrink-0 ${
-                              pathname.includes("my-projects")
-                                ? "text-violet-500"
-                                : "text-gray-400 dark:text-gray-500"
-                            }`}
-                          />
-                          <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                          Explore Startups
-                          </span>
-                        </div>
-                        <div className="flex shrink-0 ml-2">
-                          <FaChevronDown
-                            className={`w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500 ${
-                              open && "rotate-180"
-                            }`}
-                          />
-                        </div>
-                      </div>
-                    </a>
-                    <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
-                      <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
-                        <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/featured-startups"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">
-                            Featured Startups
-                            </span>
-                          </NavLink>
-                        </li>
-                        <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/recommended-startups"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">
-                            Recommended Startups
-                            </span>
-                          </NavLink>
-                        </li>
-                        <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/fydp-projects"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">
-                            FYDP Projects
-                            </span>
-                          </NavLink>
-                        </li>
-                      </ul>
-                    </div>
-                  </React.Fragment>
-                )}
-              </SidebarLinkGroup>
+  activecondition={
+    pathname.includes("my-projects") ||
+    pathname.includes("featured-startups") ||
+    pathname.includes("recommended-startups") ||
+    pathname.includes("fydp-projects")
+  }
+>
+  {(handleClick, open) => (
+    <React.Fragment>
+      <a
+        href="#0"
+        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
+          pathname.includes("my-projects")
+            ? ""
+            : "hover:text-gray-900 dark:hover:text-white"
+        }`}
+        onClick={(e) => {
+          e.preventDefault();
+          handleClick();
+          setSidebarExpanded(true);
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <MdOutlineExplore
+              className={`shrink-0 fill-current ${
+                pathname.includes("my-projects")
+                  ? "text-violet-500"
+                  : "text-gray-400 dark:text-gray-500"
+              }`}
+            />
+            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+              Explore Startups
+            </span>
+          </div>
+          <div className="flex shrink-0 ml-2">
+            <FaChevronDown
+              className={`w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500 ${
+                open && "rotate-180"
+              }`}
+            />
+          </div>
+        </div>
+      </a>
+      <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
+        <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
+          <li className="mb-1 last:mb-0">
+            <NavLink
+              end
+              to="/investor/featured-startups"
+              className={({ isActive }) =>
+                "block transition duration-150 truncate " +
+                (isActive
+                  ? "text-violet-500"
+                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
+              }
+            >
+              <span className="text-sm font-medium">
+                Featured Startups
+              </span>
+            </NavLink>
+          </li>
+          <li className="mb-1 last:mb-0">
+            <NavLink
+              end
+              to="/investor/recommended-startups"
+              className={({ isActive }) =>
+                "block transition duration-150 truncate " +
+                (isActive
+                  ? "text-violet-500"
+                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
+              }
+            >
+              <span className="text-sm font-medium">
+                Recommended Startups
+              </span>
+            </NavLink>
+          </li>
+          <li className="mb-1 last:mb-0">
+            <NavLink
+              end
+              to="/investor/fydp-projects"
+              className={({ isActive }) =>
+                "block transition duration-150 truncate " +
+                (isActive
+                  ? "text-violet-500"
+                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
+              }
+            >
+              <span className="text-sm font-medium">
+                FYDP Projects
+              </span>
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+    </React.Fragment>
+  )}
+</SidebarLinkGroup>
+
 
               <SidebarLinkGroup
                 activecondition={pathname.includes("investor-engagement")}
@@ -356,7 +363,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             }`}
                           />
                           <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                          Investment Insights
+                            Investment Insights
                           </span>
                         </div>
                         <div className="flex shrink-0 ml-2">
@@ -382,7 +389,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             }
                           >
                             <span className="text-sm font-medium">
-                            Financial Reports
+                              Financial Reports
                             </span>
                           </NavLink>
                         </li>
@@ -398,7 +405,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             }
                           >
                             <span className="text-sm font-medium">
-                            Market Analysis
+                              Market Analysis
                             </span>
                           </NavLink>
                         </li>
@@ -414,7 +421,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             }
                           >
                             <span className="text-sm font-medium">
-                            Portfolio Insights
+                              Portfolio Insights
                             </span>
                           </NavLink>
                         </li>
@@ -547,7 +554,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               }`}
                             />
                             <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Account  Settings
+                              Account Settings
                             </span>
                           </div>
                           {/* Icon */}

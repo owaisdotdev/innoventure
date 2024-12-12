@@ -43,7 +43,7 @@ const FeaturedStartups = () => {
               key={index}
               className="border rounded-lg p-6 bg-white  shadow-sm hover:shadow-md transition-shadow flex items-start"
             >
-              <div className="flex-none w-16 h-16  rounded-full flex items-center justify-center text-gray-700 font-bold">
+              <div className="flex-none w-16 h-16 bg-slate-100  rounded-full flex items-center justify-center text-gray-700 font-bold">
                 {startup.name.charAt(0)}
               </div>
               
