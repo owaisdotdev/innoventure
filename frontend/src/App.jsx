@@ -21,6 +21,7 @@ import SignUp from './pages/Signup/Signup.jsx';
 import { AuthContextProvider } from './contexts/AuthContext';
 import AuthGuard from './AuthGuard';
 import adminRoutes from './admin/pages/adminRoutes';
+import InvestorRoutes from './investor/pages/investorRoutes';
 function App() {
 
   const location = useLocation();
@@ -45,12 +46,14 @@ function App() {
         
         <Route >
          {adminRoutes}
+         {InvestorRoutes}
           <Route path="/investor/salman" element={<InvestorDashboard />} />
           <Route exact path="/investor/dashboard" element={<InvestorDashboard />} />
           {/* <Route exact path="/startup/dashboard" element={<StartupDashboard />} /> */}
         </Route>
       </Routes>
       <StartupRoutes/>
+  
 
       </AuthContextProvider>
     </>
