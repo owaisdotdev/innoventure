@@ -3,10 +3,10 @@ import Typewriter from "typewriter-effect";
 
 const LandingPage = () => {
   return (
-    <div className="h-full py-28 bg-white flex justify-center flex-col items-center">
+    <div className="h-full py-28 mb-20 bg-white flex justify-center flex-col items-center">
       <main className="flex flex-col md:flex-row aitems-center justifya-between  px-6 md:px-20 w-full max-w-7xl">
         <div className="flex flex-col justify-center itemas-center md:w-1/2">
-          <h1 className="text-4xl md:text-5xl font-black text-green-900  mb-6">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900  mb-6">
             We make it easy for everyone to invest
           </h1>
           <h2 className="pb-2 flex space-x-1 text-2xl text-blue-900 font-bold">
@@ -24,7 +24,7 @@ const LandingPage = () => {
             of life to embrace the world of investing with ease.
           </p>
           <div className="flex space-x-4">
-            <button className="px-6 py-3 bg-green-900 text-white rounded hover:bg-gray-900">
+            <button className="px-6 py-3 bg-gray-900 text-white rounded hover:bg-gray-900">
               Start investing
             </button>
             <button className="px-6 py-3 border border-gray-400 rounded hover:bg-gray-100">

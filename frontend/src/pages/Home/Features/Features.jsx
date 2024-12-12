@@ -8,13 +8,13 @@ const AboutUs = () => {
         <h2 className="text-3xl font-bold text-white mb-4">
           Empowering Blockchain-Driven Investments for Innovative Ventures.
         </h2>
-        <p className="text-gray-300 mb-6">
+        <p className="text-gray-300 flex mb-6 px-40 text-center">
           This platform bridges the gap between investors and startups by enabling secure, AI-driven investment opportunities, transforming Final Year Design Projects (FYDPs) into real-world solutions.
         </p>
       </div>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="flex flex-col space-y-20 justify-center">
-          <div className="flex items-start space-x-4">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="flex flex-col items-center space-y-20 justify-center">
+          <div className="flex items-center space-x-4">
             <div className="bg-indigo-700 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
@@ -39,7 +39,7 @@ const AboutUs = () => {
             </div>
           </div>
           {/* Feature 2 */}
-          <div className="flex items-start space-x-4">
+          <div className="flex items-center space-x-4">
             <div className="bg-indigo-700 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
@@ -66,7 +66,7 @@ const AboutUs = () => {
         </div>
 
         {/* Middle - Image */}
-        <div className="flex  justify-center">
+        {/* <div className="flex  justify-center">
           <div className="h-[80vh] w-full rounded-lg overflow-hidden">
             <img
               src="https://miro.medium.com/v2/resize:fit:1400/1*4-ZMRssGThgE6iMtAEmZAw.jpeg"
@@ -74,12 +74,12 @@ const AboutUs = () => {
               className="object-cover h-full w-full"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Right Side - 2 Features */}
         <div className="flex flex-col space-y-20 justify-center">
           {/* Feature 3 */}
-          <div className="flex items-start space-x-4">
+          <div className="flex items-center space-x-4">
             <div className="bg-indigo-700 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
@@ -100,7 +100,7 @@ const AboutUs = () => {
             </div>
           </div>
           {/* Feature 4 */}
-          <div className="flex items-start space-x-4">
+          <div className="flex items-center space-x-4">
             <div className="bg-indigo-700 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
@@ -125,7 +125,26 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
+        
       </div>
+      <div className="text-center mt-16">
+  <div className="flex justify-center space-x-12">
+    <div className="text-gray-300">
+      <h4 className="text-xl font-semibold text-indigo-500">Startups Connected</h4>
+      <p className="text-2xl font-bold">20+</p>
+    </div>
+    <div className="text-gray-300">
+      <h4 className="text-xl font-semibold text-indigo-500">Funding Opportunities</h4>
+      <p className="text-2xl font-bold">$100k+</p>
+    </div>
+    <div className="text-gray-300">
+      <h4 className="text-xl font-semibold text-indigo-500">Investors Engaged</h4>
+      <p className="text-2xl font-bold">50+</p>
+    </div>
+  </div>
+
+</div>
+
     </section>
   );
 };
