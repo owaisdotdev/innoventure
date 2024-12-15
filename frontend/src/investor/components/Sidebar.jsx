@@ -280,7 +280,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
       </a>
       <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
         <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
-          <li className="mb-1 last:mb-0">
+          {/* <li className="mb-1 last:mb-0">
             <NavLink
               end
               to="/investor/featured-startups"
@@ -295,7 +295,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                 Featured Startups
               </span>
             </NavLink>
-          </li>
+          </li> */}
           <li className="mb-1 last:mb-0">
             <NavLink
               end
