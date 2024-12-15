@@ -17,8 +17,11 @@ function PendingApprovals() {
       if (investments) {
         const approvalsWithDetails = await Promise.all(
           investments.map(async (approval) => {
+            console.log(approval)
             const investor = await getInvestorById(approval?.investorId);
             const startup = await getStartupById(approval?.startupId);
+            console.log(investor)
+            console.log(startup)
             return {
               ...approval,
               investorName: investor?.name || 'N/A',
