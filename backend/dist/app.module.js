@@ -21,6 +21,7 @@ const milestone_module_1 = require("./milestone/milestone.module");
 const smart_contract_module_1 = require("./smart-contract/smart-contract.module");
 const investment_module_1 = require("./investment/investment.module");
 const dao_module_1 = require("./dao/dao.module");
+const admin_dashboard_module_1 = require("./admin-dashboard/admin-dashboard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -47,6 +48,7 @@ exports.AppModule = AppModule = __decorate([
             smart_contract_module_1.SmartContractModule,
             investment_module_1.InvestmentModule,
             dao_module_1.DaoModule,
+            admin_dashboard_module_1.AdminDashboardModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

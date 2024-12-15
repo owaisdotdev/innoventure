@@ -61,7 +61,7 @@ let InvestorService = class InvestorService {
     async addInvestmentToInvestor(investorId, investmentId) {
         const result = await this.investorModel
             .updateOne({ _id: investorId }, {
-            $push: { 'investments': investmentId },
+            $push: { investments: investmentId },
         })
             .exec();
         if (result.modifiedCount === 0) {
@@ -111,6 +111,15 @@ let InvestorService = class InvestorService {
     }
     async findByProfileStatus(profileStatus) {
         return this.investorModel.find({ profileStatus }).exec();
+    }
+    async getRecentInvestors(days = 30) {
+        const dateFrom = new Date();
+        dateFrom.setDate(dateFrom.getDate() - days);
+        return this.investorModel
+            .find({
+            createdAt: { $gte: dateFrom },
+        })
+            .exec();
     }
 };
 exports.InvestorService = InvestorService;

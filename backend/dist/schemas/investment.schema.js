@@ -63,6 +63,14 @@ __decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], Investment.prototype, "investmentDate", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending',
+    }),
+    __metadata("design:type", String)
+], Investment.prototype, "status", void 0);
 exports.Investment = Investment = __decorate([
     (0, mongoose_1.Schema)()
 ], Investment);

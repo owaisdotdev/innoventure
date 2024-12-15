@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { Types } from 'mongoose';
 
@@ -27,20 +30,54 @@ export class BusinessPlanDto {
   industry: string;
 }
 
-export class FundingNeedsDto {
+export class FydpDetailsDto {
   @ApiProperty({
-    description: 'Total funding required for the startup',
-    example: 100000,
+    description: 'University where the FYDP was conducted',
+    example: 'University of Lahore',
+  })
+  @IsString()
+  @IsNotEmpty()
+  university: string;
+
+  @ApiProperty({
+    description: 'Year of the FYDP',
+    example: 2023,
   })
   @IsNumber()
   @IsNotEmpty()
-  totalAmount: number;
+  year: number;
 
   @ApiProperty({
-    description: 'List of milestones for the startup',
-    type: [Types.ObjectId],
+    description: 'Supervisor overseeing the FYDP',
+    example: 'Dr. Ali Khan',
   })
-  milestones: Types.ObjectId[];
+  @IsString()
+  @IsNotEmpty()
+  supervisorName: string;
+
+  @ApiProperty({
+    description: 'GitHub repository URL for the FYDP (optional)',
+    example: 'https://github.com/username/fydp',
+  })
+  @IsString()
+  @IsOptional()
+  githubRepoUrl?: string;
+
+  @ApiProperty({
+    description: 'Tags for categorizing the FYDP',
+    example: ['IoT', 'Automation', 'Agriculture'],
+  })
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
+
+  @ApiProperty({
+    description: 'Additional remarks or notes',
+    example: 'This project was a finalist in the National Competition.',
+  })
+  @IsString()
+  @IsOptional()
+  remarks?: string;
 }
 
 export class CreateStartupDto {
@@ -74,10 +111,21 @@ export class CreateStartupDto {
   })
   businessPlan: BusinessPlanDto;
 
+  @ApiProperty({
+    description: 'Indicates whether the entity is an FYDP',
+    example: true,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  isFydp?: boolean;
+
   @IsOptional()
   @ApiProperty({
-    description: 'Business plan details',
-    type: FundingNeedsDto,
+    description: 'FYDP-specific details',
+    type: FydpDetailsDto,
   })
-  fundingNeeds: FundingNeedsDto;
+  @ValidateNested()
+  @Type(() => FydpDetailsDto)
+  fydpDetails?: FydpDetailsDto;
 }

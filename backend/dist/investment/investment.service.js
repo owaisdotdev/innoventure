@@ -64,6 +64,32 @@ let InvestmentService = class InvestmentService {
     async findInvestmentsByDate(investmentDate) {
         return this.investmentModel.find({ investmentDate }).exec();
     }
+    async getRecentInvestments(days = 30) {
+        const dateFrom = new Date();
+        dateFrom.setDate(dateFrom.getDate() - days);
+        return this.investmentModel
+            .find({
+            investmentDate: { $gte: dateFrom },
+        })
+            .exec();
+    }
+    async getRecentInvestmentsWithDetails() {
+        return this.investmentModel
+            .find()
+            .sort({ investmentDate: -1 })
+            .limit(10)
+            .populate('investorId', 'name email')
+            .populate('startupId', 'name industry')
+            .exec();
+    }
+    async findInvestmentsByStatus(status) {
+        return this.investmentModel.find({ status }).exec();
+    }
+    async updateInvestmentStatus(investmentId, status) {
+        return this.investmentModel
+            .findByIdAndUpdate(investmentId, { status }, { new: true })
+            .exec();
+    }
 };
 exports.InvestmentService = InvestmentService;
 exports.InvestmentService = InvestmentService = __decorate([

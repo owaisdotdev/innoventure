@@ -15,4 +15,8 @@ export declare class StartupService {
     removeMilestoneFromStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void>;
     deleteStartup(id: string): Promise<Boolean>;
     findByIndustry(industry: string): Promise<Startup[]>;
+    getRecentStartups(days?: number): Promise<Startup[]>;
+    findFydpStartups(): Promise<(import("mongoose").Document<unknown, {}, Startup> & Startup & Required<{
+        _id: unknown;
+    }>)[]>;
 }

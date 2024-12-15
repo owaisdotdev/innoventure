@@ -16,7 +16,6 @@ export class Startup extends Document {
     type: {
       description: { type: String, required: true },
       industry: { type: String, required: true }, // E.g., "Fintech", "EdTech"
-      team: { type: [String], required: true }, // List of team members
     },
   })
   businessPlan: {
@@ -93,11 +92,30 @@ export class Startup extends Document {
   @Prop({ type: Date })
   resetCodeExpiration: Date;
 
-  @Prop({ type: Boolean, default: false }) 
+  @Prop({ type: Boolean, default: false })
   isFydp: boolean;
 
-  @Prop({ type: String, default: "" })
+  @Prop({ type: String, default: '' })
   description: string;
+
+  @Prop({
+    type: {
+      university: { type: String, required: true },
+      year: { type: Number, required: true },
+      supervisorName: { type: String, required: true },
+      githubRepoUrl: { type: String, default: '' },
+      tags: { type: [String], default: [] },
+      remarks: { type: String, default: '' },
+    },
+  })
+  fydpDetails: {
+    university: string;
+    year: number;
+    supervisorName: string;
+    githubRepoUrl?: string;
+    tags?: string[];
+    remarks?: string;
+  };
 }
 
 export const StartupSchema = SchemaFactory.createForClass(Startup);

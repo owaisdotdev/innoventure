@@ -64,19 +64,25 @@ let StartupService = class StartupService {
         return updatedStartup;
     }
     async addMilestoneToStartup(startupId, milestoneId) {
-        const result = await this.startupModel.updateOne({ _id: startupId }, { $push: { 'fundingNeeds.milestones': milestoneId } }).exec();
+        const result = await this.startupModel
+            .updateOne({ _id: startupId }, { $push: { 'fundingNeeds.milestones': milestoneId } })
+            .exec();
         if (result.modifiedCount === 0) {
             throw new common_1.NotFoundException(`Startup with ID ${startupId} not found`);
         }
     }
     async addInvestorToStartup(startupId, investorId) {
-        const result = await this.startupModel.updateOne({ _id: startupId }, { $push: { 'investors': investorId } }).exec();
+        const result = await this.startupModel
+            .updateOne({ _id: startupId }, { $push: { investors: investorId } })
+            .exec();
         if (result.modifiedCount === 0) {
             throw new common_1.NotFoundException(`Startup with ID ${startupId} not found`);
         }
     }
     async removeMilestoneFromStartup(startupId, milestoneId) {
-        const result = await this.startupModel.updateOne({ _id: startupId }, { $pull: { 'fundingNeeds.milestones': milestoneId } }).exec();
+        const result = await this.startupModel
+            .updateOne({ _id: startupId }, { $pull: { 'fundingNeeds.milestones': milestoneId } })
+            .exec();
         if (result.modifiedCount === 0) {
             throw new common_1.NotFoundException(`Startup with ID ${startupId} not found`);
         }
@@ -93,6 +99,18 @@ let StartupService = class StartupService {
     }
     async findByIndustry(industry) {
         return this.startupModel.find({ 'businessPlan.industry': industry }).exec();
+    }
+    async getRecentStartups(days = 30) {
+        const dateFrom = new Date();
+        dateFrom.setDate(dateFrom.getDate() - days);
+        return this.startupModel
+            .find({
+            createdAt: { $gte: dateFrom },
+        })
+            .exec();
+    }
+    async findFydpStartups() {
+        return this.startupModel.find({ isFydp: true }).exec();
     }
 };
 exports.StartupService = StartupService;
