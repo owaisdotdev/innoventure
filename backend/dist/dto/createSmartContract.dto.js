@@ -103,11 +103,11 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Status of the smart contract',
-        enum: ['Active', 'Completed'],
-        example: 'Active',
+        enum: ['active', 'completed'],
+        example: 'active',
     }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsEnum)(['Active', 'Completed']),
+    (0, class_validator_1.IsEnum)(['active', 'completed']),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateSmartContractDto.prototype, "status", void 0);

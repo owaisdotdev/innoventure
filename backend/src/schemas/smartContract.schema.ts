@@ -35,7 +35,7 @@ export class SmartContract extends Document {
   @Prop({ required: true })
   escrowAmount: number; // Amount in escrow
 
-  @Prop({ type: String, enum: ['Active', 'Completed'], required: true })
+  @Prop({ type: String, enum: ['active', 'completed'], required: true })
   status: string; // E.g., "Active", "Completed"
 }
 

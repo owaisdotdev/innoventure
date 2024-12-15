@@ -19,4 +19,5 @@ export declare class InvestorService {
     findByMaxInvestment(maxInvestment: number): Promise<Investor[]>;
     findByInvestmentRange(minInvestment: number, maxInvestment: number): Promise<Investor[]>;
     findByProfileStatus(profileStatus: string): Promise<Investor[]>;
+    getRecentInvestors(days?: number): Promise<Investor[]>;
 }
