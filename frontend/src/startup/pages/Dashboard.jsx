@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../partials/Header';
 import FilterButton from '../../components/DropdownFilter';
+import { Link } from 'react-router-dom';
 import Datepicker from '../../components/Datepicker';
 import DashboardCard01 from '../partials/dashboard/DashboardCard01';
 // import DashboardCard02 from '../partials/dashboard/DashboardCard02';
@@ -64,39 +65,70 @@ function Dashboard({startup}) {
               </div>
 
             </div>
-            <div className="grid grid-cols-12 gap-8">
+            <div className="flex flex-col gap-8">
+<h1></h1>
   {/* Startup Information Card */}
-  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-3xl text-gray-800 font-bold mb-6">Startup Information</h2>
-      <p className="text-xl"><strong>Name:</strong> {startup?.name}</p>
-      <p className="text-xl"><strong>Email:</strong> {startup?.email}</p>
-      <p className="text-xl"><strong>Industry:</strong> {startup?.industry}</p>
-      <p className="text-xl"><strong>Location:</strong> {startup?.location}</p>
-      <p className="text-xl"><strong>Established:</strong> {startup?.established}</p>
-      <p className="text-xl"><strong>FYDP Status:</strong> {startup?.isFydp ? 'Yes' : 'No'}</p>
-    </div>
-  </div>
+  <div className="flex flex-wrap gap-6 p-6 bg-white shadow-md rounded-lg">
 
+  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
+    <h3 className="text-xl text-gray-800 font-bold">Name</h3>
+    <p className="text-lg text-gray-700">{startup?.name || "N/A"}</p>
+  </div>
+  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
+    <h3 className="text-xl text-gray-800 font-bold">Email</h3>
+    <p className="text-lg text-gray-700">{startup?.email || "N/A"}</p>
+  </div>
+  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
+    <h3 className="text-xl text-gray-800 font-bold">Established</h3>
+    <p className="text-lg text-gray-700">{startup?.established || "N/A"}</p>
+  </div>
+  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
+    <h3 className="text-xl text-gray-800 font-bold">FYDP Status</h3>
+    <p className="text-lg text-gray-700">
+      {startup?.isFydp ? "Yes" : "No"}
+    </p>
+  </div>
+</div>
+
+<div className="">
   {/* Funding Card */}
-  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+  {/* <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
     <div className="p-4 rounded-lg">
       <h2 className="text-4xl text-gray-800 font-bold mb-6">Funding</h2>
-      <p className="text-xl"><strong>Industry:</strong> {startup?.industry}</p>
+      <p className="text-xl"><strong>Industry:</strong> {startup?.businessPlan?.industry}</p>
       <p className="text-xl"><strong>Location:</strong> {startup?.location}</p>
       <p className="text-xl"><strong>Established:</strong> {startup?.established}</p>
       <p className="text-xl"><strong>FYDP Status:</strong> {startup?.isFydp ? 'Yes' : 'No'}</p>
     </div>
-  </div>
+  </div> */}
 
   {/* Funding Amount Card */}
   <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
     <div className="p-4 rounded-lg">
-      <h2 className="text-4xl text-gray-800 font-bold mb-6">Total Funding</h2>
-      <p className="text-5xl font-bold text-blue-900">${startup?.funding?.toLocaleString()}</p>
+      <h2 className="text-3xl text-gray-800 font-bold mb-6">Total Funding</h2>
+      <p className="text-5xl font-bold text-blue-900">${startup?.funding?.toLocaleString()}10000</p>
     </div>
   </div>
-
+  
+  </div>
+    {/* Investors Card */}
+    <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
+    <div className="p-4 rounded-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Investors</h2>
+      {startup?.investors.length > 1 ? (
+        <ul>
+          {startup?.investors.map((investor, index) => (
+            <li key={index} className="text-xl">{investor}</li>
+          ))}
+        </ul>
+      ) : (
+        <div>
+        <p className="text-xl text-gray-700">No investors yet.</p>
+        <button className='text-sm px-4 py-2 bg-black text-white rounded mt-2'> <Link to="/startup/find-investors"> Find Investors using AI</Link></button>
+        </div>
+      )}
+    </div>
+  </div>
   {/* Documents Card */}
   <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
     <div className="p-4 rounded-lg">
@@ -113,21 +145,7 @@ function Dashboard({startup}) {
     </div>
   </div>
 
-  {/* Investors Card */}
-  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Investors</h2>
-      {startup?.investors.length > 0 ? (
-        <ul>
-          {startup?.investors.map((investor, index) => (
-            <li key={index} className="text-xl">{investor}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-xl text-gray-700">No investors added yet.</p>
-      )}
-    </div>
-  </div>
+
 
   {/* Progress Reports Card */}
   <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
@@ -161,8 +179,6 @@ function Dashboard({startup}) {
     </div>
   </div>
 </div>
-
-
           </div>
         </main>
 

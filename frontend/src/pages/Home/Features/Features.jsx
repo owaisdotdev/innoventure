@@ -15,7 +15,7 @@ const AboutUs = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="flex flex-col items-center space-y-20 justify-center">
           <div className="flex items-center space-x-4">
-            <div className="bg-indigo-700 p-3 rounded-full">
+            <div className="bg-indigo-900 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -40,7 +40,7 @@ const AboutUs = () => {
           </div>
           {/* Feature 2 */}
           <div className="flex items-center space-x-4">
-            <div className="bg-indigo-700 p-3 rounded-full">
+            <div className="bg-indigo-900 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -80,7 +80,7 @@ const AboutUs = () => {
         <div className="flex flex-col space-y-20 justify-center">
           {/* Feature 3 */}
           <div className="flex items-center space-x-4">
-            <div className="bg-indigo-700 p-3 rounded-full">
+            <div className="bg-indigo-900 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -101,7 +101,7 @@ const AboutUs = () => {
           </div>
           {/* Feature 4 */}
           <div className="flex items-center space-x-4">
-            <div className="bg-indigo-700 p-3 rounded-full">
+            <div className="bg-indigo-900 p-3 rounded-full">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -127,18 +127,18 @@ const AboutUs = () => {
         </div>
         
       </div>
-      <div className="text-center mt-16">
+      <div className="text-center mt-28">
   <div className="flex justify-center space-x-12">
     <div className="text-gray-300">
-      <h4 className="text-xl font-semibold text-indigo-500">Startups Connected</h4>
+      <h4 className="text-xl font-semibold text-blue-600">Startups Connected</h4>
       <p className="text-2xl font-bold">20+</p>
     </div>
     <div className="text-gray-300">
-      <h4 className="text-xl font-semibold text-indigo-500">Funding Opportunities</h4>
+      <h4 className="text-xl font-semibold text-blue-600">Funding Opportunities</h4>
       <p className="text-2xl font-bold">$100k+</p>
     </div>
     <div className="text-gray-300">
-      <h4 className="text-xl font-semibold text-indigo-500">Investors Engaged</h4>
+      <h4 className="text-xl font-semibold text-blue-600">Investors Engaged</h4>
       <p className="text-2xl font-bold">50+</p>
     </div>
   </div>

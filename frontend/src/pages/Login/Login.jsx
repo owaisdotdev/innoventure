@@ -233,7 +233,7 @@ function Login() {
                     )}
                 </div>
                 <div className="hidden lg:flex flex-1">
-                    <img src="https://coinfomania.com/wp-content/uploads/Blockchain-investment.jpg" alt="Background" className="object-cover w-full h-full rounded-r-lg" />
+                    <img src="https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg" alt="Background" className="object-cover w-full h-full rounded-r-lg" />
                 </div>
             </div>
             <ToastContainer />

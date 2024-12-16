@@ -215,7 +215,7 @@ function SignUp() {
                       now!
                     </p>
                     <p className="mt-6 text-xs text-gray-600 text-center">
-                      I agree to abide by Blocklance &nbsp;
+                      `I agree to abide by Blocklance &nbsp;
                       <a
                         href="#"
                         className="border-b border-gray-500 border-dotted"
@@ -238,14 +238,14 @@ function SignUp() {
         </div>
         <div
           style={{
-            background:
-              "url('https://coinfomania.com/wp-content/uploads/Blockchain-investment.jpg')",
+            // background:
+            //   "url('https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg')",
             backgroundSize: "fill",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }}
           className="flex-1 bg-blue-100 text-center hidden lg:flex"
-        ></div>
+        ><img src="https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg" className=" text-center hidden lg:flex object-cover" alt="" /></div>
       </div>
       <ToastContainer />
     </div>
