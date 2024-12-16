@@ -20,7 +20,7 @@ export class InvestorDashboardService {
    */
   async getTotalInvestment(investorId: string): Promise<number> {
     const investments = await this.investmentModel
-      .find({ investorId: investorId })
+      .find({ investorId: new Types.ObjectId(investorId) })
       .exec();
 
     if (investments.length > 0) {
@@ -41,7 +41,7 @@ export class InvestorDashboardService {
    */
   async getActiveStartups(investorId: string): Promise<number> {
     const investments = await this.investmentModel
-      .find({ investorId: investorId })
+      .find({ investorId: new Types.ObjectId(investorId) })
       .select('startup')
       .exec();
 
@@ -55,7 +55,7 @@ export class InvestorDashboardService {
    */
   async getTotalReturns(investorId: string): Promise<number> {
     const investments = await this.investmentModel
-      .find({ investorId: investorId, status: 'approved' })
+      .find({ investorId: new Types.ObjectId(investorId), status: 'approved' })
       .exec();
 
     // If equityDistribution contributes to returns, adjust formula accordingly
@@ -107,7 +107,7 @@ export class InvestorDashboardService {
   > {
     // Fetch active investments for the investor
     const investments = await this.investmentModel
-      .find({ investorId: investorId }) // Active investments
+      .find({ investorId: new Types.ObjectId(investorId) }) // Active investments
       .populate('startupId', 'name') // Populate startup name
       .exec();
 
