@@ -9,9 +9,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateInvestorDto = exports.InvestorCriteriaDto = exports.InvestorPreferencesDto = void 0;
+exports.CreateInvestorDto = exports.InvestorCriteriaDto = exports.InvestorPreferencesDto = exports.BusinessPlanDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
+class BusinessPlanDto {
+}
+exports.BusinessPlanDto = BusinessPlanDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Description of the business plan',
+        example: 'Our business plan focuses on revolutionizing tech solutions',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], BusinessPlanDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'The industry the startup operates in',
+        example: 'Tech',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], BusinessPlanDto.prototype, "industry", void 0);
 class InvestorPreferencesDto {
 }
 exports.InvestorPreferencesDto = InvestorPreferencesDto;
@@ -75,6 +96,13 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateInvestorDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Business plan details',
+        type: BusinessPlanDto,
+    }),
+    __metadata("design:type", BusinessPlanDto)
+], CreateInvestorDto.prototype, "businessPlan", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Profile status of the investor', example: 'active' }),
     (0, class_validator_1.IsString)(),

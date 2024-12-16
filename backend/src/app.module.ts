@@ -13,6 +13,8 @@ import { SmartContractModule } from './smart-contract/smart-contract.module';
 import { InvestmentModule } from './investment/investment.module';
 import { DaoModule } from './dao/dao.module';
 import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
+import { InvestorDashboardModule } from './investor-dashboard/investor-dashboard.module';
+import { ProposalModule } from './proposal/proposal.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
     InvestmentModule,
     DaoModule,
     AdminDashboardModule,
+    InvestorDashboardModule,
+    ProposalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

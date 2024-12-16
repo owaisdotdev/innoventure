@@ -7,6 +7,24 @@ import {
   IsString,
 } from 'class-validator';
 
+export class BusinessPlanDto {
+  @ApiProperty({
+    description: 'Description of the business plan',
+    example: 'Our business plan focuses on revolutionizing tech solutions',
+  })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @ApiProperty({
+    description: 'The industry the startup operates in',
+    example: 'Tech',
+  })
+  @IsString()
+  @IsNotEmpty()
+  industry: string;
+}
+
 export class InvestorPreferencesDto {
   @ApiProperty({ description: 'Investment sectors of interest', example: ['Tech', 'Finance'] })
   @IsArray()
@@ -56,6 +74,12 @@ export class CreateInvestorDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @ApiProperty({
+    description: 'Business plan details',
+    type: BusinessPlanDto,
+  })
+  businessPlan: BusinessPlanDto;
 
   @ApiProperty({ description: 'Profile status of the investor', example: 'active' })
   @IsString()

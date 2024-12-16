@@ -46,7 +46,7 @@ __decorate([
     __metadata("design:type", Number)
 ], SmartContract.prototype, "escrowAmount", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: String, enum: ['Active', 'Completed'], required: true }),
+    (0, mongoose_1.Prop)({ type: String, enum: ['active', 'completed'], required: true }),
     __metadata("design:type", String)
 ], SmartContract.prototype, "status", void 0);
 exports.SmartContract = SmartContract = __decorate([

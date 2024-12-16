@@ -88,11 +88,11 @@ export class CreateSmartContractDto {
 
   @ApiProperty({
     description: 'Status of the smart contract',
-    enum: ['Active', 'Completed'],
-    example: 'Active',
+    enum: ['active', 'completed'],
+    example: 'active',
   })
   @IsString()
-  @IsEnum(['Active', 'Completed'])
+  @IsEnum(['active', 'completed'])
   @IsNotEmpty()
   status: string;
 }

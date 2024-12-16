@@ -14,4 +14,14 @@ export declare class InvestmentService {
     findInvestmentsByStartup(startupId: string): Promise<Investment[]>;
     findInvestmentsByContract(contractId: string): Promise<Investment[]>;
     findInvestmentsByDate(investmentDate: Date): Promise<Investment[]>;
+    getRecentInvestments(days?: number): Promise<Investment[]>;
+    getRecentInvestmentsWithDetails(): Promise<(import("mongoose").Document<unknown, {}, Investment> & Investment & Required<{
+        _id: unknown;
+    }>)[]>;
+    findInvestmentsByStatus(status: string): Promise<(import("mongoose").Document<unknown, {}, Investment> & Investment & Required<{
+        _id: unknown;
+    }>)[]>;
+    updateInvestmentStatus(investmentId: string, status: string): Promise<import("mongoose").Document<unknown, {}, Investment> & Investment & Required<{
+        _id: unknown;
+    }>>;
 }

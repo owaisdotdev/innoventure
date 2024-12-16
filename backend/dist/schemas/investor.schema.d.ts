@@ -3,6 +3,10 @@ export declare class Investor extends Document {
     name: string;
     email: string;
     password: string;
+    businessPlan: {
+        description: string;
+        industry: string;
+    };
     preferences: {
         sectors: string[];
         regions: string[];

@@ -11,6 +11,16 @@ export class Investor extends Document {
 
   @Prop({ type: String, required: true })
   password: string;
+  @Prop({
+    type: {
+      description: { type: String, required: true },
+      industry: { type: String, required: true }
+    },
+  })
+  businessPlan: {
+    description: string;
+    industry: string;
+  };
 
   @Prop({
     type: {

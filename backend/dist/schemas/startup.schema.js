@@ -32,7 +32,6 @@ __decorate([
         type: {
             description: { type: String, required: true },
             industry: { type: String, required: true },
-            team: { type: [String], required: true },
         },
     }),
     __metadata("design:type", Object)
@@ -98,6 +97,27 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Date }),
     __metadata("design:type", Date)
 ], Startup.prototype, "resetCodeExpiration", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Boolean, default: false }),
+    __metadata("design:type", Boolean)
+], Startup.prototype, "isFydp", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, default: '' }),
+    __metadata("design:type", String)
+], Startup.prototype, "description", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: {
+            university: { type: String, required: true },
+            year: { type: Number, required: true },
+            supervisorName: { type: String, required: true },
+            githubRepoUrl: { type: String, default: '' },
+            tags: { type: [String], default: [] },
+            remarks: { type: String, default: '' },
+        },
+    }),
+    __metadata("design:type", Object)
+], Startup.prototype, "fydpDetails", void 0);
 exports.Startup = Startup = __decorate([
     (0, mongoose_1.Schema)()
 ], Startup);

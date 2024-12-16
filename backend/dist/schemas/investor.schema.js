@@ -30,6 +30,15 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: {
+            description: { type: String, required: true },
+            industry: { type: String, required: true }
+        },
+    }),
+    __metadata("design:type", Object)
+], Investor.prototype, "businessPlan", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: {
             sectors: { type: [String] },
             regions: { type: [String] },
             riskTolerance: { type: String },

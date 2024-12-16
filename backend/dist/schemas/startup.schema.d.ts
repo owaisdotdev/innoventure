@@ -29,6 +29,16 @@ export declare class Startup extends Document {
     }[];
     resetCode: string;
     resetCodeExpiration: Date;
+    isFydp: boolean;
+    description: string;
+    fydpDetails: {
+        university: string;
+        year: number;
+        supervisorName: string;
+        githubRepoUrl?: string;
+        tags?: string[];
+        remarks?: string;
+    };
 }
 export declare const StartupSchema: import("mongoose").Schema<Startup, import("mongoose").Model<Startup, any, any, any, Document<unknown, any, Startup> & Startup & Required<{
     _id: unknown;

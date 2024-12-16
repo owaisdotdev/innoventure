@@ -3,6 +3,34 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Types } from 'mongoose';
+import { CreateInvestorDto } from 'src/dto/createInvestor.dto';
+import { CreateStartupDto } from 'src/dto/createStartup.dto';
+import { CreateMilestoneDto } from 'src/dto/createMilestone.dto';
+import { CreateInvestmentDto } from 'src/dto/createInvestment.dto';
+
+// LOGIN CREDENTIALS
+const investorLoginData = {
+  email: 'ali.khan@example.com',
+  password: 'securepassword123',
+};
+const startupLoginData = {
+  email: 'info@techinnovators.pk',
+  password: 'securepassword123',
+};
+const adminLoginData = {
+  email: 'admin@example.com',
+  password: 'adminpassword123',
+};
+const investorDetails = {
+  id: '675d8f1bdfaebd7bdfb533cc',
+  name: 'Ali Khan',
+};
+const startupDetails = {
+  id: '675d8f1bdfaebd7bdfb533d2',
+  name: 'Tech Innovators Pvt Ltd',
+};
+const mileStoneId = new Types.ObjectId('675d9a1b0b64c117754ee260');
+const contractId = new Types.ObjectId('675da7ad83cb99af73145dac');
 
 // describe('AuthController (e2e)', () => {
 //   let app: INestApplication;
@@ -21,20 +49,20 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/auth/signup/investor (POST) - investor', async () => {
-//     const signupData = {
-//       name: 'John Doe',
-//       email: 'john@example.com',
-//       password: 'password123',
+//     const signupData: CreateInvestorDto = {
+//       name: 'Ali Khan',
+//       email: 'ali.khan@example.com',
+//       password: 'securepassword123',
 //       profileStatus: 'active',
 //       preferences: {
-//         sectors: ['Tech'],
-//         regions: ['US'],
+//         sectors: ['Technology', 'Real Estate'],
+//         regions: ['Pakistan', 'Middle East'],
 //         riskTolerance: 'Medium',
 //       },
 //       criteria: {
-//         minInvestment: 5000,
-//         maxInvestment: 50000,
-//         investmentHorizon: '5 years',
+//         minInvestment: 50,
+//         maxInvestment: 500,
+//         investmentHorizon: '3 years',
 //       },
 //     };
 
@@ -46,13 +74,24 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/auth/signup/startup (POST) - startup', async () => {
-//     const signupData = {
-//       name: 'Startup Co',
-//       email: 'startup@example.com',
-//       password: 'password123',
+//     const signupData: CreateStartupDto = {
+//       name: 'Tech Innovators Pvt Ltd',
+//       email: 'info@techinnovators.pk',
+//       password: 'securepassword123',
 //       businessPlan: {
-//         description: 'A comprehensive plan',
-//         industry: 'Tech',
+//         description:
+//           'Our business plan focuses on developing AI-powered solutions for the healthcare sector in Pakistan.',
+//         industry: 'Healthcare Technology',
+//       },
+//       isFydp: true,
+//       fydpDetails: {
+//         university: 'National University of Sciences and Technology (NUST)',
+//         year: 2024,
+//         supervisorName: 'Dr. Ahmed Raza',
+//         githubRepoUrl: 'https://github.com/techinnovators/fydp',
+//         tags: ['AI', 'Healthcare', 'Blockchain'],
+//         remarks:
+//           'This project won the Best Innovation Award at the NUST Tech Expo 2024.',
 //       },
 //     };
 
@@ -67,7 +106,7 @@ import { Types } from 'mongoose';
 //   it('should throw ConflictException for duplicate email during investor signup', async () => {
 //     const duplicateSignupData = {
 //       name: 'John Doe',
-//       email: 'john@example.com',
+//       email: 'ali.khan@example.com',
 //       password: 'password123',
 //       profileStatus: 'active',
 //       preferences: {
@@ -92,7 +131,7 @@ import { Types } from 'mongoose';
 //   it('should throw ConflictException for duplicate email during startup signup', async () => {
 //     const duplicateSignupData = {
 //       name: 'Startup Co',
-//       email: 'startup@example.com',
+//       email: 'info@techinnovators.pk',
 //       password: 'password123',
 //       businessPlan: {
 //         description: 'A comprehensive plan',
@@ -109,14 +148,9 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/auth/login/investor (POST)', async () => {
-//     const loginData = {
-//       email: 'john@example.com',
-//       password: 'password123',
-//     };
-
 //     const response = await request(app.getHttpServer())
 //       .post('/auth/login/investor')
-//       .send(loginData)
+//       .send(investorLoginData)
 //       .expect(200);
 
 //     expect(response.body).toHaveProperty('access_token');
@@ -138,14 +172,9 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/auth/login/startup (POST)', async () => {
-//     const loginData = {
-//       email: 'startup@example.com',
-//       password: 'password123',
-//     };
-
 //     const response = await request(app.getHttpServer())
 //       .post('/auth/login/startup')
-//       .send(loginData)
+//       .send(startupLoginData)
 //       .expect(200); // Expect a successful login
 
 //     expect(response.body).toHaveProperty('access_token');
@@ -167,14 +196,9 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/auth/login/admin (POST)', async () => {
-//     const loginData = {
-//       email: 'admin@example.com',
-//       password: 'adminpassword123',
-//     };
-
 //     const response = await request(app.getHttpServer())
 //       .post('/auth/login/admin')
-//       .send(loginData)
+//       .send(adminLoginData)
 //       .expect(200);
 
 //     expect(response.body).toHaveProperty('access_token');
@@ -212,18 +236,12 @@ import { Types } from 'mongoose';
 
 //     const loginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/investor')
-//       .send({
-//         email: 'john@example.com',
-//         password: 'password123',
-//       })
+//       .send(investorLoginData)
 //       .expect(200);
 
 //     const adminLoginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/admin')
-//       .send({
-//         email: 'admin@example.com',
-//         password: 'adminpassword123',
-//       })
+//       .send(adminLoginData)
 //       .expect(200);
 
 //     token = loginResponse.body.access_token;
@@ -246,13 +264,13 @@ import { Types } from 'mongoose';
 //   it('/investors/email (GET) - should return a specific investor by email', async () => {
 //     const response = await request(app.getHttpServer())
 //       .get('/investors/email')
-//       .query({ email: 'john@example.com' })
+//       .query({ email: investorLoginData.email })
 //       .set('Authorization', `Bearer ${token}`)
 //       .expect(200);
 
 //     createdInvestorId = response.body._id;
 
-//     expect(response.body.email).toBe('john@example.com');
+//     expect(response.body.email).toBe(investorLoginData.email);
 //   });
 
 //   it('/investors/:id (GET) - should return a specific investor by ID', async () => {
@@ -261,20 +279,14 @@ import { Types } from 'mongoose';
 //       .set('Authorization', `Bearer ${token}`)
 //       .expect(200);
 
-//     expect(response.body.email).toBe('john@example.com');
+//     expect(response.body.email).toBe(investorLoginData.email);
 //   });
 
 //   it('/investors/:id (PUT) - should update an investor', async () => {
 //     const updateData = {
-//       name: 'John Updated',
-//       preferences: {
-//         sectors: ['Tech', 'Health'],
-//         regions: ['US'],
-//         riskTolerance: 'High',
-//       },
 //       criteria: {
-//         minInvestment: 10000,
-//         maxInvestment: 100000,
+//         minInvestment: 10,
+//         maxInvestment: 100,
 //         investmentHorizon: '10 years',
 //       },
 //     };
@@ -285,8 +297,8 @@ import { Types } from 'mongoose';
 //       .send(updateData)
 //       .expect(200);
 
-//     expect(response.body.name).toBe('John Updated');
-//     expect(response.body.preferences.riskTolerance).toBe('High');
+//     expect(response.body.name).toBe(investorDetails.name);
+//     expect(response.body.preferences.riskTolerance).toBe('Medium');
 //   });
 
 //   it('/investors/:id (DELETE) - should fail when an non admin tries to delete', async () => {
@@ -315,37 +327,31 @@ import { Types } from 'mongoose';
 //   it('should return investors by sector', async () => {
 //     const response = await request(app.getHttpServer())
 //       .get('/investors/sector')
-//       .query({ sector: 'Tech' })
+//       .query({ sector: 'Technology' })
 //       .expect(200);
 
 //     expect(Array.isArray(response.body)).toBe(true);
-//     expect(
-//       response.body[0].preferences.sectors,
-//     ).toContain('Tech');
+//     expect(response.body[0].preferences.sectors).toContain('Technology');
 //   });
 
 //   it('should return investors by region', async () => {
 //     const response = await request(app.getHttpServer())
 //       .get('/investors/region')
-//       .query({ region: 'US' })
+//       .query({ region: 'Pakistan' })
 //       .expect(200);
 
 //     expect(Array.isArray(response.body)).toBe(true);
-//     expect(
-//       response.body[0].preferences.regions,
-//     ).toContain('US');
+//     expect(response.body[0].preferences.regions).toContain('Pakistan');
 //   });
 
 //   it('should return investors by risk tolerance', async () => {
 //     const response = await request(app.getHttpServer())
 //       .get('/investors/risk-tolerance')
-//       .query({ riskTolerance: 'High' })
+//       .query({ riskTolerance: 'Medium' })
 //       .expect(200);
 
 //     expect(Array.isArray(response.body)).toBe(true);
-//     expect(
-//       response.body[0].preferences.riskTolerance,
-//     ).toBe('High');
+//     expect(response.body[0].preferences.riskTolerance).toBe('Medium');
 //   });
 
 //   it('should return investors within an investment range', async () => {
@@ -374,18 +380,12 @@ import { Types } from 'mongoose';
 
 //     const loginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/startup')
-//       .send({
-//         email: 'startup@example.com',
-//         password: 'password123',
-//       })
+//       .send(startupLoginData)
 //       .expect(200);
 
 //     const adminLoginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/admin')
-//       .send({
-//         email: 'admin@example.com',
-//         password: 'adminpassword123',
-//       })
+//       .send(adminLoginData)
 //       .expect(200);
 
 //     token = loginResponse.body.access_token;
@@ -408,13 +408,13 @@ import { Types } from 'mongoose';
 //   it('/startups/email (GET) - should return a specific startup by email', async () => {
 //     const response = await request(app.getHttpServer())
 //       .get('/startups/email')
-//       .query({ email: 'startup@example.com' })
+//       .query({ email: startupLoginData.email })
 //       .set('Authorization', `Bearer ${token}`)
 //       .expect(200);
 
 //     createdStartupId = response.body._id;
 
-//     expect(response.body.email).toBe('startup@example.com');
+//     expect(response.body.email).toBe(startupLoginData.email);
 //   });
 
 //   it('/startups/:id (GET) - should return a specific startup by ID', async () => {
@@ -423,14 +423,14 @@ import { Types } from 'mongoose';
 //       .set('Authorization', `Bearer ${token}`)
 //       .expect(200);
 
-//     expect(response.body.email).toBe('startup@example.com');
+//     expect(response.body.email).toBe(startupLoginData.email);
 //   });
 
 //   it('/startups/:id (PUT) - should update an startup', async () => {
 //     const updateData = {
-//       name: 'Startup Updated',
 //       businessPlan: {
-//         description: 'A comprehensive plan',
+//         description:
+//           'Our business plan focuses on developing AI-powered solutions for the healthcare sector.',
 //         industry: 'AI',
 //       },
 //     };
@@ -441,7 +441,7 @@ import { Types } from 'mongoose';
 //       .send(updateData)
 //       .expect(200);
 
-//     expect(response.body.name).toBe('Startup Updated');
+//     expect(response.body.name).toBe(startupDetails.name);
 //     expect(response.body.businessPlan.industry).toBe('AI');
 //   });
 
@@ -464,19 +464,19 @@ import { Types } from 'mongoose';
 //     expect(response.body.message).toBe('Unauthorized');
 //   });
 
-//   it('/startups/:id (DELETE) - should delete an startup', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/startups/${createdStartupId}`)
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(200);
+//   // it('/startups/:id (DELETE) - should delete an startup', async () => {
+//   //   await request(app.getHttpServer())
+//   //     .delete(`/startups/${createdStartupId}`)
+//   //     .set('Authorization', `Bearer ${adminToken}`)
+//   //     .expect(200);
 
-//     const getResponse = await request(app.getHttpServer())
-//       .get(`/startups/${createdStartupId}`)
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(404);
+//   //   const getResponse = await request(app.getHttpServer())
+//   //     .get(`/startups/${createdStartupId}`)
+//   //     .set('Authorization', `Bearer ${adminToken}`)
+//   //     .expect(404);
 
-//     expect(getResponse.body.message).toBe('Startup not found');
-//   });
+//   //   expect(getResponse.body.message).toBe('Startup not found');
+//   // });
 // });
 
 // describe('MilestoneController (e2e)', () => {
@@ -492,15 +492,12 @@ import { Types } from 'mongoose';
 //     }).compile();
 
 //     app = moduleFixture.createNestApplication();
-//     await app.init();;
+//     await app.init();
 
 //     // Login as admin
 //     const adminLoginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/admin')
-//       .send({
-//         email: 'admin@example.com',
-//         password: 'adminpassword123',
-//       })
+//       .send(adminLoginData)
 //       .expect(200);
 
 //     adminToken = adminLoginResponse.body.access_token;
@@ -508,14 +505,11 @@ import { Types } from 'mongoose';
 //     // Login as startup to get token if needed
 //     const startupLoginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/startup')
-//       .send({
-//         email: 'startup@example.com',
-//         password: 'password123',
-//       })
+//       .send(startupLoginData)
 //       .expect(200);
 
 //     token = startupLoginResponse.body.access_token;
-//     startupId = '66fef41697d7d71ef8efb0bd';
+//     startupId = startupDetails.id;
 //   });
 
 //   afterAll(async () => {
@@ -523,13 +517,14 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/milestones/create (POST) - should create a milestone', async () => {
-//     const createMilestoneDto = {
-//       startupId: startupId,
-//       title: 'Milestone 1',
-//       description: 'First milestone description',
-//       dueDate: new Date('2024-12-31'),
-//       amountToBeReleased: 10000,
-//       status: 'pending'
+//     const createMilestoneDto: CreateMilestoneDto = {
+//       startupId: new Types.ObjectId(startupId),
+//       title: 'Prototype Development',
+//       description:
+//         'Develop a functional prototype for the smart irrigation system.',
+//       dueDate: new Date('2025-06-30'),
+//       amountToBeReleased: 5000,
+//       status: 'pending',
 //     };
 
 //     const response = await request(app.getHttpServer())
@@ -557,12 +552,12 @@ import { Types } from 'mongoose';
 //   it('/milestones/title (GET) - should return milestones by title', async () => {
 //     const response = await request(app.getHttpServer())
 //       .get('/milestones/title')
-//       .query({ title: 'Milestone 1' })
+//       .query({ title: 'Prototype Development' })
 //       .set('Authorization', `Bearer ${adminToken}`)
 //       .expect(200);
 
 //     expect(Array.isArray(response.body)).toBe(true);
-//     expect(response.body[0].title).toBe('Milestone 1');
+//     expect(response.body[0].title).toBe('Prototype Development');
 //   });
 
 //   it('/milestones/:id (GET) - should return a milestone by ID', async () => {
@@ -572,13 +567,12 @@ import { Types } from 'mongoose';
 //       .expect(200);
 
 //     expect(response.body._id).toBe(createdMilestoneId);
-//     expect(response.body.title).toBe('Milestone 1');
+//     expect(response.body.title).toBe('Prototype Development');
 //   });
 
 //   it('/milestones/:id (PUT) - should update a milestone', async () => {
 //     const updateMilestoneDto = {
-//       title: 'Updated Milestone 1',
-//       status: 'completed',
+//       status: 'pending',
 //     };
 
 //     const response = await request(app.getHttpServer())
@@ -587,21 +581,20 @@ import { Types } from 'mongoose';
 //       .set('Authorization', `Bearer ${adminToken}`)
 //       .expect(200);
 
-//     expect(response.body.title).toBe(updateMilestoneDto.title);
 //     expect(response.body.status).toBe(updateMilestoneDto.status);
 //   });
 
-//   it('/milestones/:id (DELETE) - should delete a milestone', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/milestones/${createdMilestoneId}`)
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(200);
+//   // it('/milestones/:id (DELETE) - should delete a milestone', async () => {
+//   //   await request(app.getHttpServer())
+//   //     .delete(`/milestones/${createdMilestoneId}`)
+//   //     .set('Authorization', `Bearer ${adminToken}`)
+//   //     .expect(200);
 
-//     await request(app.getHttpServer())
-//       .get(`/milestones/${createdMilestoneId}`)
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(404);
-//   });
+//   //   await request(app.getHttpServer())
+//   //     .get(`/milestones/${createdMilestoneId}`)
+//   //     .set('Authorization', `Bearer ${adminToken}`)
+//   //     .expect(404);
+//   // });
 
 //   it('/milestones/title (GET) - should return 400 if title is missing', async () => {
 //     await request(app.getHttpServer())
@@ -632,24 +625,16 @@ import { Types } from 'mongoose';
 //     app = moduleFixture.createNestApplication();
 //     await app.init();
 
-//     const startupSignupData = {
-//       email: 'startup@example.com',
-//       password: 'password123',
-//     };
-
 //     const startupSignupResponse = await request(app.getHttpServer())
 //       .post('/auth/login/startup')
-//       .send(startupSignupData)
+//       .send(startupLoginData);
 
 //     startupId = startupSignupResponse.body.startup._doc._id;
 
 //     // Login as admin
 //     const adminLoginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/admin')
-//       .send({
-//         email: 'admin@example.com',
-//         password: 'adminpassword123',
-//       })
+//       .send(adminLoginData)
 //       .expect(200);
 
 //     adminToken = adminLoginResponse.body.access_token;
@@ -660,19 +645,18 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/smart-contracts (POST) - should create a smart contract', async () => {
-//     const milestoneId = new Types.ObjectId('67001e81b2763527b243d2fd');
-
 //     const createSmartContractDto = {
 //       terms: {
-//         milestoneConditions: 'Complete all milestones',
-//         escrowAmount: 5000,
+//         milestoneConditions:
+//           'Deliver a working MVP for the blockchain-based supply chain solution.',
+//         escrowAmount: 100,
 //       },
 //       milestoneStatus: {
-//         milestoneId: milestoneId,
+//         milestoneId: mileStoneId,
 //         status: 'Pending',
 //       },
-//       escrowAmount: 20000,
-//       status: 'Active',
+//       escrowAmount: 100, // PKR
+//       status: 'active',
 //     };
 
 //     const response = await request(app.getHttpServer())
@@ -681,7 +665,9 @@ import { Types } from 'mongoose';
 //       .set('Authorization', `Bearer ${adminToken}`)
 //       .expect(201);
 
-//     expect(response.body.terms.milestoneConditions).toBe(createSmartContractDto.terms.milestoneConditions);
+//     expect(response.body.terms.milestoneConditions).toBe(
+//       createSmartContractDto.terms.milestoneConditions,
+//     );
 //     expect(response.body.status).toBe(createSmartContractDto.status);
 
 //     createdSmartContractId = response.body._id;
@@ -704,12 +690,12 @@ import { Types } from 'mongoose';
 //       .expect(200);
 
 //     expect(response.body._id).toBe(createdSmartContractId);
-//     expect(response.body.status).toBe('Active');
+//     expect(response.body.status).toBe('active');
 //   });
 
 //   it('/smart-contracts/:id (PUT) - should update a smart contract', async () => {
 //     const updateSmartContractDto = {
-//       status: 'Completed',
+//       status: 'active',
 //     };
 
 //     const response = await request(app.getHttpServer())
@@ -721,25 +707,15 @@ import { Types } from 'mongoose';
 //     expect(response.body.status).toBe(updateSmartContractDto.status);
 //   });
 
-//   it('/smart-contracts/:id/investment (POST) - should add investment to smart contract', async () => {
-//     const investmentId = new Types.ObjectId().toHexString();
-
-//     await request(app.getHttpServer())
-//       .post(`/smart-contracts/${createdSmartContractId}/investment`)
-//       .send({ investmentId })
-//       .set('Authorization', `Bearer ${adminToken}`)
-//       .expect(200);
-//   });
-
 //   it('/smart-contracts/status/:status (GET) - should retrieve smart contracts by status', async () => {
 //     const response = await request(app.getHttpServer())
-//       .get('/smart-contracts/status/Completed')
+//       .get('/smart-contracts/status/active')
 //       .set('Authorization', `Bearer ${adminToken}`)
 //       .expect(200);
 
 //     expect(Array.isArray(response.body)).toBe(true);
 //     response.body.forEach((contract) => {
-//       expect(contract.status).toBe('Completed');
+//       expect(contract.status).toBe('active');
 //     });
 //   });
 
@@ -777,10 +753,7 @@ import { Types } from 'mongoose';
 //     // Login as admin
 //     const adminLoginResponse = await request(app.getHttpServer())
 //       .post('/auth/login/admin')
-//       .send({
-//         email: 'admin@example.com',
-//         password: 'adminpassword123',
-//       })
+//       .send(adminLoginData)
 //       .expect(200);
 
 //     adminToken = adminLoginResponse.body.access_token;
@@ -791,22 +764,22 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/investments (POST) - should create a new investment', async () => {
-//     const createInvestmentDto = {
-//       investorId: new Types.ObjectId('66ffd1484ca4ca6c44f7f531'),
-//       startupId: new Types.ObjectId('66fef41697d7d71ef8efb0bd'),
-//       amount: 5000,
+//     const createInvestmentDto: CreateInvestmentDto = {
+//       investorId: new Types.ObjectId(investorDetails.id),
+//       startupId: new Types.ObjectId(startupDetails.id),
+//       amount: 500,
 //       terms: {
-//         equity: 20,
-//         conditions: 'Investment conditions',
+//         equity: 10,
+//         conditions: 'Investor holds 10% equity with no voting rights',
 //       },
 //       escrowStatus: {
-//         amount: 2000,
-//         releaseDate: new Date(),
+//         amount: 250,
+//         releaseDate: new Date('2024-12-31T00:00:00.000Z'),
 //         status: 'In escrow',
 //       },
-//       contractId: new Types.ObjectId('6700368d92c0f1a14e281bff'),
+//       contractId: contractId,
 //       equityDistribution: 10,
-//       investmentDate: new Date(),
+//       investmentDate: new Date('2024-01-01T00:00:00.000Z'),
 //     };
 
 //     const response = await request(app.getHttpServer())
@@ -840,11 +813,7 @@ import { Types } from 'mongoose';
 
 //   it('/investments/:id (PUT) - should update an investment', async () => {
 //     const updateInvestmentDto = {
-//       amount: 7000,
-//       terms: {
-//         equity: 20,
-//         conditions: 'Investment conditions',
-//       },
+//       amount: 700,
 //     };
 
 //     const response = await request(app.getHttpServer())
@@ -854,7 +823,6 @@ import { Types } from 'mongoose';
 //       .expect(200);
 
 //     expect(response.body.amount).toBe(updateInvestmentDto.amount);
-//     expect(response.body.terms.equity).toBe(updateInvestmentDto.terms.equity);
 //   });
 
 //   // it('/investments/:id (DELETE) - should delete an investment by ID', async () => {
@@ -865,7 +833,7 @@ import { Types } from 'mongoose';
 //   // });
 
 //   it('/investments/by-investor/:investorId (GET) - should retrieve investments by investor ID', async () => {
-//     const investorId = new Types.ObjectId('66feebb123e7cb24cc233158');
+//     const investorId = new Types.ObjectId(investorDetails.id);
 //     const response = await request(app.getHttpServer())
 //       .get(`/investments/by-investor/${investorId}`)
 //       .set('Authorization', `Bearer ${adminToken}`)
@@ -878,7 +846,7 @@ import { Types } from 'mongoose';
 //   });
 
 //   it('/investments/by-startup/:startupId (GET) - should retrieve investments by startup ID', async () => {
-//     const startupId = '66feebb123e7cb24cc233159';
+//     const startupId = startupDetails.id;
 
 //     const response = await request(app.getHttpServer())
 //       .get(`/investments/by-startup/${startupId}`)
@@ -901,9 +869,166 @@ import { Types } from 'mongoose';
 //   });
 // });
 
-describe('AdminDashboardController (e2e)', () => {
+// describe('AdminDashboardController (e2e)', () => {
+//   let app: INestApplication;
+//   let adminToken: string;
+
+//   beforeAll(async () => {
+//     const moduleFixture: TestingModule = await Test.createTestingModule({
+//       imports: [AppModule],
+//     }).compile();
+
+//     app = moduleFixture.createNestApplication();
+//     await app.init();
+
+//     // Login as admin
+//     const adminLoginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/admin')
+//       .send({
+//         email: 'admin@example.com',
+//         password: 'adminpassword123',
+//       })
+//       .expect(200);
+
+//     adminToken = adminLoginResponse.body.access_token;
+//   });
+
+//   afterAll(async () => {
+//     await app.close();
+//   });
+
+//   it('/admin-dashboard/total-investments (GET) - should return total investments (amount and count)', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/admin-dashboard/total-investments')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(response.body.totalAmount).toBeDefined();
+//     expect(response.body.totalCount).toBeDefined();
+//   });
+
+//   it('/admin-dashboard/active-startups (GET) - should return total active startups', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/admin-dashboard/active-startups')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(typeof response.body.activeStartups).toBe('number');
+//   });
+
+//   it('/admin-dashboard/active-investors (GET) - should return total active investors', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/admin-dashboard/active-investors')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(typeof response.body.activeInvestors).toBe('number');
+//   });
+
+//   it('/admin-dashboard/recent-activity (GET) - should return recent activity', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get('/admin-dashboard/recent-activity')
+//       .set('Authorization', `Bearer ${adminToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(response.body.recentInvestments).toBeDefined();
+//     expect(response.body.recentStartups).toBeDefined();
+//     expect(response.body.recentInvestors).toBeDefined();
+//   });
+// });
+
+// describe('InvestorDashboardController (e2e)', () => {
+//   let app: INestApplication;
+//   let investorToken: string;
+//   const investorId = investorDetails.id;
+
+//   beforeAll(async () => {
+//     const moduleFixture: TestingModule = await Test.createTestingModule({
+//       imports: [AppModule],
+//     }).compile();
+
+//     app = moduleFixture.createNestApplication();
+//     await app.init();
+
+//     // Login as investor
+//     const investorLoginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/investor')
+//       .send(investorLoginData)
+//       .expect(200);
+
+//     investorToken = investorLoginResponse.body.access_token;
+//   });
+
+//   afterAll(async () => {
+//     await app.close();
+//   });
+
+//   it('/investor-dashboard/:investorId/total-investment (GET) - should return total investment amount', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/total-investment`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     expect(typeof response.body.total).toBe('number');
+//   });
+
+//   it('/investor-dashboard/:investorId/active-projects (GET) - should return total active startups', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/active-projects`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     expect(typeof response.body.activeProjects).toBe('number');
+//   });
+
+//   it('/investor-dashboard/:investorId/total-returns (GET) - should return total returns', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/total-returns`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     expect(typeof response.body.totalReturns).toBe('number');
+//   });
+
+//   it('/investor-dashboard/:investorId/recent-activity (GET) - should return recent activity', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/recent-activity?limit=5`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(Array.isArray(response.body)).toBe(true);
+//     if (response.body.length > 0) {
+//       expect(response.body[0]).toHaveProperty('type');
+//       expect(response.body[0]).toHaveProperty('message');
+//       expect(response.body[0]).toHaveProperty('date');
+//     }
+//   });
+
+//   it('/investor-dashboard/:investorId/portfolio (GET) - should return active investments', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/portfolio`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(Array.isArray(response.body)).toBe(true);
+//     if (response.body.length > 0) {
+//       expect(response.body[0]).toHaveProperty('startupName');
+//       expect(response.body[0]).toHaveProperty('amount');
+//       expect(response.body[0]).toHaveProperty('status');
+//     }
+//   });
+// });
+
+describe('ProposalController (e2e)', () => {
   let app: INestApplication;
-  let adminToken: string;
+  let investorToken: string;
+  const investorId = investorDetails.id;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -913,62 +1038,152 @@ describe('AdminDashboardController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    // Login as admin
-    const adminLoginResponse = await request(app.getHttpServer())
-      .post('/auth/login/admin')
-      .send({
-        email: 'admin@example.com',
-        password: 'adminpassword123',
-      })
+    // Login as investor
+    const investorLoginResponse = await request(app.getHttpServer())
+      .post('/auth/login/investor')
+      .send(investorLoginData)
       .expect(200);
 
-    adminToken = adminLoginResponse.body.access_token;
+    investorToken = investorLoginResponse.body.access_token;
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it('/admin-dashboard/total-investments (GET) - should return total investments (amount and count)', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/admin-dashboard/total-investments')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .expect(200);
+  let createdProposalId: string;
+  const createProposalDto = {
+    investorId: investorDetails.id,
+    startupId: startupDetails.id,
+    industry: 'Technology',
+    investmentAmount: 1000,
+    terms: {
+      equity: 10,
+      conditions: 'Monthly revenue share of 5%',
+    },
+    escrowStatus: {
+      amount: 1000,
+      releaseDate: new Date().toISOString(),
+      status: 'In escrow',
+    },
+    status: 'pending',
+  };
 
-    console.log(response.body);
-    expect(response.body.totalAmount).toBeDefined();
-    expect(response.body.totalCount).toBeDefined();
+  it('/proposals (POST)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/proposals')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send(createProposalDto)
+      .expect(201);
+
+    createdProposalId = response.body._id;
+    expect(response.body).toHaveProperty('_id');
+    expect(response.body.investorId).toBe(investorDetails.id);
+    expect(response.body.startupId).toBe(startupDetails.id);
   });
 
-  it('/admin-dashboard/active-startups (GET) - should return total active startups', async () => {
+  it('/proposals (GET)', async () => {
     const response = await request(app.getHttpServer())
-      .get('/admin-dashboard/active-startups')
-      .set('Authorization', `Bearer ${adminToken}`)
+      .get('/proposals')
+      .set('Authorization', `Bearer ${investorToken}`)
       .expect(200);
 
-    console.log(response.body);
-    expect(typeof response.body.activeStartups).toBe('number');
+    expect(Array.isArray(response.body)).toBe(true);
+    if (response.body.length > 0) {
+      expect(response.body[0]).toHaveProperty('investorId');
+      expect(response.body[0]).toHaveProperty('startupId');
+      expect(response.body[0]).toHaveProperty('status');
+    }
   });
 
-  it('/admin-dashboard/active-investors (GET) - should return total active investors', async () => {
+  it('should get proposals filtered by status', async () => {
     const response = await request(app.getHttpServer())
-      .get('/admin-dashboard/active-investors')
-      .set('Authorization', `Bearer ${adminToken}`)
+      .get('/proposals?status=pending')
+      .set('Authorization', `Bearer ${investorToken}`)
       .expect(200);
 
-    console.log(response.body);
-    expect(typeof response.body.activeInvestors).toBe('number');
+    expect(Array.isArray(response.body)).toBe(true);
+    response.body.forEach((proposal) => {
+      expect(proposal.status).toBe('pending');
+    });
   });
 
-  it('/admin-dashboard/recent-activity (GET) - should return recent activity', async () => {
+  it('/proposals/:id (GET)', async () => {
     const response = await request(app.getHttpServer())
-      .get('/admin-dashboard/recent-activity')
-      .set('Authorization', `Bearer ${adminToken}`)
+      .get(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
       .expect(200);
 
-    console.log(response.body);
-    expect(response.body.recentInvestments).toBeDefined();
-    expect(response.body.recentStartups).toBeDefined();
-    expect(response.body.recentInvestors).toBeDefined();
+    expect(response.body._id).toBe(createdProposalId);
+    expect(response.body.investorId).toBe(investorDetails.id);
+  });
+
+  it('should return 404 for non-existent proposal', async () => {
+    await request(app.getHttpServer())
+      .get('/proposals/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(404);
+  });
+
+  it('/proposals/:id (PUT)', async () => {
+    const updateDto = {
+      investmentAmount: 150000,
+      terms: {
+        equity: 15,
+        conditions: 'Quarterly revenue share of 7%',
+      },
+    };
+
+    const response = await request(app.getHttpServer())
+      .put(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send(updateDto)
+      .expect(200);
+
+    expect(response.body.investmentAmount).toBe(150000);
+    expect(response.body.terms.equity).toBe(15);
+  });
+
+  it('/proposals/:id/status (PATCH)', async () => {
+    const response = await request(app.getHttpServer())
+      .patch(`/proposals/${createdProposalId}/status`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send({ status: 'accepted' })
+      .expect(200);
+
+    expect(response.body.status).toBe('accepted');
+  });
+
+  it('/proposals/:id/escrow (PATCH)', async () => {
+    const response = await request(app.getHttpServer())
+      .patch(`/proposals/${createdProposalId}/escrow`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send({
+        status: 'Released',
+        releaseDate: new Date().toISOString(),
+      })
+      .expect(200);
+
+    expect(response.body.escrowStatus.status).toBe('Released');
+  });
+
+  it('/proposals/:id (DELETE', async () => {
+    await request(app.getHttpServer())
+      .delete(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(200);
+
+    // Verify the proposal is deleted
+    await request(app.getHttpServer())
+      .get(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(404);
+  });
+
+  it('should return 404 for deleting non-existent proposal', async () => {
+    await request(app.getHttpServer())
+      .delete('/proposals/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(404);
   });
 });
