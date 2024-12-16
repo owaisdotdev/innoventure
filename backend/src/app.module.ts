@@ -14,6 +14,7 @@ import { InvestmentModule } from './investment/investment.module';
 import { DaoModule } from './dao/dao.module';
 import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 import { InvestorDashboardModule } from './investor-dashboard/investor-dashboard.module';
+import { ProposalModule } from './proposal/proposal.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { InvestorDashboardModule } from './investor-dashboard/investor-dashboard
     DaoModule,
     AdminDashboardModule,
     InvestorDashboardModule,
+    ProposalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

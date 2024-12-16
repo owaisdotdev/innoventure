@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-@Schema()
-export class Propsoal extends Document {
+@Schema({ timestamps: true })
+export class Proposal extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Investor' })
   investorId: Types.ObjectId;
 
@@ -40,7 +40,7 @@ export class Propsoal extends Document {
     releaseDate: Date;
     status: string; // E.g., "In escrow", "Released"
   };
-  
+
   @Prop({
     type: String,
     enum: ['pending', 'accepted', 'rejected'],
@@ -49,4 +49,4 @@ export class Propsoal extends Document {
   status: string;
 }
 
-export const PropsoalSchema = SchemaFactory.createForClass(Propsoal);
+export const ProposalSchema = SchemaFactory.createForClass(Proposal);

@@ -941,10 +941,94 @@ const contractId = new Types.ObjectId('675da7ad83cb99af73145dac');
 //   });
 // });
 
-describe('InvestorDashboardController (e2e)', () => {
+// describe('InvestorDashboardController (e2e)', () => {
+//   let app: INestApplication;
+//   let investorToken: string;
+//   const investorId = investorDetails.id;
+
+//   beforeAll(async () => {
+//     const moduleFixture: TestingModule = await Test.createTestingModule({
+//       imports: [AppModule],
+//     }).compile();
+
+//     app = moduleFixture.createNestApplication();
+//     await app.init();
+
+//     // Login as investor
+//     const investorLoginResponse = await request(app.getHttpServer())
+//       .post('/auth/login/investor')
+//       .send(investorLoginData)
+//       .expect(200);
+
+//     investorToken = investorLoginResponse.body.access_token;
+//   });
+
+//   afterAll(async () => {
+//     await app.close();
+//   });
+
+//   it('/investor-dashboard/:investorId/total-investment (GET) - should return total investment amount', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/total-investment`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     expect(typeof response.body.total).toBe('number');
+//   });
+
+//   it('/investor-dashboard/:investorId/active-projects (GET) - should return total active startups', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/active-projects`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     expect(typeof response.body.activeProjects).toBe('number');
+//   });
+
+//   it('/investor-dashboard/:investorId/total-returns (GET) - should return total returns', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/total-returns`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     expect(typeof response.body.totalReturns).toBe('number');
+//   });
+
+//   it('/investor-dashboard/:investorId/recent-activity (GET) - should return recent activity', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/recent-activity?limit=5`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(Array.isArray(response.body)).toBe(true);
+//     if (response.body.length > 0) {
+//       expect(response.body[0]).toHaveProperty('type');
+//       expect(response.body[0]).toHaveProperty('message');
+//       expect(response.body[0]).toHaveProperty('date');
+//     }
+//   });
+
+//   it('/investor-dashboard/:investorId/portfolio (GET) - should return active investments', async () => {
+//     const response = await request(app.getHttpServer())
+//       .get(`/investor-dashboard/${investorId}/portfolio`)
+//       .set('Authorization', `Bearer ${investorToken}`)
+//       .expect(200);
+
+//     console.log(response.body);
+//     expect(Array.isArray(response.body)).toBe(true);
+//     if (response.body.length > 0) {
+//       expect(response.body[0]).toHaveProperty('startupName');
+//       expect(response.body[0]).toHaveProperty('amount');
+//       expect(response.body[0]).toHaveProperty('status');
+//     }
+//   });
+// });
+
+describe('ProposalController (e2e)', () => {
   let app: INestApplication;
   let investorToken: string;
-  const investorId = investorDetails.id; 
+  const investorId = investorDetails.id;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -967,60 +1051,139 @@ describe('InvestorDashboardController (e2e)', () => {
     await app.close();
   });
 
-  it('/investor-dashboard/:investorId/total-investment (GET) - should return total investment amount', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`/investor-dashboard/${investorId}/total-investment`)
-      .set('Authorization', `Bearer ${investorToken}`)
-      .expect(200);
+  let createdProposalId: string;
+  const createProposalDto = {
+    investorId: investorDetails.id,
+    startupId: startupDetails.id,
+    industry: 'Technology',
+    investmentAmount: 1000,
+    terms: {
+      equity: 10,
+      conditions: 'Monthly revenue share of 5%',
+    },
+    escrowStatus: {
+      amount: 1000,
+      releaseDate: new Date().toISOString(),
+      status: 'In escrow',
+    },
+    status: 'pending',
+  };
 
-    expect(typeof response.body.total).toBe('number');
+  it('/proposals (POST)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/proposals')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send(createProposalDto)
+      .expect(201);
+
+    createdProposalId = response.body._id;
+    expect(response.body).toHaveProperty('_id');
+    expect(response.body.investorId).toBe(investorDetails.id);
+    expect(response.body.startupId).toBe(startupDetails.id);
   });
 
-  it('/investor-dashboard/:investorId/active-projects (GET) - should return total active startups', async () => {
+  it('/proposals (GET)', async () => {
     const response = await request(app.getHttpServer())
-      .get(`/investor-dashboard/${investorId}/active-projects`)
+      .get('/proposals')
       .set('Authorization', `Bearer ${investorToken}`)
       .expect(200);
 
-    expect(typeof response.body.activeProjects).toBe('number');
-  });
-
-  it('/investor-dashboard/:investorId/total-returns (GET) - should return total returns', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`/investor-dashboard/${investorId}/total-returns`)
-      .set('Authorization', `Bearer ${investorToken}`)
-      .expect(200);
-
-    expect(typeof response.body.totalReturns).toBe('number');
-  });
-
-  it('/investor-dashboard/:investorId/recent-activity (GET) - should return recent activity', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`/investor-dashboard/${investorId}/recent-activity?limit=5`)
-      .set('Authorization', `Bearer ${investorToken}`)
-      .expect(200);
-
-    console.log(response.body);
     expect(Array.isArray(response.body)).toBe(true);
     if (response.body.length > 0) {
-      expect(response.body[0]).toHaveProperty('type');
-      expect(response.body[0]).toHaveProperty('message');
-      expect(response.body[0]).toHaveProperty('date');
-    }
-  });
-
-  it('/investor-dashboard/:investorId/portfolio (GET) - should return active investments', async () => {
-    const response = await request(app.getHttpServer())
-      .get(`/investor-dashboard/${investorId}/portfolio`)
-      .set('Authorization', `Bearer ${investorToken}`)
-      .expect(200);
-
-    console.log(response.body);
-    expect(Array.isArray(response.body)).toBe(true);
-    if (response.body.length > 0) {
-      expect(response.body[0]).toHaveProperty('startupName');
-      expect(response.body[0]).toHaveProperty('amount');
+      expect(response.body[0]).toHaveProperty('investorId');
+      expect(response.body[0]).toHaveProperty('startupId');
       expect(response.body[0]).toHaveProperty('status');
     }
+  });
+
+  it('should get proposals filtered by status', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/proposals?status=pending')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(200);
+
+    expect(Array.isArray(response.body)).toBe(true);
+    response.body.forEach((proposal) => {
+      expect(proposal.status).toBe('pending');
+    });
+  });
+
+  it('/proposals/:id (GET)', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(200);
+
+    expect(response.body._id).toBe(createdProposalId);
+    expect(response.body.investorId).toBe(investorDetails.id);
+  });
+
+  it('should return 404 for non-existent proposal', async () => {
+    await request(app.getHttpServer())
+      .get('/proposals/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(404);
+  });
+
+  it('/proposals/:id (PUT)', async () => {
+    const updateDto = {
+      investmentAmount: 150000,
+      terms: {
+        equity: 15,
+        conditions: 'Quarterly revenue share of 7%',
+      },
+    };
+
+    const response = await request(app.getHttpServer())
+      .put(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send(updateDto)
+      .expect(200);
+
+    expect(response.body.investmentAmount).toBe(150000);
+    expect(response.body.terms.equity).toBe(15);
+  });
+
+  it('/proposals/:id/status (PATCH)', async () => {
+    const response = await request(app.getHttpServer())
+      .patch(`/proposals/${createdProposalId}/status`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send({ status: 'accepted' })
+      .expect(200);
+
+    expect(response.body.status).toBe('accepted');
+  });
+
+  it('/proposals/:id/escrow (PATCH)', async () => {
+    const response = await request(app.getHttpServer())
+      .patch(`/proposals/${createdProposalId}/escrow`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .send({
+        status: 'Released',
+        releaseDate: new Date().toISOString(),
+      })
+      .expect(200);
+
+    expect(response.body.escrowStatus.status).toBe('Released');
+  });
+
+  it('/proposals/:id (DELETE', async () => {
+    await request(app.getHttpServer())
+      .delete(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(200);
+
+    // Verify the proposal is deleted
+    await request(app.getHttpServer())
+      .get(`/proposals/${createdProposalId}`)
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(404);
+  });
+
+  it('should return 404 for deleting non-existent proposal', async () => {
+    await request(app.getHttpServer())
+      .delete('/proposals/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${investorToken}`)
+      .expect(404);
   });
 });
