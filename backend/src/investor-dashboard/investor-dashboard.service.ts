@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Investor } from '../schemas/investor.schema';
 import { Startup } from '../schemas/startup.schema';
 import { Investment } from '../schemas/investment.schema';
+import { Proposal } from '../schemas/proposal.schema';
 
 @Injectable()
 export class InvestorDashboardService {
@@ -11,6 +12,7 @@ export class InvestorDashboardService {
     @InjectModel(Investor.name) private investorModel: Model<Investor>,
     @InjectModel(Startup.name) private startupModel: Model<Startup>,
     @InjectModel(Investment.name) private investmentModel: Model<Investment>,
+    @InjectModel(Proposal.name) private proposalModel: Model<Proposal>,
   ) {}
 
   /**
@@ -20,7 +22,7 @@ export class InvestorDashboardService {
    */
   async getTotalInvestment(investorId: string): Promise<number> {
     const investments = await this.investmentModel
-      .find({ investor: investorId })
+      .find({ investorId: new Types.ObjectId(investorId) })
       .exec();
 
     if (investments.length > 0) {
@@ -41,7 +43,7 @@ export class InvestorDashboardService {
    */
   async getActiveStartups(investorId: string): Promise<number> {
     const investments = await this.investmentModel
-      .find({ investor: investorId })
+      .find({ investorId: new Types.ObjectId(investorId) })
       .select('startup')
       .exec();
 
@@ -55,7 +57,7 @@ export class InvestorDashboardService {
    */
   async getTotalReturns(investorId: string): Promise<number> {
     const investments = await this.investmentModel
-      .find({ investorId: investorId, status: 'approved' })
+      .find({ investorId: new Types.ObjectId(investorId), status: 'approved' })
       .exec();
 
     // If equityDistribution contributes to returns, adjust formula accordingly
@@ -107,7 +109,7 @@ export class InvestorDashboardService {
   > {
     // Fetch active investments for the investor
     const investments = await this.investmentModel
-      .find({ investor: investorId }) // Active investments
+      .find({ investorId: new Types.ObjectId(investorId) }) // Active investments
       .populate('startupId', 'name') // Populate startup name
       .exec();
 
@@ -119,5 +121,32 @@ export class InvestorDashboardService {
     }));
 
     return activeInvestments;
+  }
+
+   /**
+   * Get all proposals submitted by an investor
+   * @param investorId - ID of the investor
+   * @returns List of proposals with startup details and status
+   */
+   async getInvestorProposals(investorId: string) {
+    const proposals = await this.proposalModel
+      .find({ investorId: new Types.ObjectId(investorId) })
+      .populate('startupId', 'name')
+      .sort({ _id: -1 }) // Sort by newest first
+      .exec();
+
+    return proposals.map(proposal => ({
+      id: proposal._id,
+      startupName: proposal.startupId['name'],
+      industry: proposal.industry,
+      investmentAmount: proposal.investmentAmount,
+      terms: {
+        equity: proposal.terms.equity,
+        conditions: proposal.terms.conditions
+      },
+      escrowStatus: proposal.escrowStatus,
+      status: proposal.status,
+      createdAt: (proposal._id as Types.ObjectId).getTimestamp()
+    }));
   }
 }

@@ -11,7 +11,7 @@ import './charts/ChartjsConfig';
 import StartupRoutes from './startup/routes/startupRoutes';
 import Floating from './components/Floating';
 // Import pages
-
+import HowItWorks from './pages/How-it-works/How';
 import InvestorDashboard from './investor/pages/Dashboard';
 import StartupDashboard from './startup/pages/Dashboard';
 
@@ -26,7 +26,7 @@ function App() {
 
   const location = useLocation();
   // Show the Navbar only on '/' and '/about' routes
-  const showNavbar = location.pathname === '/' || location.pathname === '/about';
+  const showNavbar = location.pathname === '/' || location.pathname === '/about'|| location.pathname === '/how-it-works'|| location.pathname === '/login'|| location.pathname === '/signup';
 
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto'
@@ -43,6 +43,7 @@ function App() {
         <Route  path="/login" element={<Login />} />
         <Route  path="/signup" element={<SignUp />} />
         <Route  path="/" element={<Home />} />
+        <Route  path="/how-it-works" element={<HowItWorks />} />
         
         <Route >
          {adminRoutes}

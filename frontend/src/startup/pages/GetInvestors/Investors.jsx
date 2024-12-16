@@ -9,24 +9,13 @@ const InvestorsList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = [
-        {
-          _id: "66ffd1484ca4ca6c44f7f531",
-          name: "John Doe",
-          preferences: {
-            sectors: ["Tech"],
-            regions: ["US"],
-            riskTolerance: "Medium",
-          },
-          criteria: {
-            minInvestment: 5000,
-            maxInvestment: 50000,
-          },
-          profileStatus: "active",
-        },
-        // Add more investors here
-      ];
-      setInvestors(data);
+      try {
+        const response = await fetch("https://innoventure-api.vercel.app/investors");
+        const data = await response.json();
+        setInvestors(data);
+      } catch (error) {
+        console.error("Error fetching investors:", error);
+      }
     };
 
     fetchData();
@@ -55,7 +44,7 @@ Investors Found By AI Matchmaking        </h1>
               </p>
               <p className="text-gray-600 mb-4">Risk Tolerance: {investor.preferences.riskTolerance}</p>
               <Link
-                to={`/investor/${investor._id}`}
+                to={`/startup/investor/${investor._id}`}
                 className="px-10 bg-black py-2 wa-full text-c text-purple-100 font-semibold inline-flex items-center hover:underline"
               >
                 Pitch<FaArrowRight className="ml-2" />

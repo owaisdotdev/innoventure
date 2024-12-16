@@ -28,10 +28,13 @@ export class InvestorDashboardController {
     },
   })
   @Get(':investorId/total-investment')
-  async getTotalInvestment(@Param('investorId') investorId: string): Promise<{ total: number }> {
-    const total = await this.investorDashboardService.getTotalInvestment(investorId);
-    return { total }; 
-  }  
+  async getTotalInvestment(
+    @Param('investorId') investorId: string,
+  ): Promise<{ total: number }> {
+    const total =
+      await this.investorDashboardService.getTotalInvestment(investorId);
+    return { total };
+  }
 
   @ApiOperation({
     summary: 'Get the number of active startups an investor invested in',
@@ -51,10 +54,11 @@ export class InvestorDashboardController {
   async getActiveStartups(
     @Param('investorId') investorId: string,
   ): Promise<{ activeProjects: number }> {
-    const activeProjects = await this.investorDashboardService.getActiveStartups(investorId);
+    const activeProjects =
+      await this.investorDashboardService.getActiveStartups(investorId);
     return { activeProjects }; // Wrap in an object
   }
-  
+
   @ApiOperation({ summary: 'Get total returns for an investor' })
   @ApiParam({ name: 'investorId', description: 'ID of the investor' })
   @ApiResponse({
@@ -71,9 +75,10 @@ export class InvestorDashboardController {
   async getTotalReturns(
     @Param('investorId') investorId: string,
   ): Promise<{ totalReturns: number }> {
-    const totalReturns = await this.investorDashboardService.getTotalReturns(investorId);
+    const totalReturns =
+      await this.investorDashboardService.getTotalReturns(investorId);
     return { totalReturns }; // Wrap in an object
-  }  
+  }
 
   @ApiOperation({ summary: 'Get recent activity of an investor' })
   @ApiParam({ name: 'investorId', description: 'ID of the investor' })
@@ -115,5 +120,35 @@ export class InvestorDashboardController {
     }[]
   > {
     return this.investorDashboardService.getActiveInvestments(investorId);
+  }
+
+  @ApiOperation({ summary: 'Get all proposals submitted by an investor' })
+  @ApiParam({ name: 'investorId', description: 'ID of the investor' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of proposals with startup details and status',
+    type: [Object],
+  })
+  @Get(':investorId/proposals')
+  async getInvestorProposals(@Param('investorId') investorId: string): Promise<
+    {
+      id: unknown;
+      startupName: string;
+      industry: string;
+      investmentAmount: number;
+      terms: {
+        equity: number;
+        conditions: string;
+      };
+      escrowStatus: {
+        amount: number;
+        releaseDate: Date;
+        status: string;
+      };
+      status: string;
+      createdAt: Date;
+    }[]
+  > {
+    return this.investorDashboardService.getInvestorProposals(investorId);
   }
 }
