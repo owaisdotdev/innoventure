@@ -83,12 +83,9 @@ import { AuthContextProvider } from './contexts/AuthContext';
 import AuthGuard from './AuthGuard';
 import adminRoutes from './admin/pages/adminRoutes';
 import InvestorRoutes from './investor/pages/investorRoutes';
-// import Dashboard from './investor/pages/Dashboard';
 
-// Define getUserIdSomehow function
 const getUserIdSomehow = () => {
-  // Example: Retrieve user ID from localStorage or context
-  return localStorage.getItem('userId'); // Or replace with your actual method of getting the user ID
+  return localStorage.getItem('userId'); // Get user ID from local storage
 };
 
 const RedirectToUserDashboard = () => {
@@ -97,17 +94,18 @@ const RedirectToUserDashboard = () => {
 
   useEffect(() => {
     if (userId) {
-      navigate(`/investor/dashboard/${userId}`);
+      navigate(`/investor/dashboard/${userId}`); // Redirect with user ID
     } else {
-      navigate('/login'); 
+      navigate('/login'); // Redirect to login if no user ID
     }
   }, [navigate, userId]);
 
-  return null; 
+  return null;
 };
 
 function App() {
   const location = useLocation();
+
   const showNavbar =
     location.pathname === '/' ||
     location.pathname === '/about' ||
@@ -126,24 +124,22 @@ function App() {
       <Floating />
       <AuthContextProvider>
         {showNavbar && <Navbar />}
-        <Routes> 
-       
+        <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/" element={<Home />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
 
-          <Route element={<AuthGuard />}>
+          {/* Protected Routes with AuthGuard */}
+          <Route element={<AuthGuard />}> //task 3
             {adminRoutes}
-            {InvestorRoutes}
-            <Route path="/investor/salman" element={<InvestorDashboard />} />
             <Route path="/investor/dashboard/:userId" element={<InvestorDashboard />} />
-            <Route path="/startup/dashboard/:userId" element={<StartupDashboard />} />
+            <Route path="/startup/dashboard" element={<StartupDashboard />} />
           </Route>
-          {/* Redirect route */}
+
+          {/* Redirect route for investor dashboard */}
           <Route path="/investor/dashboard" element={<RedirectToUserDashboard />} />
         </Routes>
-        <StartupRoutes />
       </AuthContextProvider>
     </>
   );

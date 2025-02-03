@@ -370,14 +370,14 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate form data (you can add more validation logic here)
     if (!validateForm()) {
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       // Prepare data to send to the API
       const dataToSend = {
@@ -395,12 +395,12 @@ function SignUp() {
           riskTolerance: formData.preferences.riskTolerance,
         },
         criteria: {
-          minInvestment: Number(formData.criteria.minInvestment), // Ensure it's a number
-          maxInvestment: Number(formData.criteria.maxInvestment), // Ensure it's a number
+          minInvestment: Number(formData.criteria.minInvestment),  //  it's a number
+          maxInvestment: Number(formData.criteria.maxInvestment),  //  it's a number
           investmentHorizon: formData.criteria.investmentHorizon,
         },
       };
-  
+
       // Send data to the API
       const response = await fetch(
         "https://innoventure-api.vercel.app/auth/signup/investor",
@@ -412,9 +412,9 @@ function SignUp() {
           body: JSON.stringify(dataToSend),
         }
       );
-  
+
       const result = await response.json();
-  
+
       // Handle API response
       if (response.ok) {
         toast.success("Signed up successfully!");
@@ -546,9 +546,9 @@ function SignUp() {
                       required
                     >
                       <option value="">Select Risk Tolerance</option>
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
+                      <option value="Low">Low</option>      // Updated to "Low"
+                      <option value="Medium">Medium</option>  // Updated to "Medium"
+                      <option value="High">High</option>    // Updated to "High"
                     </select>
 
                     {/* Investment Criteria */}
