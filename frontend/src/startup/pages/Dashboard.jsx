@@ -1,30 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import Header from '../partials/Header';
+import React, { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import Header from "../partials/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  
   const [startup, setStartup] = useState({
     name: "",
     email: "",
     established: "",
     isFydp: false,
     funding: 0,
-    investors: "",
-    notifications: "",
+    investors: [],
+    notifications: [],
   });
 
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    established: "",
-  });
-
+  const [errors, setErrors] = useState({ name: "", email: "", established: "" });
   const startupId = localStorage.getItem("user");
 
   // Fetch startup data when the component mounts
@@ -48,10 +43,7 @@ function Dashboard() {
   // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setStartup({
-      ...startup,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setStartup({ ...startup, [name]: type === "checkbox" ? checked : value });
   };
 
   // Form validation
@@ -177,25 +169,29 @@ function Dashboard() {
                   {/* Investors */}
                   <div>
                     <label className="block text-gray-700 font-medium">Investors</label>
-                    <input
-                      type="text"
-                      name="investors"
-                      value={startup.investors}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
+                    {startup.investors.length > 0 ? (
+                      <ul className="list-disc pl-5 text-gray-700">
+                        {startup.investors.map((investor, index) => (
+                          <li key={index}>{investor}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-700">No investors yet.</p>
+                    )}
                   </div>
 
                   {/* Notifications */}
                   <div>
                     <label className="block text-gray-700 font-medium">Notifications</label>
-                    <input
-                      type="text"
-                      name="notifications"
-                      value={startup.notifications}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
+                    {startup.notifications.length > 0 ? (
+                      <ul className="list-disc pl-5 text-gray-700">
+                        {startup.notifications.map((notification, index) => (
+                          <li key={index}>{notification}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-700">No notifications yet.</p>
+                    )}
                   </div>
 
                   {/* Submit Button */}

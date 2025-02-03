@@ -8,7 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Investment Summary Data
+  // Investment Summary
   const [summaryData, setSummaryData] = useState({
     totalInvestments: 0,
     totalReturns: "$0",
@@ -26,11 +26,11 @@ function Dashboard() {
     businessPlan: "",
   });
 
-  // Filter & Date Picker States
+  // Filters & Date Picker
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [selectedDate, setSelectedDate] = useState("");
 
-  // Get Investor ID from localStorage
+  // Get Investor ID
   const investorId = localStorage.getItem("user");
 
   useEffect(() => {
@@ -38,32 +38,28 @@ function Dashboard() {
       try {
         setLoading(true);
 
-        // Fetch investor's existing information
+        // Fetch investor profile data
         const investorResponse = await fetch(
           `https://innoventure-api.vercel.app/investors/${investorId}`
         );
         const investorData = await investorResponse.json();
         setInvestorInfo(investorData);
 
-        // Fetch investment details
+        // Fetch investment summary data
         const [totalInvestments, totalReturns, activeProjects] = await Promise.all([
           fetch(`https://innoventure-api.vercel.app/investor-dashboard/${investorId}/total-investment`).then((res) => res.json()),
           fetch(`https://innoventure-api.vercel.app/investor-dashboard/${investorId}/total-returns`).then((res) => res.json()),
           fetch(`https://innoventure-api.vercel.app/investor-dashboard/${investorId}/active-projects`).then((res) => res.json()),
         ]);
 
-        // Fetch platform activity with filters
+        // Fetch filtered platform activity
         let activityUrl = `https://innoventure-api.vercel.app/investor-dashboard/${investorId}/recent-activity`;
-        if (selectedFilter !== "All") {
-          activityUrl += `?filter=${selectedFilter}`;
-        }
-        if (selectedDate) {
-          activityUrl += `&date=${selectedDate}`;
-        }
+        if (selectedFilter !== "All") activityUrl += `?filter=${selectedFilter}`;
+        if (selectedDate) activityUrl += `&date=${selectedDate}`;
 
         const recentActivity = await fetch(activityUrl).then((res) => res.json());
 
-        // Set Data in State
+        // Set State Data
         setSummaryData({
           totalInvestments: totalInvestments?.total || 0,
           totalReturns: totalReturns?.total || "$0",
@@ -77,10 +73,11 @@ function Dashboard() {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [investorId, selectedFilter, selectedDate]); // Re-fetch when filter or date changes
 
-  // Handle Form Input Change
+    fetchData();
+  }, [investorId, selectedFilter, selectedDate]); // Re-fetch on filter/date change
+
+  // Handle Profile Input Change
   const handleChange = (e) => {
     setInvestorInfo({ ...investorInfo, [e.target.name]: e.target.value });
   };
