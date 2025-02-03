@@ -21,7 +21,6 @@ const Loader = () => {
           height: 50px;
           animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
           0% {
             transform: rotate(0deg);
@@ -35,19 +34,33 @@ const Loader = () => {
   );
 };
 
-// Define the SignUp component
 function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useNavigate();
-  const { isConnected, address } = useAccount(); 
+  const { isConnected, address } = useAccount();
 
   const [formData, setFormData] = useState({
     address: address || "",
     name: "",
     email: "",
     password: "",
+    businessPlan: {
+      description: "",
+      industry: "",
+    },
+    profileStatus: "active",
+    preferences: {
+      sectors: [],
+      regions: [],
+      riskTolerance: "",
+    },
+    criteria: {
+      minInvestment: "",
+      maxInvestment: "",
+      investmentHorizon: "",
+    },
   });
 
   const handleChange = (e) => {
@@ -59,48 +72,65 @@ function SignUp() {
     setRole(e.target.value);
   };
 
+  const handleBusinessPlanChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      businessPlan: { ...formData.businessPlan, [name]: value },
+    });
+  };
+
+  const handlePreferencesChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "sectors" || name === "regions") {
+      setFormData({
+        ...formData,
+        preferences: {
+          ...formData.preferences,
+          [name]: value.split(","),
+        },
+      });
+    } else {
+      setFormData({
+        ...formData,
+        preferences: { ...formData.preferences, [name]: value },
+      });
+    }
+  };
+
+  const handleCriteriaChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      criteria: { ...formData.criteria, [name]: value },
+    });
+  };
+
   const toggleShowPassword = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
   const validateForm = () => {
-    const { name, email, password, address } = formData;
-
-    // Check if all fields are filled
-    if (!name || !email || !password || !address) {
-      toast.error("Please fill in all the fields.");
+    if (!formData.name || !formData.email || !formData.password || !formData.address) {
+      toast.error("Please fill in all required fields.");
       return false;
     }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address.");
+    if (!formData.businessPlan.description || !formData.businessPlan.industry) {
+      toast.error("Please fill in business plan details.");
       return false;
     }
-
-    // Password validation (e.g., at least 6 characters)
-    if (password.length < 6) {
-      toast.error("Password should be at least 6 characters long.");
+    if (!formData.preferences.sectors.length || !formData.preferences.regions.length) {
+      toast.error("Please select at least one sector and region.");
       return false;
     }
-
-    // Role validation
-    if (!role) {
-      toast.error("Please select a role (Investor or Startup).");
-      return false;
-    }
-
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
-      return; // Stop if the form is not valid
+      return;
     }
-
     setIsLoading(true);
     try {
       if (role === "investor") {
@@ -108,7 +138,6 @@ function SignUp() {
       } else if (role === "startup") {
         await signupStartup(formData);
       }
-
       toast.success("Signed up successfully!");
       router("/investor/dashboard");
     } catch (error) {
@@ -122,7 +151,9 @@ function SignUp() {
     document.title = "Blocklance | Sign up";
   }, []);
 
+
   return (
+    <>
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
       <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
@@ -143,6 +174,7 @@ function SignUp() {
                       placeholder="Name"
                       value={formData.name}
                       onChange={handleChange}
+                      required
                     />
                     <input
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
@@ -151,6 +183,7 @@ function SignUp() {
                       placeholder="Email"
                       value={formData.email}
                       onChange={handleChange}
+                      required
                     />
                     <input
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
@@ -159,6 +192,7 @@ function SignUp() {
                       placeholder="Password"
                       value={formData.password}
                       onChange={handleChange}
+                      required
                     />
                     <button
                       type="button"
@@ -167,27 +201,112 @@ function SignUp() {
                     >
                       {showPassword ? "Hide Password" : "Show Password"}
                     </button>
-                   {/* Address Input */}
-                   <input
-                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                        type="text"
-                        name="address"
-                        placeholder="Address"
-                        value={isConnected ? address : "Connect your wallet"} // Show address if connected
-                        onChange={handleChange}
-                        readOnly // Make this field read-only
-                      />
-
+  
+                    {/* Business Plan */}
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="description"
+                      placeholder="Business Plan Description"
+                      value={formData.businessPlan.description}
+                      onChange={handleBusinessPlanChange}
+                      required
+                    />
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="industry"
+                      placeholder="Industry"
+                      value={formData.businessPlan.industry}
+                      onChange={handleBusinessPlanChange}
+                      required
+                    />
+  
+                    {/* Preferences */}
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="sectors"
+                      placeholder="Preferred Sectors (tech, finance)"
+                      value={formData.preferences.sectors.join(",")}
+                      onChange={handlePreferencesChange}
+                      required
+                    />
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="regions"
+                      placeholder="Preferred Regions (comma separated)"
+                      value={formData.preferences.regions.join(",")}
+                      onChange={handlePreferencesChange}
+                      required
+                    />
+                    <select
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      name="riskTolerance"
+                      value={formData.preferences.riskTolerance}
+                      onChange={handlePreferencesChange}
+                      placeholder="Risk Tolerance"
+                      required
+                    >
+                      <option value="">Select Risk Tolerance</option>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+  
+                    {/* Investment Criteria */}
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="minInvestment"
+                      placeholder="Minimum Investment"
+                      value={formData.criteria.minInvestment}
+                      onChange={handleCriteriaChange}
+                      required
+                    />
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="maxInvestment"
+                      placeholder="Maximum Investment"
+                      value={formData.criteria.maxInvestment}
+                      onChange={handleCriteriaChange}
+                      required
+                    />
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      type="text"
+                      name="investmentHorizon"
+                      placeholder="Investment Horizon"
+                      value={formData.criteria.investmentHorizon}
+                      onChange={handleCriteriaChange}
+                      required
+                    />
+  
+                    {/* Address Input */}
+                    <input
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                      type="text"
+                      name="address"
+                      placeholder="Address"
+                      value={isConnected ? address : "Connect your wallet"}
+                      onChange={handleChange}
+                      readOnly
+                    />
+  
                     <select
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                       name="role"
                       value={role}
                       onChange={handleRoleChange}
+                      required
                     >
                       <option value="">Select Role</option>
                       <option value="investor">Investor</option>
                       <option value="startup">Startup/Fyp</option>
                     </select>
+  
                     <button
                       className="mt-5 tracking-wide font-semibold bg-blue-400 text-white-500 w-full py-4 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                       type="submit"
@@ -206,50 +325,14 @@ function SignUp() {
                       </svg>
                       <span className="ml-3">Sign Up</span>
                     </button>
-                    <p className="mt-6 text-sm text-gray-600 text-center">
-                      Already a member?{" "}
-                      <Link className="text-blue-500" to="/login">
-                        {" "}
-                        Login
-                      </Link>{" "}
-                      now!
-                    </p>
-                    <p className="mt-6 text-xs text-gray-600 text-center">
-                      `I agree to abide by Blocklance &nbsp;
-                      <a
-                        href="#"
-                        className="border-b border-gray-500 border-dotted"
-                      >
-                        Terms of Service &nbsp;
-                      </a>
-                      and its &nbsp;
-                      <a
-                        href="#"
-                        className="border-b border-gray-500 border-dotted"
-                      >
-                        Privacy Policy
-                      </a>
-                    </p>
                   </div>
                 </form>
               </div>
             </div>
           )}
         </div>
-        <div
-          style={{
-            // background:
-            //   "url('https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg')",
-            backgroundSize: "fill",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-          className="flex-1 bg-blue-100 text-center hidden lg:flex"
-        ><img src="https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg" className=" text-center hidden lg:flex object-cover" alt="" /></div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
     </div>
-  );
-}
-
-export default SignUp;
+  </>
+  

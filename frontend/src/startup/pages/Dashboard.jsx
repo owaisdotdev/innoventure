@@ -1,190 +1,216 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import Header from "../partials/Header";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 
-import Sidebar from '../components/Sidebar';
-import Header from '../partials/Header';
-import FilterButton from '../../components/DropdownFilter';
-import { Link } from 'react-router-dom';
-import Datepicker from '../../components/Datepicker';
-import DashboardCard01 from '../partials/dashboard/DashboardCard01';
-// import DashboardCard02 from '../partials/dashboard/DashboardCard02';
-// import DashboardCard03 from '../partials/dashboard/DashboardCard03';
-// import DashboardCard04 from '../partials/dashboard/DashboardCard04';
-// import DashboardCard05 from '../partials/dashboard/DashboardCard05';
-// import DashboardCard06 from '../partials/dashboard/DashboardCard06';
-// import DashboardCard07 from '../partials/dashboard/DashboardCard07';
-// import DashboardCard08 from '../partials/dashboard/DashboardCard08';
-// import DashboardCard09 from '../partials/dashboard/DashboardCard09';
-// import DashboardCard10 from '../partials/dashboard/DashboardCard10';
-// import DashboardCard11 from '../partials/dashboard/DashboardCard11';
-// import DashboardCard12 from '../partials/dashboard/DashboardCard12';
-// import DashboardCard13 from '../partials/dashboard/DashboardCard13';
-
-
-function Dashboard({startup}) {
-
-
-  
+function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [startup, setStartup] = useState({
+    name: "",
+    email: "",
+    established: "",
+    isFydp: false,
+    funding: 0,
+    investors: [],
+    notifications: [],
+  });
+
+  const [errors, setErrors] = useState({ name: "", email: "", established: "" });
+  const startupId = localStorage.getItem("user");
+
+  // Fetch startup data when the component mounts
+  useEffect(() => {
+    const fetchStartupData = async () => {
+      try {
+        const response = await fetch(`https://innoventure-api.vercel.app/startups/${startupId}`);
+        if (!response.ok) throw new Error("Failed to fetch startup data");
+        const data = await response.json();
+        setStartup(data);
+      } catch (error) {
+        console.error("Error fetching startup data:", error);
+        toast.error("Error fetching startup data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStartupData();
+  }, [startupId]);
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setStartup({ ...startup, [name]: type === "checkbox" ? checked : value });
+  };
+
+  // Form validation
+  const validateForm = () => {
+    let formValid = true;
+    let validationErrors = { name: "", email: "", established: "" };
+
+    if (!startup.name) {
+      validationErrors.name = "Name is required.";
+      formValid = false;
+    }
+
+    if (!startup.email) {
+      validationErrors.email = "Email is required.";
+      formValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(startup.email)) {
+      validationErrors.email = "Invalid email format.";
+      formValid = false;
+    }
+
+    if (!startup.established) {
+      validationErrors.established = "Established year is required.";
+      formValid = false;
+    }
+
+    setErrors(validationErrors);
+    return formValid;
+  };
+
+  // Update startup data
+  const handleUpdateStartup = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setUpdating(true);
+
+    try {
+      const response = await fetch(`https://innoventure-api.vercel.app/startups/${startupId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(startup),
+      });
+
+      if (!response.ok) throw new Error("Failed to update startup data");
+
+      toast.success("Startup information updated successfully!");
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error("Error updating startup information");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
-
-      {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-      {/* Content area */}
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-
-        {/*  Site header */}
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <main className="grow">
+          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
+            <h1 className="text-3xl text-gray-800 font-bold mb-6">Startup Dashboard</h1>
 
-        <main className="grow"> 
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-
-            {/* Dashboard actions */}
-            <div className="sm:flex sm:justify-between sm:items-center mb-8">
-
-              {/* Left: Title */}
-              <div className="mb-4 sm:mb-0">
-                <h1 className="text-2xl md:text-3xl text-gray-800 dark:text-gray-100 font-bold">Dashboard</h1>
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500"></div>
               </div>
+            ) : (
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Update Startup Information</h2>
+                <form onSubmit={handleUpdateStartup} className="space-y-4">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-gray-700 font-medium">Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={startup.name}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    />
+                    {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                  </div>
 
-              {/* Right: Actions */}
-              <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                {/* Filter button */}
-                <FilterButton align="right" />
-                {/* Datepicker built with flatpickr */}
-                <Datepicker align="right" />
-                {/* Add view button */}
-                <button className="btn bg-gray-900 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
-                  <svg className="fill-current shrink-0 xs:hidden" width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
-                  </svg>
-                  <span className="max-xs:sr-only">Add View</span>
-                </button>                
+                  {/* Email */}
+                  <div>
+                    <label className="block text-gray-700 font-medium">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={startup.email}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    />
+                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                  </div>
+
+                  {/* Established Year */}
+                  <div>
+                    <label className="block text-gray-700 font-medium">Established</label>
+                    <input
+                      type="text"
+                      name="established"
+                      value={startup.established}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    />
+                    {errors.established && <p className="text-red-500 text-sm">{errors.established}</p>}
+                  </div>
+
+                  {/* Funding */}
+                  <div>
+                    <label className="block text-gray-700 font-medium">Funding</label>
+                    <input
+                      type="number"
+                      name="funding"
+                      value={startup.funding}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    />
+                  </div>
+
+                  {/* Investors */}
+                  <div>
+                    <label className="block text-gray-700 font-medium">Investors</label>
+                    {startup.investors.length > 0 ? (
+                      <ul className="list-disc pl-5 text-gray-700">
+                        {startup.investors.map((investor, index) => (
+                          <li key={index}>{investor}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-700">No investors yet.</p>
+                    )}
+                  </div>
+
+                  {/* Notifications */}
+                  <div>
+                    <label className="block text-gray-700 font-medium">Notifications</label>
+                    {startup.notifications.length > 0 ? (
+                      <ul className="list-disc pl-5 text-gray-700">
+                        {startup.notifications.map((notification, index) => (
+                          <li key={index}>{notification}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-700">No notifications yet.</p>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={updating}
+                    className={`px-6 py-2 rounded-lg text-white ${
+                      updating ? "bg-gray-500 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                    }`}
+                  >
+                    {updating ? "Updating..." : "Save Changes"}
+                  </button>
+                </form>
               </div>
-
-            </div>
-            <div className="flex flex-col gap-8">
-<h1></h1>
-  {/* Startup Information Card */}
-  <div className="flex flex-wrap gap-6 p-6 bg-white shadow-md rounded-lg">
-
-  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
-    <h3 className="text-xl text-gray-800 font-bold">Name</h3>
-    <p className="text-lg text-gray-700">{startup?.name || "N/A"}</p>
-  </div>
-  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
-    <h3 className="text-xl text-gray-800 font-bold">Email</h3>
-    <p className="text-lg text-gray-700">{startup?.email || "N/A"}</p>
-  </div>
-  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
-    <h3 className="text-xl text-gray-800 font-bold">Established</h3>
-    <p className="text-lg text-gray-700">{startup?.established || "N/A"}</p>
-  </div>
-  <div className="p-4 bg-gray-200 shadow-lg rounded-lg w-full sm:w-1/2 lg:w-1/4">
-    <h3 className="text-xl text-gray-800 font-bold">FYDP Status</h3>
-    <p className="text-lg text-gray-700">
-      {startup?.isFydp ? "Yes" : "No"}
-    </p>
-  </div>
-</div>
-
-<div className="">
-  {/* Funding Card */}
-  {/* <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-4xl text-gray-800 font-bold mb-6">Funding</h2>
-      <p className="text-xl"><strong>Industry:</strong> {startup?.businessPlan?.industry}</p>
-      <p className="text-xl"><strong>Location:</strong> {startup?.location}</p>
-      <p className="text-xl"><strong>Established:</strong> {startup?.established}</p>
-      <p className="text-xl"><strong>FYDP Status:</strong> {startup?.isFydp ? 'Yes' : 'No'}</p>
-    </div>
-  </div> */}
-
-  {/* Funding Amount Card */}
-  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-3xl text-gray-800 font-bold mb-6">Total Funding</h2>
-      <p className="text-5xl font-bold text-blue-900">${startup?.funding?.toLocaleString()}10000</p>
-    </div>
-  </div>
-  
-  </div>
-    {/* Investors Card */}
-    <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Investors</h2>
-      {startup?.investors.length > 1 ? (
-        <ul>
-          {startup?.investors.map((investor, index) => (
-            <li key={index} className="text-xl">{investor}</li>
-          ))}
-        </ul>
-      ) : (
-        <div>
-        <p className="text-xl text-gray-700">No investors yet.</p>
-        <button className='text-sm px-4 py-2 bg-black text-white rounded mt-2'> <Link to="/startup/find-investors"> Find Investors using AI</Link></button>
-        </div>
-      )}
-    </div>
-  </div>
-  {/* Documents Card */}
-  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Documents</h2>
-      {startup?.documents.length > 0 ? (
-        <ul>
-          {startup?.documents.map((doc, index) => (
-            <li key={index} className="text-xl">{doc}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-xl text-gray-700">No documents available.</p>
-      )}
-    </div>
-  </div>
-
-
-
-  {/* Progress Reports Card */}
-  <div className="col-span-12 md:col-span-6 lg:col-span-4 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Progress Reports</h2>
-      {startup?.progressReports.length > 0 ? (
-        <ul>
-          {startup?.progressReports.map((report, index) => (
-            <li key={index} className="text-xl">{report}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-xl text-gray-700">No progress reports available.</p>
-      )}
-    </div>
-  </div>
-
-  {/* Notifications Card */}
-  <div className="col-span-12 p-6 bg-white shadow-md rounded-lg">
-    <div className="p-4 rounded-lg">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notifications</h2>
-      {startup?.notifications.length > 0 ? (
-        <ul>
-          {startup?.notifications.map((notification, index) => (
-            <li key={index} className="text-xl">{notification}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-xl text-gray-700">No notifications yet.</p>
-      )}
-    </div>
-  </div>
-</div>
+            )}
           </div>
         </main>
-
-
-
       </div>
+      <ToastContainer />
     </div>
   );
 }

@@ -1,18 +1,14 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { AuthContext } from './contexts/AuthContext';
+import { AuthContext } from './contexts/AuthContext'; // Fetch AuthContext Data
 
 const AuthGuard = ({ children }) => {
-    const { user } = useContext(AuthContext);
+    const { isAuthenticated } = useContext(AuthContext); // Get authentication status
 
-    if (!user) {
-        // If the user is not authenticated, redirect to the login page
+    if (!isAuthenticated) { 
         return <Navigate to="/login" replace />;
     }
-
-
     return children; 
 };
 
 export default AuthGuard;
- 9

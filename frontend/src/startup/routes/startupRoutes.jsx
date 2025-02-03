@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route,Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import StartupDashboard from '../pages/Dashboard';
 
 // Add other startup-related components
@@ -16,7 +16,6 @@ const StartupRoutes = () => {
   const [startup, setStartup] = useState(null); // Single startup fetched by ID
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     // Retrieve the ID from localStorage and fetch startup data by ID
@@ -38,7 +37,6 @@ const StartupRoutes = () => {
     fetchStartupById();
   }, []);
 
-
   return (
     <Routes>
       <Route path="/startup/dashboard" element={<StartupDashboard startup={startup} />} />
@@ -46,11 +44,9 @@ const StartupRoutes = () => {
       <Route path="/startup/find-investors" element={<Investors startup={startup} />} />
       <Route path="/startup/investor/:id" element={<InvestorDetail startup={startup} />} />
       <Route path="/startup/milestones" element={<Milestone startup={startup} />} />
-      <Route path="/startup/active-investor" element={<Active_Investors   startup={startup} />} />
-      <Route path="/startup/all-offers" element={<AllOffers   startup={startup} />} />
-      <Route path="/startup/proposals" element={<Proposals  startup={startup} />} />
-
-
+      <Route path="/startup/active-investor" element={<Active_Investors startup={startup} />} />
+      <Route path="/startup/all-offers" element={<AllOffers startup={startup} />} />
+      <Route path="/startup/proposals" element={<Proposals startup={startup} />} />
     </Routes>
   );
 };
