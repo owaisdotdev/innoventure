@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { StartupService } from './startup.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Startup, StartupSchema } from '../schemas/startup.schema';
+import { StartupService } from './startup.service';
 import { StartupController } from './startup.controller';
+// import { Startup, StartupSchema } from './schemas/startup.schema'; // Verify this path
+import { Startup, StartupSchema } from 'src/schemas/startup.schema';
 
 @Module({
   imports: [

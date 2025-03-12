@@ -1,5 +1,3 @@
-
-
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 
@@ -9,20 +7,19 @@ import Navbar from "./components/Navbar";
 import "./charts/ChartjsConfig";
 import StartupRoutes from "./startup/routes/startupRoutes";
 import Floating from "./components/Floating";
-
-// Importing Pages
 import HowItWorks from "./pages/How-it-works/How";
 import InvestorDashboard from "./investor/pages/Dashboard";
 import StartupDashboard from "./startup/pages/Dashboard";
 import Login from "./pages/Login/Login.jsx";
 import SignUp from "./pages/Signup/Signup.jsx";
-
+import SendProposal from "./investor/pages/SendProposal";
+import Proposals from "./startup/pages/Proposals";
+import AcceptedProposals from "./startup/pages/AcceptedProposals";
 import { AuthContextProvider } from "./contexts/AuthContext";
 import AuthGuard from "./AuthGuard";
 import adminRoutes from "./admin/pages/adminRoutes";
 import InvestorRoutes from "./investor/pages/investorRoutes";
 
-// Function to get user ID from local storage
 const getUserIdSomehow = () => {
   return localStorage.getItem("userId");
 };
@@ -43,10 +40,57 @@ const RedirectToUserDashboard = () => {
   return null;
 };
 
+// Redirect component for Startup Dashboard
+const RedirectToStartupDashboard = () => {
+  const navigate = useNavigate();
+  const userId = getUserIdSomehow();
+
+  useEffect(() => {
+    if (userId) {
+      navigate(`/startup/dashboard/${userId}`);
+    } else {
+      navigate("/login");
+    }
+  }, [navigate, userId]);
+
+  return null;
+};
+
+// Redirect component for Startup Proposals
+const RedirectToStartupProposals = () => {
+  const navigate = useNavigate();
+  const userId = getUserIdSomehow();
+
+  useEffect(() => {
+    if (userId) {
+      navigate(`/startup/proposals/${userId}`);
+    } else {
+      navigate("/login");
+    }
+  }, [navigate, userId]);
+
+  return null;
+};
+
+// Redirect component for Accepted Proposals
+const RedirectToAcceptedProposals = () => {
+  const navigate = useNavigate();
+  const userId = getUserIdSomehow();
+
+  useEffect(() => {
+    if (userId) {
+      navigate(`/startup/accepted-proposals/${userId}`);
+    } else {
+      navigate("/login");
+    }
+  }, [navigate, userId]);
+
+  return null;
+};
+
 function App() {
   const location = useLocation();
 
-  // Show Navbar on specific routes
   const showNavbar =
     location.pathname === "/" ||
     location.pathname === "/about" ||
@@ -72,15 +116,21 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
 
-          {/* Redirect for Investor Dashboard */}
+          {/* Redirects for Dashboards */}
           <Route path="/investor/dashboard" element={<RedirectToUserDashboard />} />
+          <Route path="/startup/dashboard" element={<RedirectToStartupDashboard />} />
+          <Route path="/startup/proposals" element={<RedirectToStartupProposals />} />
+          <Route path="/startup/accepted-proposals" element={<RedirectToAcceptedProposals />} /> {/* Added */}
 
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             {adminRoutes}
             {InvestorRoutes}
             <Route path="/investor/dashboard/:userId" element={<InvestorDashboard />} />
-            <Route path="/startup/dashboard" element={<StartupDashboard />} />
+            <Route path="/investor/send-proposals" element={<SendProposal />} />
+            <Route path="/startup/dashboard/:userId" element={<StartupDashboard />} />
+            <Route path="/startup/proposals/:userId" element={<Proposals />} />
+            <Route path="/startup/accepted-proposals/:userId" element={<AcceptedProposals />} /> {/* Updated */}
           </Route>
 
           {/* Additional Startup Routes */}

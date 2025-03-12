@@ -20,7 +20,7 @@ __decorate([
     __metadata("design:type", String)
 ], Startup.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: String, required: true }),
+    (0, mongoose_1.Prop)({ type: String, required: true, unique: true }),
     __metadata("design:type", String)
 ], Startup.prototype, "email", void 0);
 __decorate([
@@ -33,6 +33,7 @@ __decorate([
             description: { type: String, required: true },
             industry: { type: String, required: true },
         },
+        _id: false,
     }),
     __metadata("design:type", Object)
 ], Startup.prototype, "businessPlan", void 0);
@@ -42,6 +43,7 @@ __decorate([
             totalAmount: { type: Number, required: true },
             milestones: [{ type: mongoose_2.Types.ObjectId, ref: 'Milestone' }],
         },
+        _id: false,
     }),
     __metadata("design:type", Object)
 ], Startup.prototype, "fundingNeeds", void 0);
@@ -53,11 +55,12 @@ __decorate([
                 fileUrl: { type: String, required: true },
             },
         ],
+        default: [],
     }),
     __metadata("design:type", Array)
 ], Startup.prototype, "documents", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Investor' }] }),
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Investor' }], default: [] }),
     __metadata("design:type", Array)
 ], Startup.prototype, "investors", void 0);
 __decorate([
@@ -74,6 +77,7 @@ __decorate([
                 },
             },
         ],
+        default: [],
     }),
     __metadata("design:type", Array)
 ], Startup.prototype, "progressReports", void 0);
@@ -83,9 +87,10 @@ __decorate([
             {
                 type: { type: String },
                 message: { type: String },
-                date: { type: Date },
+                date: { type: Date, default: Date.now },
             },
         ],
+        default: [],
     }),
     __metadata("design:type", Array)
 ], Startup.prototype, "notifications", void 0);
@@ -115,11 +120,13 @@ __decorate([
             tags: { type: [String], default: [] },
             remarks: { type: String, default: '' },
         },
+        _id: false,
+        required: false,
     }),
     __metadata("design:type", Object)
 ], Startup.prototype, "fydpDetails", void 0);
 exports.Startup = Startup = __decorate([
-    (0, mongoose_1.Schema)()
+    (0, mongoose_1.Schema)({ timestamps: true })
 ], Startup);
 exports.StartupSchema = mongoose_1.SchemaFactory.createForClass(Startup);
 //# sourceMappingURL=startup.schema.js.map

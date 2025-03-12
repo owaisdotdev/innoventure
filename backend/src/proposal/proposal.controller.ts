@@ -1,167 +1,75 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  HttpStatus,
-  Query,
-  Patch,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiQuery,
-  ApiBody,
-} from '@nestjs/swagger';
-import { ProposalService } from './proposal.service';
-import { CreateProposalDto } from '../dto/createProposal.dto';
-import { UpdateProposalDto } from '../dto/updateProposal.dto';
-import { Proposal } from '../schemas/proposal.schema';
+import { Controller, Post, Body, Headers, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
+import { ProposalsService } from './proposal.service'; // Correct path assumed
+// import { NotificationService } from '../notification/notification.service'; // Import NotificationService
+import { NotificationsService } from 'src/notification/notification.service';
+import { CreateProposalDto } from './dtos/create-proposal.dto';
+import * as jwt from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
 
-@ApiTags('Proposals')
 @Controller('proposals')
-export class ProposalController {
-  constructor(private readonly proposalService: ProposalService) {}
+export class ProposalsController {
+  constructor(
+    private readonly proposalsService: ProposalsService,
+    private readonly configService: ConfigService,
+    private readonly notificationService: NotificationsService, // Inject NotificationService
+  ) {}
+
+  private extractUserIdFromToken(authHeader: string): string {
+    if (!authHeader) {
+      console.error('No authorization header provided');
+      throw new UnauthorizedException('No token provided');
+    }
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      console.error('Token missing from header');
+      throw new UnauthorizedException('Token missing');
+    }
+    try {
+      const secret = this.configService.get<string>('JWT_SECRET');
+      console.log('Using JWT_SECRET:', secret ? 'Set' : 'Not set'); // Log if secret is loaded
+      const decoded = jwt.verify(token, secret) as { sub: string; iat: number; exp: number };
+      console.log('Decoded token:', decoded);
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (decoded.iat > currentTime) {
+        console.error('Token issued in the future:', decoded.iat, 'vs', currentTime);
+        throw new UnauthorizedException('Token issued in the future');
+      }
+      return decoded.sub;
+    } catch (error) {
+      console.error('JWT Error:', error.message, error.stack);
+      throw new UnauthorizedException(`Invalid token: ${error.message}`);
+    }
+  }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new proposal' })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Proposal has been successfully created',
-    type: Proposal,
-  })
-  @ApiBody({ type: CreateProposalDto })
-  async createProposal(
+  async create(
     @Body() createProposalDto: CreateProposalDto,
-  ): Promise<Proposal> {
-    return this.proposalService.createProposal(createProposalDto);
-  }
+    @Headers('authorization') authHeader: string,
+  ) {
+    try {
+      console.log('Received proposal:', createProposalDto);
+      const investorId = this.extractUserIdFromToken(authHeader);
+      createProposalDto.investorId = investorId;
+      console.log('Creating proposal with investorId:', investorId);
+      const result = await this.proposalsService.create(createProposalDto);
+      console.log('Proposal created successfully:', result);
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a proposal by ID' })
-  @ApiParam({ name: 'id', description: 'Proposal ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Proposal found',
-    type: Proposal,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Proposal not found',
-  })
-  async getProposal(@Param('id') id: string): Promise<Proposal> {
-    return this.proposalService.getProposalById(id);
-  }
+      // Trigger notifications
+      await this.notificationService.create({
+        userId: createProposalDto.startupId,
+        message: `New proposal received from Investor ${investorId} for ${createProposalDto.startupName}`,
+        type: 'startup',
+      });
+      await this.notificationService.create({
+        userId: investorId,
+        message: `Proposal sent to Startup ${createProposalDto.startupName}`,
+        type: 'investor',
+      });
 
-  @Get()
-  @ApiOperation({ summary: 'Get all proposals or filter by status' })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    enum: ['pending', 'accepted', 'rejected'],
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'List of proposals',
-    type: [Proposal],
-  })
-  async getProposals(@Query('status') status?: string): Promise<Proposal[]> {
-    if (status) {
-      return this.proposalService.getProposalsByStatus(status);
+      return result;
+    } catch (error) {
+      console.error('Error in create proposal:', error.message, error.stack);
+      throw new InternalServerErrorException(error.message || 'Failed to create proposal');
     }
-    return this.proposalService.getAllProposals();
-  }
-
-  @Put(':id')
-  @ApiOperation({ summary: 'Update a proposal' })
-  @ApiParam({ name: 'id', description: 'Proposal ID' })
-  @ApiBody({ type: UpdateProposalDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Proposal updated successfully',
-    type: Proposal,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Proposal not found',
-  })
-  async updateProposal(
-    @Param('id') id: string,
-    @Body() updateProposalDto: UpdateProposalDto,
-  ): Promise<Proposal> {
-    return this.proposalService.updateProposal(id, updateProposalDto);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a proposal' })
-  @ApiParam({ name: 'id', description: 'Proposal ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Proposal deleted successfully',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Proposal not found',
-  })
-  async deleteProposal(@Param('id') id: string): Promise<void> {
-    return this.proposalService.deleteProposal(id);
-  }
-
-  @Patch(':id/escrow')
-  @ApiOperation({ summary: 'Update escrow status' })
-  @ApiParam({ name: 'id', description: 'Proposal ID' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        amount: { type: 'number' },
-        releaseDate: { type: 'string', format: 'date-time' },
-        status: { type: 'string', enum: ['In escrow', 'Released'] },
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Escrow status updated successfully',
-    type: Proposal,
-  })
-  async updateEscrowStatus(
-    @Param('id') id: string,
-    @Body() escrowStatus: Partial<Proposal['escrowStatus']>,
-  ): Promise<Proposal> {
-    return this.proposalService.updateEscrowStatus(id, escrowStatus);
-  }
-
-  @Patch(':id/status')
-  @ApiOperation({ summary: 'Accept or reject proposal' })
-  @ApiParam({ name: 'id', description: 'Proposal ID' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        status: {
-          type: 'string',
-          enum: ['accepted', 'rejected'],
-          description: 'New status of the proposal',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Proposal status updated successfully',
-    type: Proposal,
-  })
-  async changeProposalStatus(
-    @Param('id') id: string,
-    @Body('status') status: 'accepted' | 'rejected',
-  ): Promise<Proposal> {
-    return this.proposalService.changeProposalStatus(id, status);
   }
 }
-

@@ -30,10 +30,9 @@ export class InvestorDashboardController {
   @Get(':investorId/total-investment')
   async getTotalInvestment(
     @Param('investorId') investorId: string,
-  ): Promise<{ total: number }> {
-    const total =
-      await this.investorDashboardService.getTotalInvestment(investorId);
-    return { total };
+  ): Promise<number> {
+    const { total } = await this.investorDashboardService.getTotalInvestment(investorId);
+    return total;
   }
 
   @ApiOperation({
@@ -54,9 +53,8 @@ export class InvestorDashboardController {
   async getActiveStartups(
     @Param('investorId') investorId: string,
   ): Promise<{ activeProjects: number }> {
-    const activeProjects =
-      await this.investorDashboardService.getActiveStartups(investorId);
-    return { activeProjects }; // Wrap in an object
+    const { count: activeProjects } = await this.investorDashboardService.getActiveStartups(investorId);
+    return { activeProjects };
   }
 
   @ApiOperation({ summary: 'Get total returns for an investor' })
@@ -67,17 +65,16 @@ export class InvestorDashboardController {
     schema: {
       type: 'object',
       properties: {
-        totalReturns: { type: 'number' },
+        totalReturns: { type: 'string' }, // Updated to string
       },
     },
   })
   @Get(':investorId/total-returns')
   async getTotalReturns(
     @Param('investorId') investorId: string,
-  ): Promise<{ totalReturns: number }> {
-    const totalReturns =
-      await this.investorDashboardService.getTotalReturns(investorId);
-    return { totalReturns }; // Wrap in an object
+  ): Promise<{ totalReturns: string }> { // Updated to string
+    const { total } = await this.investorDashboardService.getTotalReturns(investorId);
+    return { totalReturns: total };
   }
 
   @ApiOperation({ summary: 'Get recent activity of an investor' })
@@ -98,10 +95,8 @@ export class InvestorDashboardController {
     @Param('investorId') investorId: string,
     @Query('limit') limit?: number,
   ): Promise<{ type: string; message: string; date: Date }[]> {
-    return this.investorDashboardService.getRecentActivity(
-      investorId,
-      limit || 10,
-    );
+    const { activities } = await this.investorDashboardService.getRecentActivity(investorId, limit || 10);
+    return activities;
   }
 
   @ApiOperation({ summary: 'Get active investments of an investor' })
@@ -132,19 +127,12 @@ export class InvestorDashboardController {
   @Get(':investorId/proposals')
   async getInvestorProposals(@Param('investorId') investorId: string): Promise<
     {
-      id: unknown;
+      id: string;
       startupName: string;
       industry: string;
       investmentAmount: number;
-      terms: {
-        equity: number;
-        conditions: string;
-      };
-      escrowStatus: {
-        amount: number;
-        releaseDate: Date;
-        status: string;
-      };
+      terms: { equity: number; conditions: string };
+      escrowStatus: string | { amount: number; releaseDate: Date; status: string };
       status: string;
       createdAt: Date;
     }[]

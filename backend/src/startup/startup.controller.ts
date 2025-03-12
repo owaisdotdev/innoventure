@@ -1,34 +1,67 @@
-import { Startup } from '../schemas/startup.schema';
 import {
-  Body,
   Controller,
-  Delete,
   Get,
+  Post, // Added
   Param,
-  Put,
   Query,
+  Put,
+  Delete,
+  Body,
   UseGuards,
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { AdminGuard } from '../guards/role.guard';
 import {
-  ApiBody,
+  ApiTags,
   ApiOperation,
   ApiParam,
   ApiQuery,
+  ApiBody,
   ApiResponse,
-  ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { AdminGuard } from '../guards/role.guard';
 import { StartupService } from './startup.service';
+import { CreateStartupDto } from '../dto/createStartup.dto'; // Added
 import { UpdateStartupDto } from '../dto/updateStartup.dto';
+import { Startup } from '../schemas/startup.schema';
 
 @ApiTags('Startups')
 @Controller('startups')
 export class StartupController {
-  constructor(private readonly startupservice: StartupService) {}
+  constructor(private readonly startupService: StartupService) {}
+
+  @Post() // Added
+  @ApiOperation({
+    summary: 'Create a new startup',
+    description: 'Register a new startup in the system.',
+  })
+  @ApiBody({
+    type: CreateStartupDto,
+    description: 'Startup creation details',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Startup created successfully.',
+    type: Startup,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request (e.g., duplicate email).',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error while creating startup.',
+  })
+  async createStartup(@Body() createStartupDto: CreateStartupDto): Promise<Startup> {
+    try {
+      return await this.startupService.createStartup(createStartupDto);
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new InternalServerErrorException(`Failed to create startup: ${error.message}`);
+    }
+  }
 
   @Get()
   @ApiOperation({
@@ -42,20 +75,20 @@ export class StartupController {
   })
   @ApiResponse({
     status: 500,
-    description: 'Failed to fetch startups.',
+    description: 'Internal server error while fetching startups.',
   })
-  async getAllStartups() {
+  async getAllStartups(): Promise<Startup[]> {
     try {
-      return await this.startupservice.findAllStartups();
+      return await this.startupService.findAllStartups();
     } catch (error) {
-      throw new InternalServerErrorException('Failed to fetch startups');
+      throw new InternalServerErrorException(`Failed to fetch startups: ${error.message}`);
     }
   }
 
   @Get('/email')
   @ApiOperation({
     summary: 'Get startup by email',
-    description: 'Retrieve an startup by their email address.',
+    description: 'Retrieve a startup by their email address.',
   })
   @ApiQuery({
     name: 'email',
@@ -66,7 +99,7 @@ export class StartupController {
   })
   @ApiResponse({
     status: 200,
-    description: 'startup retrieved successfully.',
+    description: 'Startup retrieved successfully.',
     type: Startup,
   })
   @ApiResponse({
@@ -75,25 +108,21 @@ export class StartupController {
   })
   @ApiResponse({
     status: 404,
-    description: 'startup with the provided email not found.',
+    description: 'Startup with the provided email not found.',
   })
   @ApiResponse({
     status: 500,
-    description: 'Error fetching startup by email.',
+    description: 'Internal server error while fetching startup by email.',
   })
-  async getStartupByEmail(@Query('email') email: string) {
+  async getStartupByEmail(@Query('email') email: string): Promise<Startup> {
     if (!email) {
       throw new BadRequestException('Email query parameter is required');
     }
-    try {
-      const startup = await this.startupservice.findByEmail(email);
-      if (!startup) {
-        throw new NotFoundException(`startup with email ${email} not found`);
-      }
-      return startup;
-    } catch (error) {
-      throw new InternalServerErrorException('Error fetching startup by email');
+    const startup = await this.startupService.findByEmail(email);
+    if (!startup) {
+      throw new NotFoundException(`Startup with email ${email} not found`);
     }
+    return startup;
   }
 
   @Get('/industry')
@@ -102,35 +131,33 @@ export class StartupController {
     description: 'Retrieve startups based on their industry.',
   })
   @ApiQuery({
-    name: 'status',
+    name: 'industry',
     required: true,
-    description: 'industry to filter startups by',
+    description: 'Industry to filter startups by',
     type: String,
     example: 'AI',
   })
   @ApiResponse({
     status: 200,
-    description: 'startups retrieved successfully.',
+    description: 'Startups retrieved successfully.',
     type: [Startup],
   })
   @ApiResponse({
     status: 400,
-    description: 'industry query parameter is required.',
+    description: 'Industry query parameter is required.',
   })
   @ApiResponse({
     status: 500,
-    description: 'Error fetching startups by industry.',
+    description: 'Internal server error while fetching startups by industry.',
   })
-  async getByIndustry(@Query('industry') industry: string) {
+  async getByIndustry(@Query('industry') industry: string): Promise<Startup[]> {
     if (!industry) {
-      throw new BadRequestException('industry query parameter is required');
+      throw new BadRequestException('Industry query parameter is required');
     }
     try {
-      return await this.startupservice.findByIndustry(industry);
+      return await this.startupService.findByIndustry(industry);
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Error fetching startups by industry',
-      );
+      throw new InternalServerErrorException(`Failed to fetch startups by industry: ${error.message}`);
     }
   }
 
@@ -148,21 +175,21 @@ export class StartupController {
   })
   @ApiResponse({
     status: 200,
-    description: 'startup retrieved successfully.',
+    description: 'Startup retrieved successfully.',
     type: Startup,
   })
   @ApiResponse({
     status: 404,
-    description: 'startup with the provided ID not found.',
+    description: 'Startup with the provided ID not found.',
   })
   @ApiResponse({
     status: 500,
-    description: 'Error fetching startup by ID.',
+    description: 'Internal server error while fetching startup by ID.',
   })
-  async getStartupById(@Param('id') id: string) {
-    const startup = await this.startupservice.findStartupById(id);
+  async getStartupById(@Param('id') id: string): Promise<Startup> {
+    const startup = await this.startupService.findStartupById(id);
     if (!startup) {
-      throw new NotFoundException(`startup not found`);
+      throw new NotFoundException(`Startup with ID ${id} not found`);
     }
     return startup;
   }
@@ -182,36 +209,34 @@ export class StartupController {
   })
   @ApiBody({
     type: UpdateStartupDto,
-    description: 'startup update details',
+    description: 'Startup update details',
   })
   @ApiResponse({
     status: 200,
-    description: 'startup updated successfully.',
+    description: 'Startup updated successfully.',
     type: Startup,
   })
   @ApiResponse({
     status: 404,
-    description: 'startup with the provided ID not found.',
+    description: 'Startup with the provided ID not found.',
   })
   @ApiResponse({
     status: 500,
-    description: 'Error updating startup.',
+    description: 'Internal server error while updating startup.',
   })
   async updateStartup(
     @Param('id') id: string,
-    @Body() updatestartupDto: UpdateStartupDto,
-  ) {
+    @Body() updateStartupDto: UpdateStartupDto,
+  ): Promise<Startup> {
     try {
-      const updatedstartup = await this.startupservice.updateStartup(
-        id,
-        updatestartupDto,
-      );
-      if (!updatedstartup) {
-        throw new NotFoundException(`startup not found`);
+      const updatedStartup = await this.startupService.updateStartup(id, updateStartupDto);
+      if (!updatedStartup) {
+        throw new NotFoundException(`Startup with ID ${id} not found`);
       }
-      return updatedstartup;
+      return updatedStartup;
     } catch (error) {
-      throw new InternalServerErrorException('Error updating startup');
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(`Failed to update startup: ${error.message}`);
     }
   }
 
@@ -219,8 +244,7 @@ export class StartupController {
   @Delete('/:id')
   @ApiOperation({
     summary: 'Delete startup',
-    description:
-      'Delete an existing startup by their unique ID. Requires admin privileges.',
+    description: 'Delete an existing startup by their unique ID. Requires admin privileges.',
   })
   @ApiParam({
     name: 'id',
@@ -231,7 +255,7 @@ export class StartupController {
   })
   @ApiResponse({
     status: 200,
-    description: 'startup deleted successfully.',
+    description: 'Startup deleted successfully.',
     schema: {
       type: 'boolean',
       example: true,
@@ -239,21 +263,22 @@ export class StartupController {
   })
   @ApiResponse({
     status: 404,
-    description: 'startup with the provided ID not found.',
+    description: 'Startup with the provided ID not found.',
   })
   @ApiResponse({
     status: 500,
-    description: 'Error deleting startup.',
+    description: 'Internal server error while deleting startup.',
   })
-  async deleteStartup(@Param('id') id: string) {
+  async deleteStartup(@Param('id') id: string): Promise<boolean> {
     try {
-      const result = await this.startupservice.deleteStartup(id);
+      const result = await this.startupService.deleteStartup(id);
       if (!result) {
-        throw new NotFoundException(`startup not found`);
+        throw new NotFoundException(`Startup with ID ${id} not found`);
       }
       return true;
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting startup', error);
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(`Failed to delete startup: ${error.message}`);
     }
   }
 }

@@ -25,13 +25,16 @@ let StartupService = class StartupService {
     async createStartup(createStartupDto) {
         try {
             const hashedPassword = await bcrypt.hash(createStartupDto.password, 10);
-            const createdStartup = await this.startupModel.create({
+            const createdStartup = new this.startupModel({
                 ...createStartupDto,
                 password: hashedPassword,
             });
-            return createdStartup;
+            return createdStartup.save();
         }
         catch (error) {
+            if (error.code === 11000) {
+                throw new common_1.BadRequestException('Email already exists');
+            }
             throw new common_1.InternalServerErrorException('Failed to create startup');
         }
     }
@@ -40,11 +43,11 @@ let StartupService = class StartupService {
     }
     async findStartupById(id) {
         if (!(0, mongoose_2.isValidObjectId)(id)) {
-            throw new common_1.BadRequestException(`Invalid ID format`);
+            throw new common_1.BadRequestException('Invalid ID format');
         }
         const startup = await this.startupModel.findById(id).exec();
         if (!startup) {
-            throw new common_1.NotFoundException(`Startup not found`);
+            throw new common_1.NotFoundException(`Startup with ID ${id} not found`);
         }
         return startup;
     }
@@ -53,7 +56,7 @@ let StartupService = class StartupService {
     }
     async updateStartup(id, updateStartupDto) {
         if (!(0, mongoose_2.isValidObjectId)(id)) {
-            throw new common_1.BadRequestException(`Invalid ID format`);
+            throw new common_1.BadRequestException('Invalid ID format');
         }
         const updatedStartup = await this.startupModel
             .findByIdAndUpdate(id, { $set: updateStartupDto }, { new: true })
@@ -64,6 +67,9 @@ let StartupService = class StartupService {
         return updatedStartup;
     }
     async addMilestoneToStartup(startupId, milestoneId) {
+        if (!(0, mongoose_2.isValidObjectId)(startupId) || !(0, mongoose_2.isValidObjectId)(milestoneId)) {
+            throw new common_1.BadRequestException('Invalid ID format');
+        }
         const result = await this.startupModel
             .updateOne({ _id: startupId }, { $push: { 'fundingNeeds.milestones': milestoneId } })
             .exec();
@@ -72,6 +78,9 @@ let StartupService = class StartupService {
         }
     }
     async addInvestorToStartup(startupId, investorId) {
+        if (!(0, mongoose_2.isValidObjectId)(startupId) || !(0, mongoose_2.isValidObjectId)(investorId)) {
+            throw new common_1.BadRequestException('Invalid ID format');
+        }
         const result = await this.startupModel
             .updateOne({ _id: startupId }, { $push: { investors: investorId } })
             .exec();
@@ -80,20 +89,23 @@ let StartupService = class StartupService {
         }
     }
     async removeMilestoneFromStartup(startupId, milestoneId) {
+        if (!(0, mongoose_2.isValidObjectId)(startupId) || !(0, mongoose_2.isValidObjectId)(milestoneId)) {
+            throw new common_1.BadRequestException('Invalid ID format');
+        }
         const result = await this.startupModel
             .updateOne({ _id: startupId }, { $pull: { 'fundingNeeds.milestones': milestoneId } })
             .exec();
         if (result.modifiedCount === 0) {
-            throw new common_1.NotFoundException(`Startup with ID ${startupId} not found`);
+            throw new common_1.NotFoundException(`Startup with ID ${startupId} not found or milestone not associated`);
         }
     }
     async deleteStartup(id) {
         if (!(0, mongoose_2.isValidObjectId)(id)) {
-            throw new common_1.BadRequestException(`Invalid ID format`);
+            throw new common_1.BadRequestException('Invalid ID format');
         }
         const result = await this.startupModel.findByIdAndDelete(id).exec();
         if (!result) {
-            throw new common_1.NotFoundException(`Startup not found`);
+            throw new common_1.NotFoundException(`Startup with ID ${id} not found`);
         }
         return true;
     }

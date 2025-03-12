@@ -25,7 +25,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
 
-  // / close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
       if (!sidebar.current || !trigger.current) return;
@@ -41,7 +40,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
     return () => document.removeEventListener("click", clickHandler);
   });
 
-  //  close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }) => {
       if (!sidebarOpen || keyCode !== 27) return;
@@ -84,7 +82,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
       >
         {/* Sidebar header */}
         <div className="flex justify-between mb-10 pr-3 sm:px-2">
-          {/* Close button */}
           <button
             ref={trigger}
             className="lg:hidden text-gray-500 hover:text-gray-400"
@@ -96,14 +93,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
             <svg
               className="w-6 h-6 fill-current"
               viewBox="0 0 24 24"
-              xmlns="http:/www.w3.org/2000/svg"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z" />
             </svg>
           </button>
-          {/* Logo */}
           <NavLink end to="/" className="font-bold text-xl block">
-           Innoventures
+            Innoventures
           </NavLink>
         </div>
 
@@ -171,7 +167,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               Dashboard
                             </span>
                           </div>
-                          {/* Icon */}
                           <div className="flex shrink-0 ml-2">
                             <svg
                               className={`w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500 ${
@@ -202,7 +197,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               </span>
                             </NavLink>
                           </li>
-
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
@@ -226,111 +220,126 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                 }}
               </SidebarLinkGroup>
 
+              {/* Explore Startups */}
               <SidebarLinkGroup
-  activecondition={
-    pathname.includes("my-projects") ||
-    pathname.includes("featured-startups") ||
-    pathname.includes("recommended-startups") ||
-    pathname.includes("fydp-projects")
-  }
->
-  {(handleClick, open) => (
-    <React.Fragment>
-      <a
-        href="#0"
-        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-          pathname.includes("my-projects")
-            ? ""
-            : "hover:text-gray-900 dark:hover:text-white"
-        }`}
-        onClick={(e) => {
-          e.preventDefault();
-          handleClick();
-          setSidebarExpanded(true);
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <MdOutlineExplore
-              className={`shrink-0 fill-current ${
-                pathname.includes("my-projects")
-                  ? "text-violet-500"
-                  : "text-gray-400 dark:text-gray-500"
-              }`}
-            />
-            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-              Explore Startups
-            </span>
-          </div>
-          <div className="flex shrink-0 ml-2">
-            <FaChevronDown
-              className={`w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500 ${
-                open && "rotate-180"
-              }`}
-            />
-          </div>
-        </div>
-      </a>
-      <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
-        <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
-          {/* <li className="mb-1 last:mb-0">
-            <NavLink
-              end
-              to="/investor/featured-startups"
-              className={({ isActive }) =>
-                "block transition duration-150 truncate " +
-                (isActive
-                  ? "text-violet-500"
-                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-              }
-            >
-              <span className="text-sm font-medium">
-                Featured Startups
-              </span>
-            </NavLink>
-          </li> */}
-          <li className="mb-1 last:mb-0">
-            <NavLink
-              end
-              to="/investor/recommended-startups"
-              className={({ isActive }) =>
-                "block transition duration-150 truncate " +
-                (isActive
-                  ? "text-violet-500"
-                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-              }
-            >
-              <span className="text-sm font-medium">
-                Recommended Startups
-              </span>
-            </NavLink>
-          </li>
-          <li className="mb-1 last:mb-0">
-            <NavLink
-              end
-              to="/investor/fydp-projects"
-              className={({ isActive }) =>
-                "block transition duration-150 truncate " +
-                (isActive
-                  ? "text-violet-500"
-                  : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-              }
-            >
-              <span className="text-sm font-medium">
-                FYDP Projects
-              </span>
-            </NavLink>
-          </li>
-        </ul>
-      </div>
-    </React.Fragment>
-  )}
-</SidebarLinkGroup>
-
-
-              <SidebarLinkGroup
-                activecondition={pathname.includes("investor-engagement")}
+                activecondition={
+                  pathname.includes("my-projects") ||
+                  pathname.includes("featured-startups") ||
+                  pathname.includes("recommended-startups") ||
+                  pathname.includes("fydp-projects")
+                }
               >
+                {(handleClick, open) => (
+                  <React.Fragment>
+                    <a
+                      href="#0"
+                      className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
+                        pathname.includes("my-projects")
+                          ? ""
+                          : "hover:text-gray-900 dark:hover:text-white"
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleClick();
+                        setSidebarExpanded(true);
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <MdOutlineExplore
+                            className={`shrink-0 fill-current ${
+                              pathname.includes("my-projects")
+                                ? "text-violet-500"
+                                : "text-gray-400 dark:text-gray-500"
+                            }`}
+                          />
+                          <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                            Explore Startups
+                          </span>
+                        </div>
+                        <div className="flex shrink-0 ml-2">
+                          <FaChevronDown
+                            className={`w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500 ${
+                              open && "rotate-180"
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </a>
+                    <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
+                      <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
+                        <li className="mb-1 last:mb-0">
+                          <NavLink
+                            end
+                            to="/investor/recommended-startups"
+                            className={({ isActive }) =>
+                              "block transition duration-150 truncate " +
+                              (isActive
+                                ? "text-violet-500"
+                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
+                            }
+                          >
+                            <span className="text-sm font-medium">
+                              Recommended Startups
+                            </span>
+                          </NavLink>
+                        </li>
+                        <li className="mb-1 last:mb-0">
+                          <NavLink
+                            end
+                            to="/investor/fydp-projects"
+                            className={({ isActive }) =>
+                              "block transition duration-150 truncate " +
+                              (isActive
+                                ? "text-violet-500"
+                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
+                            }
+                          >
+                            <span className="text-sm font-medium">FYDP Projects</span>
+                          </NavLink>
+                        </li>
+                      </ul>
+                    </div>
+                  </React.Fragment>
+                )}
+              </SidebarLinkGroup>
+
+              {/* Send Proposals */}
+              <li
+                className={`pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 ${
+                  pathname.includes("send-proposals")
+                    ? "bg-gray-100 dark:bg-gray-700/50"
+                    : ""
+                }`}
+              >
+                <NavLink
+                  end
+                  to="/investor/send-proposals"
+                  className={({ isActive }) =>
+                    `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
+                      isActive
+                        ? "text-violet-500"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                    }`
+                  }
+                >
+                  <div className="flex items-center">
+                    <FaHandshake
+                      className={`shrink-0 ${
+                        pathname.includes("send-proposals")
+                          ? "text-violet-500"
+                          : "text-gray-400 dark:text-gray-500"
+                      }`}
+                    />
+                    <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                      Send Proposals
+                    </span>
+                  </div>
+                </NavLink>
+              </li>
+
+              {/* Investment Insights */}
+              <SidebarLinkGroup activecondition={pathname.includes("investor-engagement")}>
                 {(handleClick, open) => (
                   <React.Fragment>
                     <a
@@ -381,9 +390,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">
-                              Financial Reports
-                            </span>
+                            <span className="text-sm font-medium">Financial Reports</span>
                           </NavLink>
                         </li>
                         <li className="mb-1 last:mb-0">
@@ -397,9 +404,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">
-                              Market Analysis
-                            </span>
+                            <span className="text-sm font-medium">Market Analysis</span>
                           </NavLink>
                         </li>
                         <li className="mb-1 last:mb-0">
@@ -413,9 +418,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">
-                              Portfolio Insights
-                            </span>
+                            <span className="text-sm font-medium">Portfolio Insights</span>
                           </NavLink>
                         </li>
                       </ul>
@@ -424,9 +427,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                 )}
               </SidebarLinkGroup>
 
-              <SidebarLinkGroup
-                activecondition={pathname.includes("smart-contracts")}
-              >
+              {/* Smart Contracts */}
+              <SidebarLinkGroup activecondition={pathname.includes("smart-contracts")}>
                 {(handleClick, open) => (
                   <React.Fragment>
                     <a
@@ -477,9 +479,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">
-                              My Contracts
-                            </span>
+                            <span className="text-sm font-medium">My Contracts</span>
                           </NavLink>
                         </li>
                         <li className="mb-1 last:mb-0">
@@ -493,9 +493,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">
-                              Create Contract
-                            </span>
+                            <span className="text-sm font-medium">Create Contract</span>
                           </NavLink>
                         </li>
                         <li className="mb-1 last:mb-0">
@@ -509,9 +507,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">
-                              Templates
-                            </span>
+                            <span className="text-sm font-medium">Templates</span>
                           </NavLink>
                         </li>
                       </ul>
@@ -520,6 +516,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                 )}
               </SidebarLinkGroup>
 
+              {/* Account Settings */}
               <SidebarLinkGroup activecondition={pathname.includes("settings")}>
                 {(handleClick, open) => {
                   return (
@@ -550,7 +547,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                               Account Settings
                             </span>
                           </div>
-                          {/* Icon */}
                           <div className="flex shrink-0 ml-2">
                             <FaChevronDown
                               className={`w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500 ${
@@ -630,7 +626,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
               <span className="sr-only">Expand / collapse sidebar</span>
               <svg
                 className="shrink-0 fill-current text-gray-400 dark:text-gray-500 sidebar-expanded:rotate-180"
-                xmlns="http:/www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"

@@ -6,26 +6,30 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, isValidObjectId } from 'mongoose';
-import { Startup } from '../schemas/startup.schema';
-import { CreateStartupDto } from '../dto/createStartup.dto';
-import { UpdateStartupDto } from '../dto/updateStartup.dto';
+// import { Startup } from './schemas/startup.schema';
+import { Startup } from 'src/schemas/startup.schema';
+// import { CreateStartupDto } from './dto/create-startup.dto'; // Adjusted path
+import { CreateStartupDto } from 'src/dto/createStartup.dto';
+// import { UpdateStartupDto } from './dto/update-startup.dto'; // Adjusted path
+import { UpdateStartupDto } from 'src/dto/updateStartup.dto';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class StartupService {
-  constructor(
-    @InjectModel(Startup.name) private startupModel: Model<Startup>,
-  ) {}
+  constructor(@InjectModel(Startup.name) private startupModel: Model<Startup>) {}
 
   async createStartup(createStartupDto: CreateStartupDto): Promise<Startup> {
     try {
       const hashedPassword = await bcrypt.hash(createStartupDto.password, 10);
-      const createdStartup = await this.startupModel.create({
+      const createdStartup = new this.startupModel({
         ...createStartupDto,
         password: hashedPassword,
       });
-      return createdStartup;
+      return createdStartup.save();
     } catch (error) {
+      if (error.code === 11000) { // Duplicate key error (e.g., email)
+        throw new BadRequestException('Email already exists');
+      }
       throw new InternalServerErrorException('Failed to create startup');
     }
   }
@@ -36,12 +40,11 @@ export class StartupService {
 
   async findStartupById(id: string): Promise<Startup> {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Invalid ID format`);
+      throw new BadRequestException('Invalid ID format');
     }
-
     const startup = await this.startupModel.findById(id).exec();
     if (!startup) {
-      throw new NotFoundException(`Startup not found`);
+      throw new NotFoundException(`Startup with ID ${id} not found`);
     }
     return startup;
   }
@@ -50,83 +53,71 @@ export class StartupService {
     return this.startupModel.findOne({ email }).exec();
   }
 
-  async updateStartup(
-    id: string,
-    updateStartupDto: UpdateStartupDto,
-  ): Promise<Startup> {
+  async updateStartup(id: string, updateStartupDto: UpdateStartupDto): Promise<Startup> {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Invalid ID format`);
+      throw new BadRequestException('Invalid ID format');
     }
-
     const updatedStartup = await this.startupModel
       .findByIdAndUpdate(id, { $set: updateStartupDto }, { new: true })
       .exec();
-
     if (!updatedStartup) {
       throw new NotFoundException(`Startup with ID ${id} not found`);
     }
-
     return updatedStartup;
   }
 
-  async addMilestoneToStartup(
-    startupId: string,
-    milestoneId: Types.ObjectId,
-  ): Promise<void> {
+  async addMilestoneToStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void> {
+    if (!isValidObjectId(startupId) || !isValidObjectId(milestoneId)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const result = await this.startupModel
       .updateOne(
         { _id: startupId },
         { $push: { 'fundingNeeds.milestones': milestoneId } },
       )
       .exec();
-
     if (result.modifiedCount === 0) {
       throw new NotFoundException(`Startup with ID ${startupId} not found`);
     }
   }
 
-  async addInvestorToStartup(
-    startupId: string,
-    investorId: Types.ObjectId,
-  ): Promise<void> {
+  async addInvestorToStartup(startupId: string, investorId: Types.ObjectId): Promise<void> {
+    if (!isValidObjectId(startupId) || !isValidObjectId(investorId)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const result = await this.startupModel
       .updateOne({ _id: startupId }, { $push: { investors: investorId } })
       .exec();
-
     if (result.modifiedCount === 0) {
       throw new NotFoundException(`Startup with ID ${startupId} not found`);
     }
   }
 
-  async removeMilestoneFromStartup(
-    startupId: string,
-    milestoneId: Types.ObjectId,
-  ): Promise<void> {
+  async removeMilestoneFromStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void> {
+    if (!isValidObjectId(startupId) || !isValidObjectId(milestoneId)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const result = await this.startupModel
       .updateOne(
         { _id: startupId },
         { $pull: { 'fundingNeeds.milestones': milestoneId } },
       )
       .exec();
-
     if (result.modifiedCount === 0) {
-      throw new NotFoundException(`Startup with ID ${startupId} not found`);
+      throw new NotFoundException(`Startup with ID ${startupId} not found or milestone not associated`);
     }
   }
 
-  async deleteStartup(id: string): Promise<Boolean> {
+  async deleteStartup(id: string): Promise<boolean> {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Invalid ID format`);
+      throw new BadRequestException('Invalid ID format');
     }
-
     const result = await this.startupModel.findByIdAndDelete(id).exec();
     if (!result) {
-      throw new NotFoundException(`Startup not found`);
+      throw new NotFoundException(`Startup with ID ${id} not found`);
     }
     return true;
   }
-
-  // Getter Functions
 
   async findByIndustry(industry: string): Promise<Startup[]> {
     return this.startupModel.find({ 'businessPlan.industry': industry }).exec();
@@ -134,9 +125,7 @@ export class StartupService {
 
   async getRecentStartups(days: number = 30): Promise<Startup[]> {
     const dateFrom = new Date();
-    dateFrom.setDate(dateFrom.getDate() - days); // Calculate the date `days` ago from today
-
-    // Query startups where `createdAt` is greater than or equal to `dateFrom`
+    dateFrom.setDate(dateFrom.getDate() - days);
     return this.startupModel
       .find({
         createdAt: { $gte: dateFrom },
@@ -144,7 +133,7 @@ export class StartupService {
       .exec();
   }
 
-  async findFydpStartups() {
+  async findFydpStartups(): Promise<Startup[]> {
     return this.startupModel.find({ isFydp: true }).exec();
   }
 }

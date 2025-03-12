@@ -9,15 +9,15 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private investorService: InvestorService,
-    private startupService: StartupService,
-    private adminService: AdminService,
-    private configService: ConfigService,
+    private readonly investorService: InvestorService,
+    private readonly startupService: StartupService,
+    private readonly adminService: AdminService,
+    private readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET_KEY'),
+      secretOrKey: configService.get<string>('JWT_SECRET'), // Changed to match .env
     });
   }
 
@@ -31,6 +31,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       validatedEntity = await this.startupService.findByEmail(payload.email);
     } else if (payload.role === 'admin') {
       validatedEntity = await this.adminService.findByEmail(payload.email);
+    } else {
+      throw new UnauthorizedException('Invalid role in token');
     }
 
     // If no user/entity is found, throw UnauthorizedException
@@ -38,12 +40,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User not found or unauthorized');
     }
 
-    // Depending on the role, return the corresponding entity object
+    // Return the validated entity with role and ID
     return {
-      id: validatedEntity.id,
+      id: validatedEntity._id, // Changed to _id for MongoDB consistency
       email: validatedEntity.email,
       role: payload.role,
-      entity: validatedEntity, // Attach the entire object (investor, startup, or admin)
+      entity: validatedEntity,
     };
   }
 }

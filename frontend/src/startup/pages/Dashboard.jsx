@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Header from "../partials/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Link } from "react-router-dom";
+import { FaBell, FaUser } from "react-icons/fa";
+import ChatIcon from "@/components/ChatIcon";
+import ChatBox from "@/components/ChatBox";
+
+const BASE_URL = "http://localhost:3000";
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
   const [startup, setStartup] = useState({
     name: "",
     email: "",
@@ -18,197 +22,232 @@ function Dashboard() {
     investors: [],
     notifications: [],
   });
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const [errors, setErrors] = useState({ name: "", email: "", established: "" });
-  const startupId = localStorage.getItem("user");
+  const { userId } = useParams();
+  const navigate = useNavigate();
 
-  // Fetch startup data when the component mounts
   useEffect(() => {
     const fetchStartupData = async () => {
       try {
-        const response = await fetch(`https://innoventure-api.vercel.app/startups/${startupId}`);
-        if (!response.ok) throw new Error("Failed to fetch startup data");
-        const data = await response.json();
-        setStartup(data);
+        setLoading(true);
+        console.log("[Startup] Fetching startup data for userId:", userId);
+
+        const startupResponse = await fetch(`${BASE_URL}/startups/${userId}`);
+        if (!startupResponse.ok) {
+          const errorText = await startupResponse.text();
+          throw new Error(`Failed to fetch startup data: ${startupResponse.status} - ${errorText}`);
+        }
+        const startupData = await startupResponse.json();
+        console.log("[Startup] Fetched startup data:", startupData);
+        setStartup({
+          name: startupData.name || "",
+          email: startupData.email || "",
+          established: startupData.established || "",
+          isFydp: startupData.isFydp || false,
+          funding: startupData.funding || 0,
+          investors: startupData.investors || [],
+          notifications: startupData.notifications || [],
+        });
+
+        console.log("[Startup] Fetching notifications for userId:", userId);
+        const notificationsResponse = await fetch(`${BASE_URL}/notifications/${userId}`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        console.log(`[Startup] Fetch status: ${notificationsResponse.status}`);
+        if (!notificationsResponse.ok) {
+          const errorText = await notificationsResponse.text();
+          console.error("[Startup] Fetch notifications failed:", errorText);
+          throw new Error(`Failed to fetch notifications: ${notificationsResponse.status} - ${errorText}`);
+        }
+        const notificationsData = await notificationsResponse.json();
+        console.log("[Startup] Raw notifications response:", notificationsData);
+
+        const formattedNotifications = Array.isArray(notificationsData)
+          ? notificationsData.map((notif) => ({
+              message: notif.message || "No message",
+              timestamp: notif.timestamp || notif.createdAt || new Date().toISOString(),
+              read: notif.read || false,
+            }))
+          : [];
+        console.log("[Startup] Formatted notifications:", formattedNotifications);
+        setNotifications(formattedNotifications);
       } catch (error) {
-        console.error("Error fetching startup data:", error);
-        toast.error("Error fetching startup data");
+        console.error("[Startup] Error fetching data:", error.message);
+        toast.error(`Error fetching data: ${error.message}`);
+        setNotifications([]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchStartupData();
-  }, [startupId]);
+  }, [userId, navigate]);
 
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setStartup({ ...startup, [name]: type === "checkbox" ? checked : value });
-  };
-
-  // Form validation
-  const validateForm = () => {
-    let formValid = true;
-    let validationErrors = { name: "", email: "", established: "" };
-
-    if (!startup.name) {
-      validationErrors.name = "Name is required.";
-      formValid = false;
-    }
-
-    if (!startup.email) {
-      validationErrors.email = "Email is required.";
-      formValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(startup.email)) {
-      validationErrors.email = "Invalid email format.";
-      formValid = false;
-    }
-
-    if (!startup.established) {
-      validationErrors.established = "Established year is required.";
-      formValid = false;
-    }
-
-    setErrors(validationErrors);
-    return formValid;
-  };
-
-  // Update startup data
-  const handleUpdateStartup = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setUpdating(true);
-
+  const markAsRead = async (message) => {
     try {
-      const response = await fetch(`https://innoventure-api.vercel.app/startups/${startupId}`, {
-        method: "PUT",
+      console.log("[Startup] Marking notification as read, message:", message);
+      const response = await fetch(`${BASE_URL}/notifications/${userId}/mark-read`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(startup),
+        body: JSON.stringify({ message }),
       });
-
-      if (!response.ok) throw new Error("Failed to update startup data");
-
-      toast.success("Startup information updated successfully!");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to mark notification as read: ${response.status} - ${errorText}`);
+      }
+      setNotifications((prev) =>
+        prev.map((notif) => (notif.message === message ? { ...notif, read: true } : notif))
+      );
+      toast.success("Notification marked as read");
     } catch (error) {
-      console.error("Update error:", error);
-      toast.error("Error updating startup information");
-    } finally {
-      setUpdating(false);
+      console.error("[Startup] Error marking notification as read:", error.message);
+      toast.error("Failed to mark notification as read");
     }
   };
+
+  const unreadCount = notifications.filter((notif) => !notif.read).length;
+
+  if (loading) return <div className="text-center mt-20 text-white">Loading...</div>;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-900">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
-            <h1 className="text-3xl text-gray-800 font-bold mb-6">Startup Dashboard</h1>
-
-            {loading ? (
-              <div className="flex justify-center items-center h-32">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500"></div>
-              </div>
-            ) : (
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4">Update Startup Information</h2>
-                <form onSubmit={handleUpdateStartup} className="space-y-4">
-                  {/* Name */}
-                  <div>
-                    <label className="block text-gray-700 font-medium">Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={startup.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                    {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block text-gray-700 font-medium">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={startup.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                    {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-                  </div>
-
-                  {/* Established Year */}
-                  <div>
-                    <label className="block text-gray-700 font-medium">Established</label>
-                    <input
-                      type="text"
-                      name="established"
-                      value={startup.established}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                    {errors.established && <p className="text-red-500 text-sm">{errors.established}</p>}
-                  </div>
-
-                  {/* Funding */}
-                  <div>
-                    <label className="block text-gray-700 font-medium">Funding</label>
-                    <input
-                      type="number"
-                      name="funding"
-                      value={startup.funding}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg"
-                    />
-                  </div>
-
-                  {/* Investors */}
-                  <div>
-                    <label className="block text-gray-700 font-medium">Investors</label>
-                    {startup.investors.length > 0 ? (
-                      <ul className="list-disc pl-5 text-gray-700">
-                        {startup.investors.map((investor, index) => (
-                          <li key={index}>{investor}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-gray-700">No investors yet.</p>
-                    )}
-                  </div>
-
-                  {/* Notifications */}
-                  <div>
-                    <label className="block text-gray-700 font-medium">Notifications</label>
-                    {startup.notifications.length > 0 ? (
-                      <ul className="list-disc pl-5 text-gray-700">
-                        {startup.notifications.map((notification, index) => (
-                          <li key={index}>{notification}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-gray-700">No notifications yet.</p>
-                    )}
-                  </div>
-
-                  {/* Submit Button */}
+            <div className="sm:flex sm:justify-between sm:items-center mb-8">
+              <h1 className="text-3xl text-white font-bold">Startup Dashboard</h1>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowUserModal(true)}
+                  className="text-gray-300 hover:text-white focus:outline-none"
+                  aria-label="User Profile"
+                >
+                  <FaUser className="w-6 h-6" />
+                </button>
+                <div className="relative">
                   <button
-                    type="submit"
-                    disabled={updating}
-                    className={`px-6 py-2 rounded-lg text-white ${
-                      updating ? "bg-gray-500 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-                    }`}
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="text-gray-300 hover:text-white focus:outline-none"
+                    aria-label="Notifications"
                   >
-                    {updating ? "Updating..." : "Save Changes"}
+                    <FaBell className="w-6 h-6" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
                   </button>
-                </form>
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto border border-gray-700">
+                      {notifications.length === 0 ? (
+                        <p className="p-4 text-gray-400">No notifications available</p>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.message}
+                            className={`p-4 border-b border-gray-700 ${notif.read ? "bg-gray-700" : "bg-gray-800"}`}
+                          >
+                            <p className="text-sm text-gray-200">{notif.message}</p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(notif.timestamp).toLocaleString()}
+                            </p>
+                            {!notif.read && (
+                              <button
+                                onClick={() => markAsRead(notif.message)}
+                                className="text-xs text-indigo-400 hover:text-indigo-300 mt-1"
+                              >
+                                Mark as read
+                              </button>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {showUserModal && (
+              <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex justify-center items-center">
+                <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-xl border border-gray-700">
+                  <h2 className="text-2xl font-bold mb-6 text-white">Startup Details</h2>
+                  <div className="space-y-5">
+                    <div className="flex items-center border-b border-gray-600 pb-2">
+                      <label className="text-indigo-400 font-semibold w-1/3">Name</label>
+                      <p className="text-gray-100 w-2/3">{startup.name || "N/A"}</p>
+                    </div>
+                    <div className="flex items-center border-b border-gray-600 pb-2">
+                      <label className="text-indigo-400 font-semibold w-1/3">Email</label>
+                      <p className="text-gray-100 w-2/3">{startup.email || "N/A"}</p>
+                    </div>
+                    <div className="flex items-center border-b border-gray-600 pb-2">
+                      <label className="text-indigo-400 font-semibold w-1/3">Established Year</label>
+                      <p className="text-gray-100 w-2/3">{startup.established || "N/A"}</p>
+                    </div>
+                    <div className="flex items-center border-b border-gray-600 pb-2">
+                      <label className="text-indigo-400 font-semibold w-1/3">Funding</label>
+                      <p className="text-gray-100 w-2/3">${startup.funding.toLocaleString() || 0}</p>
+                    </div>
+                    <div className="flex items-start border-b border-gray-600 pb-2">
+                      <label className="text-indigo-400 font-semibold w-1/3">Investors</label>
+                      <div className="w-2/3">
+                        {startup.investors.length > 0 ? (
+                          <ul className="list-disc pl-5 text-gray-100">
+                            {startup.investors.map((investor, index) => (
+                              <li key={index}>{investor}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-100">No investors yet.</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      onClick={() => setShowUserModal(false)}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
+
+            <div className="bg-gray-800 p-6 rounded-lg shadow-md space-y-6">
+              <div className="mt-6 flex space-x-4">
+                <Link
+                  to={`/startup/proposals/${userId}`}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                >
+                  View Proposals
+                </Link>
+                <Link
+                  to={`/startup/accepted-proposals/${userId}`}
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                >
+                  Accepted Proposals
+                </Link>
+              </div>
+            </div>
           </div>
         </main>
+
+        <ChatIcon onClick={() => setIsChatOpen(!isChatOpen)} userId={userId} />
+        <ChatBox
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          userId={userId}
+          recipientId="67bf29890c2f666e54f3968f"
+        />
       </div>
       <ToastContainer />
     </div>

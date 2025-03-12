@@ -27,23 +27,24 @@ exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule,
             passport_1.PassportModule,
             jwt_1.JwtModule.registerAsync({
                 imports: [config_1.ConfigModule],
                 inject: [config_1.ConfigService],
                 useFactory: (configService) => ({
-                    secret: configService.get('JWT_SECRET_KEY'),
+                    secret: configService.get('JWT_SECRET'),
                     signOptions: { expiresIn: '7d' },
                 }),
             }),
-            startup_module_1.StartupModule,
-            investor_module_1.InvestorModule,
-            admin_module_1.AdminModule,
-            email_module_1.EmailModule,
             mongoose_1.MongooseModule.forFeature([
                 { name: investor_schema_1.Investor.name, schema: investor_schema_1.InvestorSchema },
                 { name: startup_schema_1.Startup.name, schema: startup_schema_1.StartupSchema },
             ]),
+            startup_module_1.StartupModule,
+            investor_module_1.InvestorModule,
+            admin_module_1.AdminModule,
+            email_module_1.EmailModule,
         ],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
         exports: [auth_service_1.AuthService],

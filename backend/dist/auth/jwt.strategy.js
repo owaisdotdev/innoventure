@@ -22,7 +22,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get('JWT_SECRET_KEY'),
+            secretOrKey: configService.get('JWT_SECRET'),
         });
         this.investorService = investorService;
         this.startupService = startupService;
@@ -40,11 +40,14 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         else if (payload.role === 'admin') {
             validatedEntity = await this.adminService.findByEmail(payload.email);
         }
+        else {
+            throw new common_1.UnauthorizedException('Invalid role in token');
+        }
         if (!validatedEntity) {
             throw new common_1.UnauthorizedException('User not found or unauthorized');
         }
         return {
-            id: validatedEntity.id,
+            id: validatedEntity._id,
             email: validatedEntity.email,
             role: payload.role,
             entity: validatedEntity,

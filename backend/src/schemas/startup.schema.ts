@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true }) // Added timestamps for createdAt/updatedAt
 export class Startup extends Document {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true }) // Added unique constraint for email
   email: string;
 
   @Prop({ type: String, required: true })
@@ -15,8 +15,9 @@ export class Startup extends Document {
   @Prop({
     type: {
       description: { type: String, required: true },
-      industry: { type: String, required: true }, // E.g., "Fintech", "EdTech"
+      industry: { type: String, required: true },
     },
+    _id: false, // Prevents _id generation for subdocument
   })
   businessPlan: {
     description: string;
@@ -28,6 +29,7 @@ export class Startup extends Document {
       totalAmount: { type: Number, required: true },
       milestones: [{ type: Types.ObjectId, ref: 'Milestone' }],
     },
+    _id: false,
   })
   fundingNeeds: {
     totalAmount: number;
@@ -37,18 +39,19 @@ export class Startup extends Document {
   @Prop({
     type: [
       {
-        docType: { type: String, required: true }, // E.g., "Financial Report", "Business Plan"
+        docType: { type: String, required: true },
         fileUrl: { type: String, required: true },
       },
     ],
+    default: [],
   })
   documents: {
     docType: string;
     fileUrl: string;
   }[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Investor' }] })
-  investors: Types.ObjectId[]; // References to Investor documents
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Investor' }], default: [] })
+  investors: Types.ObjectId[];
 
   @Prop({
     type: [
@@ -63,6 +66,7 @@ export class Startup extends Document {
         },
       },
     ],
+    default: [],
   })
   progressReports: {
     milestoneId: Types.ObjectId;
@@ -76,9 +80,10 @@ export class Startup extends Document {
       {
         type: { type: String },
         message: { type: String },
-        date: { type: Date },
+        date: { type: Date, default: Date.now },
       },
     ],
+    default: [],
   })
   notifications: {
     type: string;
@@ -107,6 +112,8 @@ export class Startup extends Document {
       tags: { type: [String], default: [] },
       remarks: { type: String, default: '' },
     },
+    _id: false,
+    required: false, // Only required if isFydp is true, handle in logic
   })
   fydpDetails: {
     university: string;

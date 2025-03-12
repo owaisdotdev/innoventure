@@ -20,34 +20,27 @@ export class InvestorDashboardService {
    * @param investorId - ID of the investor
    * @returns Total investment amount
    */
-  async getTotalInvestment(investorId: string): Promise<number> {
+  async getTotalInvestment(investorId: string): Promise<{ total: number }> {
     const investments = await this.investmentModel
       .find({ investorId: new Types.ObjectId(investorId) })
       .exec();
 
-    if (investments.length > 0) {
-      const totalInvestment = investments.reduce(
-        (sum, investment) => sum + investment.amount,
-        0,
-      );
-      return totalInvestment;
-    } else {
-      return 0;
-    }
+    const totalInvestment = investments.reduce((sum, investment) => sum + (investment.amount || 0), 0);
+    return { total: totalInvestment };
   }
 
   /**
-   * Get active startups the investor has invested in
+   * Get the number of active startups the investor has invested in
    * @param investorId - ID of the investor
    * @returns Number of active startups
    */
-  async getActiveStartups(investorId: string): Promise<number> {
+  async getActiveStartups(investorId: string): Promise<{ count: number }> {
     const investments = await this.investmentModel
       .find({ investorId: new Types.ObjectId(investorId) })
-      .select('startup')
+      .select('startupId')
       .exec();
 
-    return investments.length;
+    return { count: investments.length };
   }
 
   /**
@@ -55,18 +48,17 @@ export class InvestorDashboardService {
    * @param investorId - ID of the investor
    * @returns Total returns calculated from equityDistribution
    */
-  async getTotalReturns(investorId: string): Promise<number> {
+  async getTotalReturns(investorId: string): Promise<{ total: string }> {
     const investments = await this.investmentModel
       .find({ investorId: new Types.ObjectId(investorId), status: 'approved' })
       .exec();
 
-    // If equityDistribution contributes to returns, adjust formula accordingly
     const totalReturns = investments.reduce((sum, investment) => {
-      const equityValue = investment.equityDistribution * investment.amount; // Hypothetical calculation
+      const equityValue = (investment.equityDistribution || 0) * (investment.amount || 0);
       return sum + equityValue;
     }, 0);
 
-    return totalReturns;
+    return { total: `$${totalReturns.toFixed(2)}` };
   }
 
   /**
@@ -78,21 +70,27 @@ export class InvestorDashboardService {
   async getRecentActivity(
     investorId: string,
     limit = 10,
-  ): Promise<{ type: string; message: string; date: Date }[]> {
-    const investor = await this.investorModel
-      .findById(investorId)
-      .select('notifications')
-      .exec();
+  ): Promise<{ activities: { type: string; message: string; date: Date }[] }> {
+    try {
+      const investor = await this.investorModel
+        .findById(investorId)
+        .select('notifications')
+        .exec();
 
-    if (!investor) {
-      throw new Error('Investor not found');
+      if (!investor || !investor.notifications) {
+        console.log(`[Service] No investor or notifications found for investorId: ${investorId}`);
+        return { activities: [] };
+      }
+
+      const recentActivity = investor.notifications
+        .sort((a, b) => b.date.getTime() - a.date.getTime())
+        .slice(0, limit);
+
+      return { activities: recentActivity };
+    } catch (error) {
+      console.error(`[Service] Error fetching recent activity for ${investorId}:`, error.message);
+      return { activities: [] };
     }
-
-    const recentActivity = investor.notifications
-      .sort((a, b) => b.date.getTime() - a.date.getTime()) // Sort by date, descending
-      .slice(0, limit);
-
-    return recentActivity;
   }
 
   /**
@@ -101,52 +99,55 @@ export class InvestorDashboardService {
    * @returns List of active investments with startup name, investment amount, and status
    */
   async getActiveInvestments(investorId: string): Promise<
-    {
-      startupName: string;
-      amount: number;
-      status: string;
-    }[]
+    { startupName: string; amount: number; status: string }[]
   > {
-    // Fetch active investments for the investor
     const investments = await this.investmentModel
-      .find({ investorId: new Types.ObjectId(investorId) }) // Active investments
-      .populate('startupId', 'name') // Populate startup name
+      .find({ investorId: new Types.ObjectId(investorId) })
+      .populate('startupId', 'name')
       .exec();
 
-    // Map the results to include only required fields
-    const activeInvestments = investments.map((investment) => ({
-      startupName: investment.startupId['name'], // Access populated startup name
-      amount: investment.amount,
-      status: investment.status,
+    return investments.map((investment) => ({
+      startupName: investment.startupId && 'name' in investment.startupId ? investment.startupId['name'] as string : 'Unknown',
+      amount: investment.amount || 0,
+      status: investment.status || 'Unknown',
     }));
-
-    return activeInvestments;
   }
 
-   /**
+  /**
    * Get all proposals submitted by an investor
    * @param investorId - ID of the investor
    * @returns List of proposals with startup details and status
    */
-   async getInvestorProposals(investorId: string) {
+  async getInvestorProposals(investorId: string): Promise<
+    {
+      id: string;
+      startupName: string;
+      industry: string;
+      investmentAmount: number;
+      terms: { equity: number; conditions: string };
+      escrowStatus: string | { amount: number; releaseDate: Date; status: string }; // Updated type
+      status: string;
+      createdAt: Date;
+    }[]
+  > {
     const proposals = await this.proposalModel
       .find({ investorId: new Types.ObjectId(investorId) })
       .populate('startupId', 'name')
-      .sort({ _id: -1 }) // Sort by newest first
+      .sort({ _id: -1 })
       .exec();
 
-    return proposals.map(proposal => ({
-      id: proposal._id,
-      startupName: proposal.startupId['name'],
-      industry: proposal.industry,
-      investmentAmount: proposal.investmentAmount,
+    return proposals.map((proposal) => ({
+      id: proposal._id.toString(),
+      startupName: proposal.startupId && 'name' in proposal.startupId ? (proposal.startupId as any).name : 'Unknown',
+      industry: proposal.industry || 'N/A',
+      investmentAmount: proposal.investmentAmount || 0,
       terms: {
-        equity: proposal.terms.equity,
-        conditions: proposal.terms.conditions
+        equity: proposal.terms?.equity || 0,
+        conditions: proposal.terms?.conditions || 'N/A',
       },
-      escrowStatus: proposal.escrowStatus,
-      status: proposal.status,
-      createdAt: (proposal._id as Types.ObjectId).getTimestamp()
+      escrowStatus: proposal.escrowStatus || 'N/A', // Keep as-is, TypeScript will handle union type
+      status: proposal.status || 'Pending',
+      createdAt: (proposal._id as Types.ObjectId).getTimestamp(),
     }));
   }
 }

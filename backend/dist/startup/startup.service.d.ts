@@ -1,7 +1,7 @@
 import { Model, Types } from 'mongoose';
-import { Startup } from '../schemas/startup.schema';
-import { CreateStartupDto } from '../dto/createStartup.dto';
-import { UpdateStartupDto } from '../dto/updateStartup.dto';
+import { Startup } from 'src/schemas/startup.schema';
+import { CreateStartupDto } from 'src/dto/createStartup.dto';
+import { UpdateStartupDto } from 'src/dto/updateStartup.dto';
 export declare class StartupService {
     private startupModel;
     constructor(startupModel: Model<Startup>);
@@ -13,10 +13,8 @@ export declare class StartupService {
     addMilestoneToStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void>;
     addInvestorToStartup(startupId: string, investorId: Types.ObjectId): Promise<void>;
     removeMilestoneFromStartup(startupId: string, milestoneId: Types.ObjectId): Promise<void>;
-    deleteStartup(id: string): Promise<Boolean>;
+    deleteStartup(id: string): Promise<boolean>;
     findByIndustry(industry: string): Promise<Startup[]>;
     getRecentStartups(days?: number): Promise<Startup[]>;
-    findFydpStartups(): Promise<(import("mongoose").Document<unknown, {}, Startup> & Startup & Required<{
-        _id: unknown;
-    }>)[]>;
+    findFydpStartups(): Promise<Startup[]>;
 }

@@ -9,7 +9,7 @@ import { Investor, InvestorSchema } from '../schemas/investor.schema';
 import { Startup, StartupSchema } from '../schemas/startup.schema';
 import { Investment, InvestmentSchema } from '../schemas/investment.schema';
 import { Proposal, ProposalSchema } from '../schemas/proposal.schema';
-import { ProposalModule } from '../proposal/proposal.module';
+import { ProposalsModule } from '../proposal/proposal.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { ProposalModule } from '../proposal/proposal.module';
     InvestmentModule,
     StartupModule,
     InvestorModule,
-    ProposalModule
+    ProposalsModule
   ],
   providers: [InvestorDashboardService],
   controllers: [InvestorDashboardController],

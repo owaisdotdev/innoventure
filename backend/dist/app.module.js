@@ -11,10 +11,10 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const mongoose_1 = require("@nestjs/mongoose");
+const config_1 = require("@nestjs/config");
 const investor_module_1 = require("./investor/investor.module");
 const startup_module_1 = require("./startup/startup.module");
 const auth_module_1 = require("./auth/auth.module");
-const config_1 = require("@nestjs/config");
 const admin_module_1 = require("./admin/admin.module");
 const email_module_1 = require("./email/email.module");
 const milestone_module_1 = require("./milestone/milestone.module");
@@ -22,6 +22,10 @@ const smart_contract_module_1 = require("./smart-contract/smart-contract.module"
 const investment_module_1 = require("./investment/investment.module");
 const dao_module_1 = require("./dao/dao.module");
 const admin_dashboard_module_1 = require("./admin-dashboard/admin-dashboard.module");
+const investor_dashboard_module_1 = require("./investor-dashboard/investor-dashboard.module");
+const proposal_module_1 = require("./proposal/proposal.module");
+const notification_module_1 = require("./notification/notification.module");
+const chat_module_1 = require("./chat/chat.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -35,9 +39,19 @@ exports.AppModule = AppModule = __decorate([
             mongoose_1.MongooseModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 inject: [config_1.ConfigService],
-                useFactory: (configService) => ({
-                    uri: configService.get('MONGODB_URI'),
-                }),
+                useFactory: (configService) => {
+                    const uri = configService.get('MONGODB_URI');
+                    if (!uri) {
+                        console.error('MONGODB_URI is not defined in .env');
+                        throw new Error('MONGODB_URI is not defined in the .env file');
+                    }
+                    console.log(`Connecting to MongoDB at: ${uri}`);
+                    return {
+                        uri,
+                        useNewUrlParser: true,
+                        useUnifiedTopology: true,
+                    };
+                },
             }),
             investor_module_1.InvestorModule,
             startup_module_1.StartupModule,
@@ -49,6 +63,10 @@ exports.AppModule = AppModule = __decorate([
             investment_module_1.InvestmentModule,
             dao_module_1.DaoModule,
             admin_dashboard_module_1.AdminDashboardModule,
+            investor_dashboard_module_1.InvestorDashboardModule,
+            proposal_module_1.ProposalsModule,
+            notification_module_1.NotificationsModule,
+            chat_module_1.ChatModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
