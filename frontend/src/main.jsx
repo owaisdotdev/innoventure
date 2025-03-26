@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';  // Import Provider
 import { store } from '@/redux/store';         // Import your Redux store
 import ThemeProvider from './utils/ThemeContext';
 import App from './App';
-import { AuthContextProvider  } from './contexts/AuthContext';
+import { AuthContextProvider } from './contexts/AuthContext';
 import MyProvider from './Providers/Web3Provider';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -14,10 +14,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Router>
         <ThemeProvider>
           <MyProvider>
-      <App />
-      </MyProvider>
-    
-         </ThemeProvider>
+            <App />
+          </MyProvider>
+
+        </ThemeProvider>
       </Router>
     </Provider>
   </React.StrictMode>
