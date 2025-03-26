@@ -6,6 +6,9 @@ import { Notification } from './notification.schema';
 
 @Injectable()
 export class NotificationsService {
+  create(arg0: { userId: string; message: string; type: string; }) {
+    throw new Error('Method not implemented.');
+  }
   constructor(@InjectModel('Notification') private notificationModel: Model<Notification>) {}
 
   async createNotification(userId: string, message: string) {

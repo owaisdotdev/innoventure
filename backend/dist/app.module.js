@@ -26,6 +26,9 @@ const investor_dashboard_module_1 = require("./investor-dashboard/investor-dashb
 const proposal_module_1 = require("./proposal/proposal.module");
 const notification_module_1 = require("./notification/notification.module");
 const chat_module_1 = require("./chat/chat.module");
+const match_controller_1 = require("./match.controller");
+const match_service_1 = require("./match.service");
+const axios_1 = require("@nestjs/axios");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,11 +51,10 @@ exports.AppModule = AppModule = __decorate([
                     console.log(`Connecting to MongoDB at: ${uri}`);
                     return {
                         uri,
-                        useNewUrlParser: true,
-                        useUnifiedTopology: true,
                     };
                 },
             }),
+            axios_1.HttpModule,
             investor_module_1.InvestorModule,
             startup_module_1.StartupModule,
             auth_module_1.AuthModule,
@@ -68,8 +70,8 @@ exports.AppModule = AppModule = __decorate([
             notification_module_1.NotificationsModule,
             chat_module_1.ChatModule,
         ],
-        controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        controllers: [app_controller_1.AppController, match_controller_1.MatchController],
+        providers: [app_service_1.AppService, match_service_1.MatchService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

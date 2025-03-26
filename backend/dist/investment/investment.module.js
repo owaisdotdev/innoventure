@@ -7,30 +7,32 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvestmentModule = void 0;
-const smart_contract_module_1 = require("./../smart-contract/smart-contract.module");
 const common_1 = require("@nestjs/common");
-const investment_service_1 = require("./investment.service");
 const mongoose_1 = require("@nestjs/mongoose");
-const investment_schema_1 = require("../schemas/investment.schema");
+const investment_service_1 = require("./investment.service");
 const investment_controller_1 = require("./investment.controller");
+const investment_schema_1 = require("../schemas/investment.schema");
 const smartContract_schema_1 = require("../schemas/smartContract.schema");
 const investor_schema_1 = require("../schemas/investor.schema");
+const startup_schema_1 = require("../schemas/startup.schema");
+const smart_contract_module_1 = require("../smart-contract/smart-contract.module");
 const investor_module_1 = require("../investor/investor.module");
 const startup_module_1 = require("../startup/startup.module");
-const startup_schema_1 = require("../schemas/startup.schema");
 let InvestmentModule = class InvestmentModule {
 };
 exports.InvestmentModule = InvestmentModule;
 exports.InvestmentModule = InvestmentModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: investment_schema_1.Investment.name, schema: investment_schema_1.InvestmentSchema }]),
-            mongoose_1.MongooseModule.forFeature([{ name: smartContract_schema_1.SmartContract.name, schema: smartContract_schema_1.SmartContractSchema }]),
-            mongoose_1.MongooseModule.forFeature([{ name: investor_schema_1.Investor.name, schema: investor_schema_1.InvestorSchema }]),
-            mongoose_1.MongooseModule.forFeature([{ name: startup_schema_1.Startup.name, schema: startup_schema_1.StartupSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: investment_schema_1.Investment.name, schema: investment_schema_1.InvestmentSchema },
+                { name: smartContract_schema_1.SmartContract.name, schema: smartContract_schema_1.SmartContractSchema },
+                { name: investor_schema_1.Investor.name, schema: investor_schema_1.InvestorSchema },
+                { name: startup_schema_1.Startup.name, schema: startup_schema_1.StartupSchema },
+            ]),
             smart_contract_module_1.SmartContractModule,
             investor_module_1.InvestorModule,
-            startup_module_1.StartupModule
+            startup_module_1.StartupModule,
         ],
         providers: [investment_service_1.InvestmentService],
         exports: [investment_service_1.InvestmentService],

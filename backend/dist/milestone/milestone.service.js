@@ -16,92 +16,79 @@ exports.MilestoneService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const milestone_schema_1 = require("../schemas/milestone.schema");
-const startup_schema_1 = require("../schemas/startup.schema");
+const milestone_schema_1 = require("./milestone.schema");
+const axios_1 = require("axios");
+const mongoose_3 = require("mongoose");
 let MilestoneService = class MilestoneService {
-    constructor(milestoneModel, startupModel) {
+    constructor(milestoneModel) {
         this.milestoneModel = milestoneModel;
-        this.startupModel = startupModel;
     }
-    async createMilestone(createMilestoneDto) {
-        if (createMilestoneDto.associatedSmartContractId) {
-            const { associatedSmartContractId, ...rest } = createMilestoneDto;
-            const milestoneData = {
-                ...rest,
-                associatedSmartContractId: new mongoose_2.Types.ObjectId(associatedSmartContractId),
-            };
-            const createdMilestone = new this.milestoneModel(milestoneData);
-            return createdMilestone.save();
-        }
-        else {
-            const createdMilestone = new this.milestoneModel(createMilestoneDto);
-            return createdMilestone.save();
-        }
+    async uploadToPinata(file) {
+        const url = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
+        const formData = new FormData();
+        formData.append('file', file.buffer, file.originalname);
+        const response = await axios_1.default.post(url, formData, {
+            headers: {
+                'pinata_api_key': process.env.PINATA_API_KEY,
+                'pinata_secret_api_key': process.env.PINATA_API_SECRET,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
     }
-    async findAllMilestones() {
-        return this.milestoneModel.find().exec();
+    async analyzeWithGemini(file) {
+        const apiKey = process.env.GEMINI_API_KEY;
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        const fileContent = file.buffer.toString('base64');
+        const response = await axios_1.default.post(url, {
+            contents: [{ parts: [{ text: `Analyze this financial report: ${fileContent}` }] }],
+        }, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data.candidates[0].content.parts[0].text;
     }
-    async findMilestoneById(milestoneId) {
-        if (!(0, mongoose_2.isValidObjectId)(milestoneId)) {
-            throw new common_1.BadRequestException(`Invalid ID format`);
+    async submitMilestone(data, file) {
+        const fileUrl = await this.uploadToPinata(file);
+        const financialAnalysis = await this.analyzeWithGemini(file);
+        const milestone = new this.milestoneModel({
+            ...data,
+            fileUrl,
+            financialAnalysis,
+            submittedAt: new Date(),
+            smartContractIds: [],
+        });
+        return milestone.save();
+    }
+    async findMilestoneById(id) {
+        if (!mongoose_3.Types.ObjectId.isValid(id)) {
+            throw new Error('Invalid Milestone ID format');
         }
-        const milestone = await this.milestoneModel.findById(milestoneId).exec();
+        const milestone = await this.milestoneModel.findById(id).exec();
         if (!milestone) {
-            throw new common_1.NotFoundException('milestone not found');
+            throw new Error('Milestone not found');
         }
         return milestone;
     }
-    async updateMilestone(milestoneId, updatemilestoneDto) {
-        if (!(0, mongoose_2.isValidObjectId)(milestoneId)) {
-            throw new common_1.BadRequestException(`Invalid ID format`);
+    async addSmartContractToMilestone(milestoneId, smartContractId) {
+        if (!mongoose_3.Types.ObjectId.isValid(milestoneId)) {
+            throw new Error('Invalid Milestone ID format');
         }
-        const updatedmilestone = await this.milestoneModel
-            .findByIdAndUpdate(milestoneId, { $set: updatemilestoneDto }, { new: true })
-            .exec();
-        if (!updatedmilestone) {
-            throw new common_1.NotFoundException('milestone not found');
+        const milestone = await this.milestoneModel.findById(milestoneId).exec();
+        if (!milestone) {
+            throw new Error('Milestone not found');
         }
-        return updatedmilestone;
-    }
-    async addSmartContractToMilestone(milestonId, smartContractId) {
-        const result = await this.milestoneModel.updateOne({ _id: milestonId }, { $set: { 'associatedSmartContractId': smartContractId } }).exec();
-        if (result.modifiedCount === 0) {
-            throw new common_1.NotFoundException(`Milestone with ID ${milestonId} not found`);
-        }
-    }
-    async deleteMilestone(milestoneId) {
-        if (!(0, mongoose_2.isValidObjectId)(milestoneId)) {
-            throw new common_1.BadRequestException(`Invalid ID format`);
-        }
-        await this.startupModel.updateOne({ 'fundingNeeds.milestones': milestoneId }, { $pull: { 'fundingNeeds.milestones': milestoneId } });
-        const result = await this.milestoneModel
-            .findByIdAndDelete(milestoneId)
-            .exec();
-        if (!result) {
-            throw new common_1.NotFoundException('milestone not found');
-        }
-        return true;
-    }
-    async findByStatus(status) {
-        return this.milestoneModel.find({ status }).exec();
-    }
-    async findByTitle(title) {
-        return this.milestoneModel.find({ title }).exec();
-    }
-    async findBySmartContract(associatedSmartContractId) {
-        if (!mongoose_2.Types.ObjectId.isValid(associatedSmartContractId)) {
-            throw new common_1.BadRequestException('Invalid Smart Contract ID format');
-        }
-        const objectId = new mongoose_2.Types.ObjectId(associatedSmartContractId);
-        return this.milestoneModel.find({ associatedSmartContractId: objectId }).exec();
+        milestone.smartContractIds = milestone.smartContractIds || [];
+        milestone.smartContractIds.push(smartContractId);
+        return milestone.save();
     }
 };
 exports.MilestoneService = MilestoneService;
 exports.MilestoneService = MilestoneService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(milestone_schema_1.Milestone.name)),
-    __param(1, (0, mongoose_1.InjectModel)(startup_schema_1.Startup.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model,
-        mongoose_2.Model])
+    __param(0, (0, mongoose_1.InjectModel)(milestone_schema_1.MilestoneModelName)),
+    __metadata("design:paramtypes", [mongoose_2.Model])
 ], MilestoneService);
 //# sourceMappingURL=milestone.service.js.map

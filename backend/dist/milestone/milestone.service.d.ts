@@ -1,18 +1,12 @@
-import { Model, Types } from 'mongoose';
-import { Milestone } from '../schemas/milestone.schema';
-import { CreateMilestoneDto } from '../dto/createMilestone.dto';
-import { UpdateMilestoneDto } from '../dto/updateMilestone.dto';
+import { Model } from 'mongoose';
+import { Milestone } from './milestone.schema';
+import { Types } from 'mongoose';
 export declare class MilestoneService {
     private milestoneModel;
-    private startupModel;
-    constructor(milestoneModel: Model<Milestone>, startupModel: Model<Milestone>);
-    createMilestone(createMilestoneDto: CreateMilestoneDto): Promise<Milestone>;
-    findAllMilestones(): Promise<Milestone[]>;
-    findMilestoneById(milestoneId: string): Promise<Milestone>;
-    updateMilestone(milestoneId: string, updatemilestoneDto: UpdateMilestoneDto): Promise<Milestone>;
-    addSmartContractToMilestone(milestonId: string, smartContractId: Types.ObjectId): Promise<void>;
-    deleteMilestone(milestoneId: string): Promise<Boolean>;
-    findByStatus(status: string): Promise<Milestone[]>;
-    findByTitle(title: string): Promise<Milestone[]>;
-    findBySmartContract(associatedSmartContractId: string): Promise<Milestone[]>;
+    constructor(milestoneModel: Model<Milestone>);
+    uploadToPinata(file: Express.Multer.File): Promise<string>;
+    analyzeWithGemini(file: Express.Multer.File): Promise<string>;
+    submitMilestone(data: any, file: Express.Multer.File): Promise<Milestone>;
+    findMilestoneById(id: string): Promise<Milestone>;
+    addSmartContractToMilestone(milestoneId: string, smartContractId: Types.ObjectId): Promise<Milestone>;
 }

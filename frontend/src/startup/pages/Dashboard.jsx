@@ -1,112 +1,259 @@
+
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import Header from "../partials/Header";
+import Header from "../../partials/Header";
+import FilterButton from "../../components/DropdownFilter";
+import Datepicker from "../../components/DropdownFilter";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaBell, FaUser } from "react-icons/fa";
-import ChatIcon from "@/components/ChatIcon";
-import ChatBox from "@/components/ChatBox";
+import { FaBell } from "react-icons/fa";
+import ChatIcon from "../../components/ChatIcon";
+import ChatBox from "../../components/ChatBox";
+import { Link } from "react-router-dom";
+import MilestoneForm from "../../components/MilestoneForm.jsx";
+import Modal from "../../components/Modal.jsx";
+import { Bar, Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-const BASE_URL = "http://localhost:3000";
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [startup, setStartup] = useState({
-    name: "",
-    email: "",
-    established: "",
-    isFydp: false,
-    funding: 0,
-    investors: [],
-    notifications: [],
+  const [summaryData] = useState({
+    totalFunding: 10000,
+    milestonesCompleted: 0,
+    activeProjects: 1,
   });
+  const [loading, setLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [selectedDate, setSelectedDate] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showUserModal, setShowUserModal] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isMilestoneFormOpen, setIsMilestoneFormOpen] = useState(false);
+  const [project, setProject] = useState({
+    id: "proj1",
+    name: "Sample Project",
+    totalMilestones: 3,
+    status: "active",
+    milestones: [],
+  });
+  const [matchedInvestors, setMatchedInvestors] = useState([]);
 
-  const { userId } = useParams();
-  const navigate = useNavigate();
+  // const startupId = "add valid startup ID here";
+  // const investorId = "add valid investor ID here";
+
+  const syncData = () => {
+    const storedProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || project;
+    setProject(storedProject);
+
+    const storedNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
+    setNotifications(storedNotifications);
+  };
 
   useEffect(() => {
-    const fetchStartupData = async () => {
+    const fetchMatches = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        console.log("[Startup] Fetching startup data for userId:", userId);
+        syncData(); // Initial sync
 
-        const startupResponse = await fetch(`${BASE_URL}/startups/${userId}`);
-        if (!startupResponse.ok) {
-          const errorText = await startupResponse.text();
-          throw new Error(`Failed to fetch startup data: ${startupResponse.status} - ${errorText}`);
-        }
-        const startupData = await startupResponse.json();
-        console.log("[Startup] Fetched startup data:", startupData);
-        setStartup({
-          name: startupData.name || "",
-          email: startupData.email || "",
-          established: startupData.established || "",
-          isFydp: startupData.isFydp || false,
-          funding: startupData.funding || 0,
-          investors: startupData.investors || [],
-          notifications: startupData.notifications || [],
-        });
-
-        console.log("[Startup] Fetching notifications for userId:", userId);
-        const notificationsResponse = await fetch(`${BASE_URL}/notifications/${userId}`, {
+        const response = await fetch("http://localhost:3000/match", {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ startup_id: startupId }),
         });
-        console.log(`[Startup] Fetch status: ${notificationsResponse.status}`);
-        if (!notificationsResponse.ok) {
-          const errorText = await notificationsResponse.text();
-          console.error("[Startup] Fetch notifications failed:", errorText);
-          throw new Error(`Failed to fetch notifications: ${notificationsResponse.status} - ${errorText}`);
-        }
-        const notificationsData = await notificationsResponse.json();
-        console.log("[Startup] Raw notifications response:", notificationsData);
 
-        const formattedNotifications = Array.isArray(notificationsData)
-          ? notificationsData.map((notif) => ({
-              message: notif.message || "No message",
-              timestamp: notif.timestamp || notif.createdAt || new Date().toISOString(),
-              read: notif.read || false,
-            }))
-          : [];
-        console.log("[Startup] Formatted notifications:", formattedNotifications);
-        setNotifications(formattedNotifications);
-      } catch (error) {
-        console.error("[Startup] Error fetching data:", error.message);
-        toast.error(`Error fetching data: ${error.message}`);
-        setNotifications([]);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Response from NestJS:", data);
+
+        if (data.potential_investors) {
+          setMatchedInvestors(data.potential_investors);
+        } else {
+          toast.error("No matched investors found.");
+        }
+      } catch (err) {
+        console.error("Fetch error:", err.message);
+        toast.error("Error fetching matched investors: " + err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStartupData();
-  }, [userId, navigate]);
+    fetchMatches();
 
-  const markAsRead = async (message) => {
-    try {
-      console.log("[Startup] Marking notification as read, message:", message);
-      const response = await fetch(`${BASE_URL}/notifications/${userId}/mark-read`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to mark notification as read: ${response.status} - ${errorText}`);
+    const handleStorageChange = (e) => {
+      if (e.key === `startupProject_${startupId}` || e.key === `investorProject_${investorId}`) {
+        const updatedProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || project;
+        setProject(updatedProject);
       }
-      setNotifications((prev) =>
-        prev.map((notif) => (notif.message === message ? { ...notif, read: true } : notif))
+      if (e.key === `startupNotifications_${startupId}` || e.key === `investorNotifications_${investorId}`) {
+        const updatedNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
+        setNotifications(updatedNotifications);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [startupId]);
+
+  const markAsRead = (message) => {
+    setNotifications((prev) => {
+      const updated = prev.map((notif) =>
+        notif.message === message ? { ...notif, read: true } : notif
       );
-      toast.success("Notification marked as read");
-    } catch (error) {
-      console.error("[Startup] Error marking notification as read:", error.message);
-      toast.error("Failed to mark notification as read");
+      localStorage.setItem(`startupNotifications_${startupId}`, JSON.stringify(updated));
+      return updated;
+    });
+    toast.success("Notification marked as read");
+  };
+
+  const addMilestone = (milestone, isResubmission = false, existingMilestoneId = null) => {
+    if (project.status === "completed") {
+      toast.error("Cannot submit milestone: Project is already completed");
+      return;
     }
+
+    const updatedMilestone = {
+      id: isResubmission ? existingMilestoneId : Date.now().toString(),
+      milestoneId: milestone.milestoneId || `M${project.milestones.length + 1}`,
+      title: milestone.title,
+      description: milestone.description,
+      budgetSpent: milestone.budgetSpent || "0",
+      completionDate: milestone.completionDate || new Date().toISOString().split("T")[0],
+      fileUrl: milestone.fileUrl || "",
+      fileName: milestone.fileName || "No file",
+      financialAnalysis: milestone.financialAnalysis || "Pending",
+      submittedAt: milestone.submittedAt || new Date().toISOString(),
+      status: "pending",
+    };
+
+    setProject((prev) => {
+      const newMilestones = isResubmission
+        ? prev.milestones.map((m) => (m.id === existingMilestoneId ? updatedMilestone : m))
+        : [...prev.milestones, updatedMilestone];
+      const updatedProject = { ...prev, milestones: newMilestones, status: "active" };
+
+      // Sync with both Startup and Investor
+      localStorage.setItem(`startupProject_${startupId}`, JSON.stringify(updatedProject));
+      const investorProject = JSON.parse(localStorage.getItem(`investorProject_${investorId}`)) || {
+        id: "proj1",
+        name: "Sample Project",
+        totalMilestones: 3,
+        status: "active",
+        milestones: [],
+      };
+      investorProject.milestones = newMilestones;
+      investorProject.status = "active";
+      localStorage.setItem(`investorProject_${investorId}`, JSON.stringify(investorProject));
+
+      // Update notifications for Investor
+      const investorNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
+      investorNotifications.push({
+        message: `${isResubmission ? "Resubmitted" : "New"} milestone: ${milestone.title}`,
+        timestamp: new Date().toISOString(),
+        read: false,
+        milestoneId: updatedMilestone.id,
+      });
+      localStorage.setItem(`investorNotifications_${investorId}`, JSON.stringify(investorNotifications));
+
+      // Update notifications for Startup
+      const startupNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
+      startupNotifications.push({
+        message: `Milestone ${milestone.title} ${isResubmission ? "resubmitted" : "submitted"}`,
+        timestamp: new Date().toISOString(),
+        read: false,
+        milestoneId: updatedMilestone.id,
+      });
+      localStorage.setItem(`startupNotifications_${startupId}`, JSON.stringify(startupNotifications));
+      setNotifications(startupNotifications);
+
+      return updatedProject;
+    });
+    toast.success(`Milestone ${isResubmission ? "resubmitted" : "submitted"} successfully`);
+  };
+
+  const barChartData = {
+    labels: project.milestones.length > 0 ? project.milestones.map((m) => m.title) : ["No Milestones"],
+    datasets: [
+      {
+        label: "Budget Spent ($)",
+        data: project.milestones.length > 0
+          ? project.milestones.map((m) => parseFloat(m.budgetSpent) || 0)
+          : [0],
+        backgroundColor: "rgba(75, 192, 192, 0.8)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const barChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "top", labels: { color: "#fff" } },
+      title: { display: true, text: "Budget Spent per Milestone", color: "#fff", font: { size: 18 } },
+    },
+    scales: {
+      x: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
+      y: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" }, beginAtZero: true },
+    },
+  };
+
+  const lineGraphData = {
+    labels: project.milestones.length > 0
+      ? project.milestones.map((m) => new Date(m.completionDate).toLocaleDateString())
+      : ["No Data"],
+    datasets: [
+      {
+        label: "Budget Spent ($)",
+        data: project.milestones.length > 0
+          ? project.milestones.map((m) => parseFloat(m.budgetSpent) || 0)
+          : [0],
+        fill: false,
+        borderColor: "rgba(255, 99, 132, 1)",
+        tension: 0.1,
+        pointBackgroundColor: "rgba(255, 99, 132, 1)",
+        pointBorderColor: "#fff",
+      },
+    ],
+  };
+
+  const lineGraphOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "top", labels: { color: "#fff" } },
+      title: { display: true, text: "Budget Spent Over Time", color: "#fff", font: { size: 18 } },
+    },
+    scales: {
+      x: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
+      y: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" }, beginAtZero: true },
+    },
   };
 
   const unreadCount = notifications.filter((notif) => !notif.read).length;
@@ -119,26 +266,22 @@ function Dashboard() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main className="grow">
-          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
+          <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
             <div className="sm:flex sm:justify-between sm:items-center mb-8">
-              <h1 className="text-3xl text-white font-bold">Startup Dashboard</h1>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowUserModal(true)}
-                  className="text-gray-300 hover:text-white focus:outline-none"
-                  aria-label="User Profile"
-                >
-                  <FaUser className="w-6 h-6" />
-                </button>
+              <h1 className="text-2xl md:text-3xl text-white font-bold">Startup Dashboard</h1>
+              <div className="relative flex items-center gap-4">
+                <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                  <FilterButton selected={selectedFilter} setSelected={setSelectedFilter} />
+                  <Datepicker selected={selectedDate} setSelected={setSelectedDate} />
+                </div>
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="text-gray-300 hover:text-white focus:outline-none"
-                    aria-label="Notifications"
+                    className="text-gray-300 hover:text-white"
                   >
                     <FaBell className="w-6 h-6" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                      <span className="absolute top-0 right-0 w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full flex items-center justify-center">
                         {unreadCount}
                       </span>
                     )}
@@ -146,11 +289,11 @@ function Dashboard() {
                   {showNotifications && (
                     <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto border border-gray-700">
                       {notifications.length === 0 ? (
-                        <p className="p-4 text-gray-400">No notifications available</p>
+                        <p className="p-4 text-gray-400">No notifications</p>
                       ) : (
                         notifications.map((notif) => (
                           <div
-                            key={notif.message}
+                            key={notif.timestamp + notif.message}
                             className={`p-4 border-b border-gray-700 ${notif.read ? "bg-gray-700" : "bg-gray-800"}`}
                           >
                             <p className="text-sm text-gray-200">{notif.message}</p>
@@ -174,80 +317,165 @@ function Dashboard() {
               </div>
             </div>
 
-            {showUserModal && (
-              <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex justify-center items-center">
-                <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-xl border border-gray-700">
-                  <h2 className="text-2xl font-bold mb-6 text-white">Startup Details</h2>
-                  <div className="space-y-5">
-                    <div className="flex items-center border-b border-gray-600 pb-2">
-                      <label className="text-indigo-400 font-semibold w-1/3">Name</label>
-                      <p className="text-gray-100 w-2/3">{startup.name || "N/A"}</p>
-                    </div>
-                    <div className="flex items-center border-b border-gray-600 pb-2">
-                      <label className="text-indigo-400 font-semibold w-1/3">Email</label>
-                      <p className="text-gray-100 w-2/3">{startup.email || "N/A"}</p>
-                    </div>
-                    <div className="flex items-center border-b border-gray-600 pb-2">
-                      <label className="text-indigo-400 font-semibold w-1/3">Established Year</label>
-                      <p className="text-gray-100 w-2/3">{startup.established || "N/A"}</p>
-                    </div>
-                    <div className="flex items-center border-b border-gray-600 pb-2">
-                      <label className="text-indigo-400 font-semibold w-1/3">Funding</label>
-                      <p className="text-gray-100 w-2/3">${startup.funding.toLocaleString() || 0}</p>
-                    </div>
-                    <div className="flex items-start border-b border-gray-600 pb-2">
-                      <label className="text-indigo-400 font-semibold w-1/3">Investors</label>
-                      <div className="w-2/3">
-                        {startup.investors.length > 0 ? (
-                          <ul className="list-disc pl-5 text-gray-100">
-                            {startup.investors.map((investor, index) => (
-                              <li key={index}>{investor}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-gray-100">No investors yet.</p>
-                        )}
-                      </div>
-                    </div>
+            <div className="p-6 bg-gray-800 space-y-6 rounded-lg shadow-md">
+              <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4 text-white">Summary of Progress</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-blue-600 p-4 rounded-lg text-center">
+                    <p className="text-gray-200">Total Funding</p>
+                    <h3 className="text-2xl font-bold text-white">${summaryData.totalFunding}</h3>
                   </div>
-                  <div className="mt-6 flex justify-end">
-                    <button
-                      onClick={() => setShowUserModal(false)}
-                      className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                    >
-                      Close
-                    </button>
+                  <div className="bg-green-600 p-4 rounded-lg text-center">
+                    <p className="text-gray-200">Milestones Completed</p>
+                    <h3 className="text-2xl font-bold text-white">{summaryData.milestonesCompleted}</h3>
+                  </div>
+                  <div className="bg-yellow-600 p-4 rounded-lg text-center">
+                    <p className="text-gray-200">Active Projects</p>
+                    <h3 className="text-2xl font-bold text-white">{summaryData.activeProjects}</h3>
                   </div>
                 </div>
               </div>
-            )}
 
-            <div className="bg-gray-800 p-6 rounded-lg shadow-md space-y-6">
-              <div className="mt-6 flex space-x-4">
-                <Link
-                  to={`/startup/proposals/${userId}`}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                >
-                  View Proposals
-                </Link>
-                <Link
-                  to={`/startup/accepted-proposals/${userId}`}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                >
-                  Accepted Proposals
-                </Link>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+                  <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
+                    <span className="mr-2">📊</span> Budget Spent per Milestone
+                  </h2>
+                  <div className="h-64">
+                    <Bar data={barChartData} options={barChartOptions} />
+                  </div>
+                </div>
+                <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+                  <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
+                    <span className="mr-2">📈</span> Budget Spent Over Time
+                  </h2>
+                  <div className="h-64">
+                    <Line data={lineGraphData} options={lineGraphOptions} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
+                  <span className="mr-2">🤝</span> Matched Investors
+                </h2>
+                {matchedInvestors.length === 0 ? (
+                  <p className="text-gray-400">No matched investors found yet.</p>
+                ) : (
+                  <ul className="space-y-4 max-h-80 overflow-y-auto">
+                    {matchedInvestors.map((investor) => (
+                      <li
+                        key={investor._id}
+                        className="bg-gray-600 p-4 rounded-lg shadow-md border-l-4 border-green-500 hover:bg-gray-500 transition-colors"
+                      >
+                        <p className="text-white font-semibold">Investor ID: {investor._id}</p>
+                        <p className="text-gray-200">
+                          Description: {investor.businessPlan?.description || "N/A"}
+                        </p>
+                        <p className="text-gray-200">
+                          Industry: {investor.investmentPreferences?.industry || "N/A"}
+                        </p>
+                        <p className="text-gray-200">
+                          Funding Amount: {investor.investmentPreferences?.fundingAmount || "N/A"}
+                        </p>
+                        <p className="text-gray-200">
+                          Risk Level: {investor.investmentPreferences?.riskLevel || "N/A"}
+                        </p>
+                        <p className="text-gray-400">
+                          Similarity Score: {(investor.similarity * 100).toFixed(2)}%
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-4">
+                {project.milestones.length < project.totalMilestones && project.status === "active" && (
+                  <button
+                    onClick={() => setIsMilestoneFormOpen(true)}
+                    className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600"
+                  >
+                    Submit Milestone ({project.milestones.length + 1}/{project.totalMilestones})
+                  </button>
+                )}
+              </div>
+
+              <div className="mt-6">
+                <h2 className="text-xl font-semibold mb-4 text-white">
+                  Project: {project.name} (Status: {project.status})
+                </h2>
+                {project.milestones.length === 0 ? (
+                  <p className="text-gray-400">No milestones submitted yet.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {project.milestones.map((milestone) => (
+                      <li key={milestone.id} className="bg-gray-700 p-4 rounded-lg">
+                        <p className="text-white">
+                          <strong>Milestone ID:</strong> {milestone.milestoneId}
+                        </p>
+                        <p className="text-white">
+                          <strong>Title:</strong> {milestone.title}
+                        </p>
+                        <p className="text-gray-200">
+                          <strong>Description:</strong> {milestone.description}
+                        </p>
+                        <p className="text-gray-200">
+                          <strong>Budget Spent:</strong> ${milestone.budgetSpent}
+                        </p>
+                        <p className="text-gray-200">
+                          <strong>Completion Date:</strong> {milestone.completionDate}
+                        </p>
+                        <p className="text-gray-400">
+                          <strong>File:</strong>{" "}
+                          {milestone.fileUrl ? (
+                            <a
+                              href={milestone.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-indigo-400 hover:text-indigo-300"
+                            >
+                              {milestone.fileName}
+                            </a>
+                          ) : (
+                            "No file"
+                          )}
+                        </p>
+                        <p className="text-gray-200">
+                          <strong>Financial Analysis:</strong> {milestone.financialAnalysis || "Pending"}
+                        </p>
+                        <p className="text-gray-400">
+                          <strong>Submitted At:</strong> {new Date(milestone.submittedAt).toLocaleString()}
+                        </p>
+                        <p className="text-gray-400">
+                          <strong>Status:</strong> {milestone.status}
+                        </p>
+                        {milestone.status === "pending_modifications" && project.status === "active" && (
+                          <button
+                            onClick={() => setIsMilestoneFormOpen(true)}
+                            className="mt-2 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                          >
+                            Resubmit Milestone
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </div>
         </main>
-
-        <ChatIcon onClick={() => setIsChatOpen(!isChatOpen)} userId={userId} />
+        <ChatIcon onClick={() => setIsChatOpen(!isChatOpen)} userId={startupId} />
         <ChatBox
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}
-          userId={userId}
-          recipientId="67bf29890c2f666e54f3968f"
+          userId={startupId}
+          recipientId={investorId}
         />
+        <Modal isOpen={isMilestoneFormOpen} onClose={() => setIsMilestoneFormOpen(false)}>
+          <MilestoneForm onClose={() => setIsMilestoneFormOpen(false)} addMilestone={addMilestone} />
+        </Modal>
       </div>
       <ToastContainer />
     </div>

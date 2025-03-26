@@ -12,6 +12,9 @@ import { Startup } from '../schemas/startup.schema';
 
 @Injectable()
 export class SmartContractService {
+  findSmartContractById(arg0: string) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectModel(SmartContract.name)
     private smartContractModel: Model<SmartContract>,

@@ -6,6 +6,7 @@ import { Startup } from '../schemas/startup.schema';
 export declare class SmartContractService {
     private smartContractModel;
     private startupModel;
+    findSmartContractById(arg0: string): void;
     constructor(smartContractModel: Model<SmartContract>, startupModel: Model<Startup>);
     createsmartContract(createSmartContractDto: CreateSmartContractDto): Promise<SmartContract>;
     findAllsmartContracts(): Promise<SmartContract[]>;

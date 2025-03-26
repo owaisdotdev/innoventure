@@ -15,8 +15,11 @@ import { DaoModule } from './dao/dao.module';
 import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 import { InvestorDashboardModule } from './investor-dashboard/investor-dashboard.module';
 import { ProposalsModule } from './proposal/proposal.module';
-import { NotificationsModule } from './notification/notification.module'; // Single, consistent import
+import { NotificationsModule } from './notification/notification.module';
 import { ChatModule } from './chat/chat.module';
+import { MatchController } from './match.controller';
+import { MatchService } from './match.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -36,11 +39,11 @@ import { ChatModule } from './chat/chat.module';
         console.log(`Connecting to MongoDB at: ${uri}`); // Debug log
         return {
           uri,
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
+          // Remove deprecated options (useNewUrlParser, useUnifiedTopology) as they are ignored in newer MongoDB drivers
         };
       },
     }),
+    HttpModule, // Required for MatchService to make HTTP calls
     InvestorModule,
     StartupModule,
     AuthModule,
@@ -53,10 +56,10 @@ import { ChatModule } from './chat/chat.module';
     AdminDashboardModule,
     InvestorDashboardModule,
     ProposalsModule,
-    NotificationsModule, // Only one instance, correctly named
+    NotificationsModule,
     ChatModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, MatchController], // Add MatchController here
+  providers: [AppService, MatchService], // Add MatchService here
 })
 export class AppModule {}

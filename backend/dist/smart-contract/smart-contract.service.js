@@ -19,6 +19,9 @@ const mongoose_2 = require("mongoose");
 const smartContract_schema_1 = require("../schemas/smartContract.schema");
 const startup_schema_1 = require("../schemas/startup.schema");
 let SmartContractService = class SmartContractService {
+    findSmartContractById(arg0) {
+        throw new Error('Method not implemented.');
+    }
     constructor(smartContractModel, startupModel) {
         this.smartContractModel = smartContractModel;
         this.startupModel = startupModel;
