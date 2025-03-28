@@ -60,8 +60,8 @@ function Dashboard() {
   });
   const [matchedInvestors, setMatchedInvestors] = useState([]);
 
-  // const startupId = "add valid startup ID here";
-  // const investorId = "add valid investor ID here";
+  const startupId = "675d8f1bdfaebd7bdfb533d2";
+  const investorId = "675d8f1bdfaebd7bdfb533cc";
 
   const syncData = () => {
     const storedProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || project;

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
-
 import Home from "./pages/Home/Home";
 import "./css/style.css";
 import Navbar from "./components/Navbar";
@@ -19,7 +18,7 @@ import { AuthContextProvider } from "./contexts/AuthContext";
 import AuthGuard from "./AuthGuard";
 import adminRoutes from "./admin/pages/adminRoutes";
 import InvestorRoutes from "./investor/pages/investorRoutes";
-
+import Milestones from "./investor/pages/Milestones"
 const getUserIdSomehow = () => {
   return localStorage.getItem("userId");
 };
@@ -121,7 +120,7 @@ function App() {
           <Route path="/startup/dashboard" element={<RedirectToStartupDashboard />} />
           <Route path="/startup/proposals" element={<RedirectToStartupProposals />} />
           <Route path="/startup/accepted-proposals" element={<RedirectToAcceptedProposals />} /> {/* Added */}
-
+          <Route path="/investor/milestones" element={<Milestones />} />
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             {adminRoutes}

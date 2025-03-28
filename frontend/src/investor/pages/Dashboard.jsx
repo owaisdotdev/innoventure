@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../../partials/Header";
@@ -59,10 +58,9 @@ function Dashboard() {
     milestones: [],
   });
   const [endReason, setEndReason] = useState("");
-  const [matchedStartups, setMatchedStartups] = useState([]);
 
-  // const investorId = "Add valid investor ID here";
-  // const startupId = "Add valid startup ID here";
+  const startupId = "675d8f1bdfaebd7bdfb533d2";
+  const investorId = "675d8f1bdfaebd7bdfb533cc";
 
   const syncData = () => {
     const storedProject = JSON.parse(localStorage.getItem(`investorProject_${investorId}`)) || project;
@@ -73,38 +71,8 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const fetchMatches = async () => {
-      setLoading(true);
-      try {
-        syncData(); // Initial sync
-
-        const response = await fetch("http://localhost:3000/match", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ investor_id: investorId }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Response from NestJS:", data);
-
-        if (data.potential_startups) {
-          setMatchedStartups(data.potential_startups);
-        } else {
-          toast.error("No matched startups found.");
-        }
-      } catch (err) {
-        console.error("Fetch error:", err.message);
-        toast.error("Error fetching matched startups: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMatches();
+    syncData(); // Initial sync
+    setLoading(false);
 
     const handleStorageChange = (e) => {
       if (e.key === `investorProject_${investorId}` || e.key === `startupProject_${startupId}`) {
@@ -158,7 +126,6 @@ function Dashboard() {
         : [...prev.milestones, updatedMilestone];
       const updatedProject = { ...prev, milestones: newMilestones, status: "active" };
 
-      // Sync with both Investor and Startup
       localStorage.setItem(`investorProject_${investorId}`, JSON.stringify(updatedProject));
       const startupProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || {
         id: "proj1",
@@ -171,7 +138,6 @@ function Dashboard() {
       startupProject.status = "active";
       localStorage.setItem(`startupProject_${startupId}`, JSON.stringify(startupProject));
 
-      // Update notifications for Startup
       const startupNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
       startupNotifications.push({
         message: `${isResubmission ? "Resubmitted" : "New"} milestone: ${milestone.title}`,
@@ -181,7 +147,6 @@ function Dashboard() {
       });
       localStorage.setItem(`startupNotifications_${startupId}`, JSON.stringify(startupNotifications));
 
-      // Update notifications for Investor
       const investorNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
       investorNotifications.push({
         message: `Milestone ${milestone.title} ${isResubmission ? "resubmitted" : "submitted"}`,
@@ -226,14 +191,12 @@ function Dashboard() {
           : "active";
       const updatedProject = { ...prev, milestones: updatedMilestones, status: newStatus };
 
-      // Sync with both Investor and Startup
       localStorage.setItem(`investorProject_${investorId}`, JSON.stringify(updatedProject));
       const startupProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || {};
       startupProject.milestones = updatedMilestones;
       startupProject.status = newStatus;
       localStorage.setItem(`startupProject_${startupId}`, JSON.stringify(startupProject));
 
-      // Update notifications for Startup
       const startupNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
       startupNotifications.push({
         message: `Milestone ${milestoneId} ${action.replace("_", " ")}${reason ? `: ${reason}` : ""}`,
@@ -242,7 +205,6 @@ function Dashboard() {
       });
       localStorage.setItem(`startupNotifications_${startupId}`, JSON.stringify(startupNotifications));
 
-      // Update notifications for Investor
       const investorNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
       investorNotifications.push({
         message: `Milestone ${milestoneId} ${action.replace("_", " ")}`,
@@ -271,7 +233,6 @@ function Dashboard() {
       startupProject.status = "terminated";
       localStorage.setItem(`startupProject_${startupId}`, JSON.stringify(startupProject));
 
-      // Notify Startup
       const startupNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
       startupNotifications.push({
         message: `Project terminated by investor: ${endReason}`,
@@ -280,7 +241,6 @@ function Dashboard() {
       });
       localStorage.setItem(`startupNotifications_${startupId}`, JSON.stringify(startupNotifications));
 
-      // Notify Investor
       const investorNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
       investorNotifications.push({
         message: `Project terminated: ${endReason}`,
@@ -453,44 +413,6 @@ function Dashboard() {
                     <Line data={lineGraphData} options={lineGraphOptions} />
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
-                  <span className="mr-2">🤝</span> Matched Startups
-                </h2>
-                {matchedStartups.length === 0 ? (
-                  <p className="text-gray-400">No matched startups found yet.</p>
-                ) : (
-                  <ul className="space-y-4 max-h-80 overflow-y-auto">
-                    {matchedStartups.map((startup) => (
-                      <li
-                        key={startup._id}
-                        className="bg-gray-600 p-4 rounded-lg shadow-md border-l-4 border-green-500 hover:bg-gray-500 transition-colors"
-                      >
-                        <p className="text-white font-semibold">Startup ID: {startup._id}</p>
-                        <p className="text-gray-200">
-                          Description: {startup.businessPlan?.description || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Business Model: {startup.businessPlan?.businessModel || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Market Potential: {startup.businessPlan?.marketPotential || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Financial Health: {startup.businessPlan?.financialHealth || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Team: {startup.teamBackground || "N/A"}
-                        </p>
-                        <p className="text-gray-400">
-                          Similarity Score: {(startup.similarity * 100).toFixed(2)}%
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </div>
 
               <div className="mt-6 flex flex-wrap gap-4">
