@@ -8,8 +8,8 @@ const Milestones = () => {
   const [matchedStartups, setMatchedStartups] = useState([]);
   const [selectedStartup, setSelectedStartup] = useState(null); // For modal
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-  const startupId = "675d8f1bdfaebd7bdfb533d2";
-  const investorId = "675d8f1bdfaebd7bdfb533cc";
+  const startupId = "add valid startup id here"; // Replace with actual startup ID
+  const investorId = "add valid investor id here"; // Replace with actual investor ID
 
   useEffect(() => {
     const fetchMatches = async () => {
