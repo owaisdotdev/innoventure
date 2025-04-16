@@ -8,8 +8,8 @@ const Milestones = () => {
   const [matchedStartups, setMatchedStartups] = useState([]);
   const [selectedStartup, setSelectedStartup] = useState(null); // For modal
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-  const startupId = "add valid startup id here"; // Replace with actual startup ID
-  const investorId = "add valid investor id here"; // Replace with actual investor ID
+  const startupId = "675d8f1bdfaebd7bdfb533d2"; 
+  const investorId = "675d8f1bdfaebd7bdfb533cc";
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -26,7 +26,7 @@ const Milestones = () => {
         }
 
         const data = await response.json();
-        console.log("Response from NestJS in Milestones:", data);
+        // console.log("Response from NestJS in Milestones:", data);
 
         if (data.potential_startups) {
           setMatchedStartups(data.potential_startups);
@@ -77,9 +77,9 @@ const Milestones = () => {
 
       {/* Matched Startups Section */}
       <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-semibold mb-8 text-gray-100 flex items-center justify-center">
+        {/* <h2 className="text-2xl font-semibold mb-8 text-gray-100 flex items-center justify-center">
           <span className="mr-3 text-indigo-400">🤝</span> Matched Startups
-        </h2>
+        </h2> */}
         {matchedStartups.length === 0 ? (
           <p className="text-gray-400 text-center py-6 text-lg">
             No matched startups found yet.

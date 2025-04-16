@@ -22,12 +22,12 @@ const ChatIcon = ({ onClick, userId }) => {
     socket.on("newMessage", (message) => {
       if (message.recipientId === userId && message.senderId !== userId) {
         setUnreadCount((prev) => prev + 1);
-        console.log("Unread message count incremented:", message);
+        // console.log("Unread message count incremented:", message);
       }
     });
 
     socket.on("connect_error", (err) => {
-      console.error("ChatIcon WebSocket error:", err.message);
+      // console.error("ChatIcon WebSocket error:", err.message);
     });
 
     return () => {
