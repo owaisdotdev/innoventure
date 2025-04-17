@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../../partials/Header";
@@ -12,30 +11,6 @@ import ChatBox from "../../components/ChatBox";
 import { Link } from "react-router-dom";
 import MilestoneForm from "../../components/MilestoneForm.jsx";
 import Modal from "../../components/Modal.jsx";
-import { Bar, Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -58,13 +33,13 @@ function Dashboard() {
     status: "active",
     milestones: [],
   });
-  const [matchedInvestors, setMatchedInvestors] = useState([]);
 
-  const startupId = "add your startup id here"; // Replace with actual startup ID
-  const investorId = "add your investor id here"; // Replace with actual investor ID
+  const startupId = "675d8f1bdfaebd7bdfb533d2";
+  const investorId = "675d8f1bdfaebd7bdfb533cc";
 
   const syncData = () => {
     const storedProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || project;
+    console.log("Loaded project:", storedProject); // Debug project state
     setProject(storedProject);
 
     const storedNotifications = JSON.parse(localStorage.getItem(`startupNotifications_${startupId}`)) || [];
@@ -72,42 +47,24 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const fetchMatches = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
         syncData(); // Initial sync
-
-        const response = await fetch("http://localhost:3000/match", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ startup_id: startupId }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Response from NestJS:", data);
-
-        if (data.potential_investors) {
-          setMatchedInvestors(data.potential_investors);
-        } else {
-          toast.error("No matched investors found.");
-        }
       } catch (err) {
-        console.error("Fetch error:", err.message);
-        toast.error("Error fetching matched investors: " + err.message);
+        console.error("Sync error:", err.message);
+        toast.error("Error syncing data: " + err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMatches();
+    fetchData();
 
     const handleStorageChange = (e) => {
       if (e.key === `startupProject_${startupId}` || e.key === `investorProject_${investorId}`) {
         const updatedProject = JSON.parse(localStorage.getItem(`startupProject_${startupId}`)) || project;
+        console.log("Updated project:", updatedProject); // Debug project state
         setProject(updatedProject);
       }
       if (e.key === `startupNotifications_${startupId}` || e.key === `investorNotifications_${investorId}`) {
@@ -196,66 +153,6 @@ function Dashboard() {
     toast.success(`Milestone ${isResubmission ? "resubmitted" : "submitted"} successfully`);
   };
 
-  const barChartData = {
-    labels: project.milestones.length > 0 ? project.milestones.map((m) => m.title) : ["No Milestones"],
-    datasets: [
-      {
-        label: "Budget Spent ($)",
-        data: project.milestones.length > 0
-          ? project.milestones.map((m) => parseFloat(m.budgetSpent) || 0)
-          : [0],
-        backgroundColor: "rgba(75, 192, 192, 0.8)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const barChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: "top", labels: { color: "#fff" } },
-      title: { display: true, text: "Budget Spent per Milestone", color: "#fff", font: { size: 18 } },
-    },
-    scales: {
-      x: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
-      y: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" }, beginAtZero: true },
-    },
-  };
-
-  const lineGraphData = {
-    labels: project.milestones.length > 0
-      ? project.milestones.map((m) => new Date(m.completionDate).toLocaleDateString())
-      : ["No Data"],
-    datasets: [
-      {
-        label: "Budget Spent ($)",
-        data: project.milestones.length > 0
-          ? project.milestones.map((m) => parseFloat(m.budgetSpent) || 0)
-          : [0],
-        fill: false,
-        borderColor: "rgba(255, 99, 132, 1)",
-        tension: 0.1,
-        pointBackgroundColor: "rgba(255, 99, 132, 1)",
-        pointBorderColor: "#fff",
-      },
-    ],
-  };
-
-  const lineGraphOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: "top", labels: { color: "#fff" } },
-      title: { display: true, text: "Budget Spent Over Time", color: "#fff", font: { size: 18 } },
-    },
-    scales: {
-      x: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
-      y: { ticks: { color: "#fff" }, grid: { color: "rgba(255, 255, 255, 0.1)" }, beginAtZero: true },
-    },
-  };
-
   const unreadCount = notifications.filter((notif) => !notif.read).length;
 
   if (loading) return <div className="text-center mt-20 text-white">Loading...</div>;
@@ -336,69 +233,19 @@ function Dashboard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
-                    <span className="mr-2">📊</span> Budget Spent per Milestone
-                  </h2>
-                  <div className="h-64">
-                    <Bar data={barChartData} options={barChartOptions} />
-                  </div>
-                </div>
-                <div className="bg-gray-700 p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
-                    <span className="mr-2">📈</span> Budget Spent Over Time
-                  </h2>
-                  <div className="h-64">
-                    <Line data={lineGraphData} options={lineGraphOptions} />
-                  </div>
-                </div>
-              </div>
-
               <div className="bg-gray-700 p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold mb-4 text-white flex items-center">
-                  <span className="mr-2">🤝</span> Matched Investors
+                  <span className="mr-2">📌</span> Submit New Milestone
                 </h2>
-                {matchedInvestors.length === 0 ? (
-                  <p className="text-gray-400">No matched investors found yet.</p>
-                ) : (
-                  <ul className="space-y-4 max-h-80 overflow-y-auto">
-                    {matchedInvestors.map((investor) => (
-                      <li
-                        key={investor._id}
-                        className="bg-gray-600 p-4 rounded-lg shadow-md border-l-4 border-green-500 hover:bg-gray-500 transition-colors"
-                      >
-                        <p className="text-white font-semibold">Investor ID: {investor._id}</p>
-                        <p className="text-gray-200">
-                          Description: {investor.businessPlan?.description || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Industry: {investor.investmentPreferences?.industry || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Funding Amount: {investor.investmentPreferences?.fundingAmount || "N/A"}
-                        </p>
-                        <p className="text-gray-200">
-                          Risk Level: {investor.investmentPreferences?.riskLevel || "N/A"}
-                        </p>
-                        <p className="text-gray-400">
-                          Similarity Score: {(investor.similarity * 100).toFixed(2)}%
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-4">
-                {project.milestones.length < project.totalMilestones && project.status === "active" && (
+                <div className="flex justify-center">
                   <button
                     onClick={() => setIsMilestoneFormOpen(true)}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600"
+                    className="bg-red-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out flex items-center"
                   >
+                    <span className="mr-2">📌</span>
                     Submit Milestone ({project.milestones.length + 1}/{project.totalMilestones})
                   </button>
-                )}
+                </div>
               </div>
 
               <div className="mt-6">

@@ -62,11 +62,27 @@ function Dashboard() {
   const startupId = "675d8f1bdfaebd7bdfb533d2";
   const investorId = "675d8f1bdfaebd7bdfb533cc";
 
+  // Function to format timestamp as relative time
+  const getRelativeTime = (timestamp) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - time) / 1000);
+
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? "s" : ""} ago`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+  };
+
   const syncData = () => {
     const storedProject = JSON.parse(localStorage.getItem(`investorProject_${investorId}`)) || project;
     setProject(storedProject);
 
     const storedNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
+    console.log("[Dashboard] Loaded notifications:", storedNotifications); // Debug log
     setNotifications(storedNotifications);
   };
 
@@ -81,6 +97,7 @@ function Dashboard() {
       }
       if (e.key === `investorNotifications_${investorId}` || e.key === `startupNotifications_${startupId}`) {
         const updatedNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
+        console.log("[Dashboard] Storage change - Updated notifications:", updatedNotifications); // Debug log
         setNotifications(updatedNotifications);
       }
     };
@@ -347,7 +364,7 @@ function Dashboard() {
                     )}
                   </button>
                   {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto border border-gray-700">
+                    <div className="absolute right-0 mt-2 w-80 bg-gray-800 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto border border-gray-700">
                       {notifications.length === 0 ? (
                         <p className="p-4 text-gray-400">No notifications</p>
                       ) : (
@@ -357,9 +374,7 @@ function Dashboard() {
                             className={`p-4 border-b border-gray-700 ${notif.read ? "bg-gray-700" : "bg-gray-800"}`}
                           >
                             <p className="text-sm text-gray-200">{notif.message}</p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(notif.timestamp).toLocaleString()}
-                            </p>
+                            <p className="text-xs text-gray-400">{getRelativeTime(notif.timestamp)}</p>
                             {!notif.read && (
                               <button
                                 onClick={() => markAsRead(notif.message)}

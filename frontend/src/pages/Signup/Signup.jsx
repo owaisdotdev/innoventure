@@ -81,7 +81,7 @@ function SignUp() {
         ...formData,
         preferences: {
           ...formData.preferences,
-          [name]: value.split(",").map((item) => item.trim()),
+          [name]: value ? value.split(",").map((item) => item.trim()) : [],
         },
       });
     } else {
@@ -107,7 +107,7 @@ function SignUp() {
         ...formData,
         fydpDetails: {
           ...formData.fydpDetails,
-          [name]: value.split(",").map((tag) => tag.trim()),
+          [name]: value ? value.split(",").map((tag) => tag.trim()) : [],
         },
       });
     } else {
@@ -121,60 +121,101 @@ function SignUp() {
   const validateForm = () => {
     const { name, email, password, businessPlan } = formData;
 
-    if (!name || !email || !password) {
-      toast.error("Please fill in all required fields.");
+    // Common validations
+    if (!name.trim()) {
+      toast.error("Name is required.");
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!email.trim() || !emailRegex.test(email)) {
       toast.error("Please enter a valid email address.");
       return false;
     }
 
-    if (password.length < 6) {
-      toast.error("Password should be at least 6 characters long.");
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!password || !passwordRegex.test(password)) {
+      toast.error(
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+      );
       return false;
     }
 
-    if (!businessPlan.description || !businessPlan.industry) {
-      toast.error("Please fill in business plan details.");
+    if (!businessPlan.description.trim()) {
+      toast.error("Business plan description is required.");
       return false;
     }
 
-    if (role === "investor") {
-      const { preferences, criteria } = formData;
-      if (
-        preferences.sectors.length === 0 ||
-        preferences.regions.length === 0 ||
-        !preferences.riskTolerance ||
-        !criteria.minInvestment ||
-        !criteria.maxInvestment ||
-        !criteria.investmentHorizon
-      ) {
-        toast.error("Please fill in all investor-specific fields.");
-        return false;
-      }
-    }
-
-    if (role === "startup") {
-      const { fydpDetails } = formData;
-      if (
-        formData.isFydp &&
-        (!fydpDetails.university ||
-          !fydpDetails.year ||
-          !fydpDetails.supervisorName ||
-          !fydpDetails.githubRepoUrl ||
-          fydpDetails.tags.length === 0)
-      ) {
-        toast.error("Please fill in all FYDP details for startups.");
-        return false;
-      }
+    if (!businessPlan.industry.trim()) {
+      toast.error("Business plan industry is required.");
+      return false;
     }
 
     if (!role) {
       toast.error("Please select a role (Investor or Startup).");
       return false;
+    }
+
+    // Investor-specific validations
+    if (role === "investor") {
+      const { preferences, criteria } = formData;
+      if (!preferences.sectors.length || preferences.sectors.some((s) => !s.trim())) {
+        toast.error("Please provide at least one valid sector (comma-separated).");
+        return false;
+      }
+      if (!preferences.regions.length || preferences.regions.some((r) => !r.trim())) {
+        toast.error("Please provide at least one valid region (comma-separated).");
+        return false;
+      }
+      if (!["Low", "Medium", "High"].includes(preferences.riskTolerance)) {
+        toast.error("Please select a valid risk tolerance (Low, Medium, High).");
+        return false;
+      }
+      const minInvestment = Number(criteria.minInvestment);
+      const maxInvestment = Number(criteria.maxInvestment);
+      if (!criteria.minInvestment || minInvestment <= 0) {
+        toast.error("Minimum investment must be a positive number.");
+        return false;
+      }
+      if (!criteria.maxInvestment || maxInvestment <= 0) {
+        toast.error("Maximum investment must be a positive number.");
+        return false;
+      }
+      if (minInvestment > maxInvestment) {
+        toast.error("Minimum investment cannot exceed maximum investment.");
+        return false;
+      }
+      if (!criteria.investmentHorizon.trim()) {
+        toast.error("Investment horizon is required.");
+        return false;
+      }
+    }
+
+    // Startup-specific validations
+    if (role === "startup" && formData.isFydp) {
+      const { fydpDetails } = formData;
+      if (!fydpDetails.university.trim()) {
+        toast.error("University is required for FYDP.");
+        return false;
+      }
+      const year = Number(fydpDetails.year);
+      if (!fydpDetails.year || isNaN(year) || year < 2000 || year > new Date().getFullYear() + 1) {
+        toast.error("Please provide a valid year (2000 to next year).");
+        return false;
+      }
+      if (!fydpDetails.supervisorName.trim()) {
+        toast.error("Supervisor name is required for FYDP.");
+        return false;
+      }
+      const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/;
+      if (!fydpDetails.githubRepoUrl.trim() || !urlRegex.test(fydpDetails.githubRepoUrl)) {
+        toast.error("Please provide a valid GitHub repository URL.");
+        return false;
+      }
+      if (!fydpDetails.tags.length || fydpDetails.tags.some((t) => !t.trim())) {
+        toast.error("Please provide at least one valid tag (comma-separated).");
+        return false;
+      }
     }
 
     return true;
@@ -189,12 +230,12 @@ function SignUp() {
 
     try {
       const baseData = {
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
         password: formData.password,
         businessPlan: {
-          description: formData.businessPlan.description,
-          industry: formData.businessPlan.industry,
+          description: formData.businessPlan.description.trim(),
+          industry: formData.businessPlan.industry.trim(),
         },
         profileStatus: formData.profileStatus,
       };
@@ -207,14 +248,14 @@ function SignUp() {
         dataToSend = {
           ...baseData,
           preferences: {
-            sectors: formData.preferences.sectors,
-            regions: formData.preferences.regions,
+            sectors: formData.preferences.sectors.filter((s) => s.trim()),
+            regions: formData.preferences.regions.filter((r) => r.trim()),
             riskTolerance: formData.preferences.riskTolerance,
           },
           criteria: {
             minInvestment: Number(formData.criteria.minInvestment),
             maxInvestment: Number(formData.criteria.maxInvestment),
-            investmentHorizon: formData.criteria.investmentHorizon,
+            investmentHorizon: formData.criteria.investmentHorizon.trim(),
           },
         };
       } else if (role === "startup") {
@@ -224,12 +265,12 @@ function SignUp() {
           isFydp: formData.isFydp,
           fydpDetails: formData.isFydp
             ? {
-                university: formData.fydpDetails.university,
+                university: formData.fydpDetails.university.trim(),
                 year: Number(formData.fydpDetails.year),
-                supervisorName: formData.fydpDetails.supervisorName,
-                githubRepoUrl: formData.fydpDetails.githubRepoUrl,
-                tags: formData.fydpDetails.tags,
-                remarks: formData.fydpDetails.remarks,
+                supervisorName: formData.fydpDetails.supervisorName.trim(),
+                githubRepoUrl: formData.fydpDetails.githubRepoUrl.trim(),
+                tags: formData.fydpDetails.tags.filter((t) => t.trim()),
+                remarks: formData.fydpDetails.remarks.trim(),
               }
             : undefined,
         };
@@ -248,25 +289,31 @@ function SignUp() {
 
       if (response.ok) {
         toast.success("Signed up successfully!");
+        const userId = result.userId || result.id || result._id;
+        if (!userId) {
+          throw new Error("User ID not found in response");
+        }
         const user = {
-          userId: result.userId || result.id || result._id || "temp-id",
-          email: formData.email,
-          role: role,
+          userId,
+          email: formData.email.trim(),
+          role,
         };
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("role", role);
         console.log("Logging in with:", user, result.token);
         login(user, result.token);
 
         setTimeout(() => {
-          const redirectPath = `/${role}/dashboard/${user.userId}`;
+          const redirectPath = `/${role}/dashboard/${userId}`;
           console.log("Redirecting to:", redirectPath);
-          navigate(redirectPath);
+          navigate(redirectPath, { replace: true });
         }, 100);
       } else {
         throw new Error(result.message || "Signup failed");
       }
     } catch (error) {
       console.error("Signup error:", error);
-      toast.error(error.message);
+      toast.error(error.message || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -290,8 +337,11 @@ function SignUp() {
               <div className="w-full flex-1 mt-3">
                 <form onSubmit={handleSubmit}>
                   <div className="mx-auto max-w-xs">
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Name <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       name="name"
                       placeholder="Name"
@@ -299,8 +349,11 @@ function SignUp() {
                       onChange={handleChange}
                       required
                     />
+                    <label className="block text-sm text-gray-600 mb-1 mt-5">
+                      Email <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="email"
                       name="email"
                       placeholder="Email"
@@ -308,8 +361,11 @@ function SignUp() {
                       onChange={handleChange}
                       required
                     />
+                    <label className="block text-sm text-gray-600 mb-1 mt-5">
+                      Password <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type={showPassword ? "text" : "password"}
                       name="password"
                       placeholder="Password"
@@ -324,8 +380,11 @@ function SignUp() {
                     >
                       {showPassword ? "Hide Password" : "Show Password"}
                     </button>
+                    <label className="block text-sm text-gray-600 mb-1 mt-5">
+                      Business Plan Description <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       name="description"
                       placeholder="Business Plan Description"
@@ -333,8 +392,11 @@ function SignUp() {
                       onChange={handleBusinessPlanChange}
                       required
                     />
+                    <label className="block text-sm text-gray-600 mb-1 mt-5">
+                      Industry <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       name="industry"
                       placeholder="Industry"
@@ -342,8 +404,11 @@ function SignUp() {
                       onChange={handleBusinessPlanChange}
                       required
                     />
+                    <label className="block text-sm text-gray-600 mb-1 mt-5">
+                      Role <span className="text-red-500">*</span>
+                    </label>
                     <select
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       name="role"
                       value={role}
                       onChange={handleRoleChange}
@@ -355,8 +420,11 @@ function SignUp() {
                     </select>
                     {role === "investor" && (
                       <>
+                        <label className="block text-sm text-gray-600 mb-1 mt-5">
+                          Preferred Sectors <span className="text-red-500">*</span>
+                        </label>
                         <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                           type="text"
                           name="sectors"
                           placeholder="Preferred Sectors (tech, finance)"
@@ -364,8 +432,11 @@ function SignUp() {
                           onChange={handlePreferencesChange}
                           required
                         />
+                        <label className="block text-sm text-gray-600 mb-1 mt-5">
+                          Preferred Regions <span className="text-red-500">*</span>
+                        </label>
                         <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                           type="text"
                           name="regions"
                           placeholder="Preferred Regions (comma separated)"
@@ -373,8 +444,11 @@ function SignUp() {
                           onChange={handlePreferencesChange}
                           required
                         />
+                        <label className="block text-sm text-gray-600 mb-1 mt-5">
+                          Risk Tolerance <span className="text-red-500">*</span>
+                        </label>
                         <select
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                           name="riskTolerance"
                           value={formData.preferences.riskTolerance}
                           onChange={handlePreferencesChange}
@@ -385,8 +459,11 @@ function SignUp() {
                           <option value="Medium">Medium</option>
                           <option value="High">High</option>
                         </select>
+                        <label className="block text-sm text-gray-600 mb-1 mt-5">
+                          Minimum Investment <span className="text-red-500">*</span>
+                        </label>
                         <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                           type="number"
                           name="minInvestment"
                           placeholder="Minimum Investment"
@@ -394,8 +471,11 @@ function SignUp() {
                           onChange={handleCriteriaChange}
                           required
                         />
+                        <label className="block text-sm text-gray-600 mb-1 mt-5">
+                          Maximum Investment <span className="text-red-500">*</span>
+                        </label>
                         <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                           type="number"
                           name="maxInvestment"
                           placeholder="Maximum Investment"
@@ -403,8 +483,11 @@ function SignUp() {
                           onChange={handleCriteriaChange}
                           required
                         />
+                        <label className="block text-sm text-gray-600 mb-1 mt-5">
+                          Investment Horizon <span className="text-red-500">*</span>
+                        </label>
                         <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                           type="text"
                           name="investmentHorizon"
                           placeholder="Investment Horizon"
@@ -429,8 +512,11 @@ function SignUp() {
                         </label>
                         {formData.isFydp && (
                           <>
+                            <label className="block text-sm text-gray-600 mb-1 mt-5">
+                              University <span className="text-red-500">*</span>
+                            </label>
                             <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                               type="text"
                               name="university"
                               placeholder="University"
@@ -438,8 +524,11 @@ function SignUp() {
                               onChange={handleFydpDetailsChange}
                               required
                             />
+                            <label className="block text-sm text-gray-600 mb-1 mt-5">
+                              Year <span className="text-red-500">*</span>
+                            </label>
                             <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                               type="number"
                               name="year"
                               placeholder="Year"
@@ -447,8 +536,11 @@ function SignUp() {
                               onChange={handleFydpDetailsChange}
                               required
                             />
+                            <label className="block text-sm text-gray-600 mb-1 mt-5">
+                              Supervisor Name <span className="text-red-500">*</span>
+                            </label>
                             <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                               type="text"
                               name="supervisorName"
                               placeholder="Supervisor Name"
@@ -456,8 +548,11 @@ function SignUp() {
                               onChange={handleFydpDetailsChange}
                               required
                             />
+                            <label className="block text-sm text-gray-600 mb-1 mt-5">
+                              GitHub Repository URL <span className="text-red-500">*</span>
+                            </label>
                             <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                               type="text"
                               name="githubRepoUrl"
                               placeholder="GitHub Repository URL"
@@ -465,8 +560,11 @@ function SignUp() {
                               onChange={handleFydpDetailsChange}
                               required
                             />
+                            <label className="block text-sm text-gray-600 mb-1 mt-5">
+                              Tags <span className="text-red-500">*</span>
+                            </label>
                             <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                               type="text"
                               name="tags"
                               placeholder="Tags (comma separated)"
@@ -474,8 +572,11 @@ function SignUp() {
                               onChange={handleFydpDetailsChange}
                               required
                             />
+                            <label className="block text-sm text-gray-600 mb-1 mt-5">
+                              Remarks
+                            </label>
                             <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                               type="text"
                               name="remarks"
                               placeholder="Remarks"
