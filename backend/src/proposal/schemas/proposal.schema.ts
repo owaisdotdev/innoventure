@@ -9,32 +9,61 @@ export class Proposal extends Document {
   @Prop({ required: true })
   investorId: string;
 
-  @Prop({ required: true })
-  startupName: string;
+  @Prop({ enum: ['startup', 'investor'], required: true })
+  sentBy: string;
 
   @Prop({ required: true })
-  industry: string;
+  title: string;
 
+  @Prop({ required: true })
+  message: string;
+
+  @Prop()
   investmentAmount: number;
 
+  @Prop()
   equityOffer: number;
 
+  @Prop()
+  equityInterest: number;
+
+  @Prop()
+  fundingRequired: number;
+
+  @Prop()
+  useOfFunds: string;
+
+  @Prop()
+  milestones: string;
+
+  @Prop()
   deliverables: string;
 
-  milestones: string;
+  @Prop()
+  valueAddition: string;
+
+  @Prop()
+  relevantExperience: string;
+
+  @Prop()
+  attachment: string;
 
   @Prop({ enum: ['pending', 'accepted', 'rejected'], default: 'pending' })
   status: string;
 
-  @Prop({ enum: ['startup', 'investor'], default: 'investor' })
-  sentBy: string;
+  @Prop()
+  startupName: string;
 
+  @Prop()
+  industry: string;
+
+  @Prop()
   startupEmail: string;
 
-  fundingRequired: string;
-
+  @Prop()
   pitchDeck: string;
 
+  @Prop()
   description: string;
 }
 

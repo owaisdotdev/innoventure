@@ -3,10 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Proposal } from './schemas/proposal.schema';
 import { CreateProposalDto } from './dtos/create-proposal.dto';
+import { UpdateProposalDto } from 'src/dto/updateProposal.dto';
 
 @Injectable()
 export class ProposalsService {
-  constructor(@InjectModel(Proposal.name) private proposalModel: Model<Proposal>) {}
+  constructor(
+    @InjectModel(Proposal.name) private proposalModel: Model<Proposal>,
+  ) {}
 
   async create(createProposalDto: CreateProposalDto): Promise<Proposal> {
     try {
@@ -24,5 +27,29 @@ export class ProposalsService {
 
   async findByStartupId(startupId: string): Promise<Proposal[]> {
     return this.proposalModel.find({ startupId }).exec();
+  }
+
+  async findByInvestorId(investorId: string): Promise<Proposal[]> {
+    return this.proposalModel.find({ investorId }).exec();
+  }
+
+  async updateProposal(
+    id: string,
+    updateProposalDto: UpdateProposalDto,
+  ): Promise<Proposal> {
+    try {
+      const updatedProposal = await this.proposalModel.findByIdAndUpdate(
+        id,
+        { $set: updateProposalDto },
+        { new: true },
+      );
+      if (!updatedProposal) {
+        throw new Error('Proposal not found');
+      }
+      return updatedProposal;
+    } catch (error) {
+      console.error('Error updating proposal:', error.message, error.stack);
+      throw error;
+    }
   }
 }
