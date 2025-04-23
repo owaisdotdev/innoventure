@@ -12,7 +12,7 @@ const FydpsList = () => {
   useEffect(() => {
     const fetchStartups = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/startups', {
+        const response = await fetch('http://localhost:3000/startups', {
           headers: { accept: 'application/json' },
         });
         if (response.ok) {

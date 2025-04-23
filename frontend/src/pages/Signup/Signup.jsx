@@ -244,7 +244,7 @@ function SignUp() {
       let dataToSend = {};
 
       if (role === "investor") {
-        apiUrl = "https://innoventure-api.vercel.app/auth/signup/investor";
+        apiUrl = "http://localhost:3000/auth/signup/investor";
         dataToSend = {
           ...baseData,
           preferences: {
@@ -259,7 +259,7 @@ function SignUp() {
           },
         };
       } else if (role === "startup") {
-        apiUrl = "https://innoventure-api.vercel.app/auth/signup/startup";
+        apiUrl = "http://localhost:3000/auth/signup/startup";
         dataToSend = {
           ...baseData,
           isFydp: formData.isFydp,

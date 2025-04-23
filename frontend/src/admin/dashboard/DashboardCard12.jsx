@@ -8,7 +8,7 @@ function DashboardCard12() {
   useEffect(() => {
     const fetchRecentActivities = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/admin-dashboard/recent-activity', {
+        const response = await fetch('http://localhost:3000/admin-dashboard/recent-activity', {
           method: 'GET',
           headers: {
             'accept': '*/*',

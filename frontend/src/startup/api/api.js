@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://innoventure-api.vercel.app/startups';
+const API_BASE_URL = 'http://localhost:3000/startups';
 
 const StartupService = {
   // GET /startups - Get all startups

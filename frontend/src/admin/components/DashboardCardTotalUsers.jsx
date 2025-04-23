@@ -11,7 +11,7 @@ function DashboardCardTotalUsers() {
   useEffect(() => {
     const fetchActiveInvestors = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/admin-dashboard/active-investors', {
+        const response = await fetch('http://localhost:3000/admin-dashboard/active-investors', {
           method: 'GET',
           headers: {
             'accept': '*/*',
