@@ -37,12 +37,12 @@ Investors Found By AI Matchmaking        </h1>
                 <h2 className="text-2xl font-bold text-gray-800">{investor.name}</h2>
               </div>
               <p className="text-gray-600 mb-2 flex items-center">
-                <FaIndustry className="text-blue-400 mr-2" /> Sectors: {investor.preferences.sectors.join(", ")}
+                <FaIndustry className="text-blue-400 mr-2" /> Sectors: {investor.preferences?.sectors.join(", ")}
               </p>
               <p className="text-gray-600 mb-2 flex items-center">
-                <FaMoneyBillWave className="text-green-400 mr-2" /> Min Investment: ${investor.criteria.minInvestment}
+                <FaMoneyBillWave className="text-green-400 mr-2" /> Min Investment: ${investor.criteria?.minInvestment}
               </p>
-              <p className="text-gray-600 mb-4">Risk Tolerance: {investor.preferences.riskTolerance}</p>
+              <p className="text-gray-600 mb-4">Risk Tolerance: {investor.preferences?.riskTolerance}</p>
               <Link
                 to={`/startup/investor/${investor._id}`}
                 className="px-10 bg-black py-2 wa-full text-c text-purple-100 font-semibold inline-flex items-center hover:underline"

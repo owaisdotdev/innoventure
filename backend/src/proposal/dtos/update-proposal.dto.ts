@@ -1,3 +1,3 @@
 export class UpdateProposalDto {
-    status: 'accepted' | 'rejected';
-  }
+  status: 'accepted' | 'rejected';
+}

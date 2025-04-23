@@ -7,4 +7,9 @@ export class CreateProposalDto {
   equityOffer: number;
   deliverables: string;
   milestones: string;
+  sentBy?: string;
+  startupEmail?: string;
+  fundingRequired?: string;
+  pitchDeck?: string;
+  description?: string;
 }
