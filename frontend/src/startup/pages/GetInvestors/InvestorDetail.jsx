@@ -34,7 +34,7 @@ const InvestorDetail = () => {
     try {
       toast.info("Submitting your pitch...", { autoClose: 2000 });
 
-      const response = await fetch(`https://innoventure-api.vercel.app/pitches`, {
+      const response = await fetch(`http://localhost:3000/proposals`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, investorId: id }),
