@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 
 import Sidebar from '../components/Sidebar';
-import Header from '../../partials/Header';
-import FilterButton from '../../components/DropdownFilter';
-import Datepicker from '../../components/Datepicker';
+
 
 
 function Layout({ children }) {
@@ -20,7 +18,7 @@ function Layout({ children }) {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
 
         {/*  Site header */}
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        {/* <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
 
         <main className="grow">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
@@ -36,9 +34,9 @@ function Layout({ children }) {
               {/* Right: Actions */}
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
                 {/* Filter button */}
-                <FilterButton align="right" />
+                {/* <FilterButton align="right" /> */}
                 {/* Datepicker built with flatpickr */}
-                <Datepicker align="right" />
+                {/* <Datepicker align="right" /> */}
                 {/* Add view button */}
                 <button className="btn bg-gray-900 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white">
                   <svg className="fill-current shrink-0 xs:hidden" width="16" height="16" viewBox="0 0 16 16">

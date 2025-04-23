@@ -11,46 +11,68 @@ function SendProposal() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProposal = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const investorId = localStorage.getItem("userId");
-
-        const response = await fetch(
-          `http://localhost:3000/proposals/investor/${investorId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch proposals");
-        }
-
-        const data = await response.json();
-        setProposals(data);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchProposal();
+    fetchProposals();
   }, []);
 
+  const fetchProposals = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const investorId = localStorage.getItem("userId");
+
+      const response = await fetch(
+        `http://localhost:3000/proposals/investor/${investorId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch proposals");
+      }
+
+      const data = await response.json();
+      setProposals(data);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  const updateProposalStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:3000/proposals/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update proposal status");
+      }
+
+      toast.success(`Proposal ${status}`);
+      // Refresh proposals
+      fetchProposals();
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+  };
+
   const handleAccept = (id) => {
-    toast.success(`Accepted proposal ${id}`);
-    // TODO: Call backend to accept proposal
+    updateProposalStatus(id, "accepted");
   };
 
   const handleReject = (id) => {
-    toast.error(`Rejected proposal ${id}`);
-    // TODO: Call backend to reject proposal
+    updateProposalStatus(id, "rejected");
   };
 
   const sentByMe = proposals.filter((p) => p.sentBy === "investor");
@@ -70,7 +92,7 @@ function SendProposal() {
           <p><strong>Industry:</strong> {proposal.industry || "Not provided"}</p>
           <p><strong>Attachment:</strong> {proposal.attachment}</p>
         </div>
-        {showActions && (
+        {showActions && proposal.status === "pending" && (
           <div className="mt-4 flex gap-2">
             <button
               onClick={() => handleAccept(proposal._id)}

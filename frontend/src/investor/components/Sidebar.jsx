@@ -381,7 +381,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investor/market-analysis"
+                            to="/investor/active-projects"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -389,7 +389,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                                 : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                             }
                           >
-                            <span className="text-sm font-medium">Market Analysis</span>
+                            <span className="text-sm font-medium">Active Projects</span>
                           </NavLink>
                         </li>
                         <li className="mb-1 last:mb-0">

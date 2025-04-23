@@ -22,7 +22,7 @@ const StartupDetails = () => {
     const fetchStartupDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/startups/${id}`,
+          `http://localhost:3000/investor/${id}`,
           {
             headers: { accept: "application/json" },
           }
@@ -91,11 +91,11 @@ console.log(token)
   
   if (!startup) {
     return (
-      <Layout>
+      // <Layout>
         <div className="px-6 py-4 flex items-center justify-center">
           <h1 className="text-2xl text-gray-800 font-bold">Loading...</h1>
         </div>
-      </Layout>
+      // </Layout>
     );
   }
 
