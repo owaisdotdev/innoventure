@@ -18,7 +18,8 @@ import { AuthContextProvider } from "./contexts/AuthContext";
 import AuthGuard from "./AuthGuard";
 import adminRoutes from "./admin/pages/adminRoutes";
 import InvestorRoutes from "./investor/pages/investorRoutes";
-import Milestones from "./investor/pages/Milestones"
+import Milestones from "./investor/pages/Milestones";
+
 const getUserIdSomehow = () => {
   return localStorage.getItem("userId");
 };
@@ -107,7 +108,7 @@ function App() {
     <>
       <Floating />
       <AuthContextProvider>
-        {showNavbar && <Navbar />}
+       {showNavbar && <Navbar />}
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -122,7 +123,7 @@ function App() {
           <Route path="/startup/accepted-proposals" element={<RedirectToAcceptedProposals />} /> {/* Added */}
           <Route path="/investor/milestones" element={<Milestones />} />
           {/* Protected Routes */}
-          <Route element={<AuthGuard />}>
+          <Route>
             {adminRoutes}
             {InvestorRoutes}
             <Route path="/investor/dashboard/:userId" element={<InvestorDashboard />} />

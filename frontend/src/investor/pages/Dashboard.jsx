@@ -23,6 +23,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getTotalInvestments } from "@/api/investorService";
 
 // Register Chart.js components
 ChartJS.register(
@@ -77,13 +78,14 @@ function Dashboard() {
     return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
   };
 
-  const syncData = () => {
+  const syncData = async () => {
     const storedProject = JSON.parse(localStorage.getItem(`investorProject_${investorId}`)) || project;
     setProject(storedProject);
 
     const storedNotifications = JSON.parse(localStorage.getItem(`investorNotifications_${investorId}`)) || [];
     console.log("[Dashboard] Loaded notifications:", storedNotifications); // Debug log
     setNotifications(storedNotifications);
+    const totalInvestments = await getTotalInvestments();
   };
 
   useEffect(() => {
