@@ -12,7 +12,7 @@ function DashboardCardActiveStartups() {
     // Fetch the total active startups data from the API
     const fetchActiveStartups = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/admin-dashboard/active-startups');
+        const response = await fetch('http://localhost:3000/admin-dashboard/active-startups');
         const data = await response.json();
         setActiveStartups(data.activeStartups || 0); // Adjust based on the actual API structure
         setLoading(false);

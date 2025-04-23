@@ -12,7 +12,7 @@ function DashboardCardTotalInvestments() {
     // Fetch the total investments data from the API
     const fetchTotalInvestments = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/admin-dashboard/total-investments');
+        const response = await fetch('http://localhost:3000/admin-dashboard/total-investments');
         const data = await response.json();
         setTotalInvestments({
           totalAmount: data.totalAmount|| 0, // Adjust to the actual API response structure

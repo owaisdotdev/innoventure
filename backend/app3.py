@@ -52,14 +52,14 @@ def match():
 
         if startup_id:
             # Fetch startup description
-            startups_data = fetch_data('https://innoventure-api.vercel.app/startups')
+            startups_data = fetch_data('http://localhost:3000/startups')
             startup = next((s for s in startups_data if s.get("_id") == startup_id), None)
             if not startup:
                 return jsonify({"error": "Startup not found"}), 404
             startup_description = startup.get("businessPlan", {}).get("description", "")
             print(startup_description)
             # Fetch all investors
-            investors_data = fetch_data('https://innoventure-api.vercel.app/investors')
+            investors_data = fetch_data('http://localhost:3000/investors')
             investor_descriptions = [inv.get("businessPlan", {}).get("description", "") for inv in investors_data]
             investor_ids = [inv.get("_id") for inv in investors_data]
             print(investor_ids)
@@ -73,14 +73,14 @@ def match():
 
         elif investor_id:
             # Fetch investor description
-            investors_data = fetch_data('https://innoventure-api.vercel.app/investors')
+            investors_data = fetch_data('http://localhost:3000/investors')
             investor = next((inv for inv in investors_data if inv.get("_id") == investor_id), None)
             if not investor:
                 return jsonify({"error": "Investor not found"}), 404
             investor_description = investor.get("businessPlan", {}).get("description", "")
             
             # Fetch all startups
-            startups_data = fetch_data('https://innoventure-api.vercel.app/startups')
+            startups_data = fetch_data('http://localhost:3000/startups')
             startup_descriptions = [s.get("businessPlan", {}).get("description", "") for s in startups_data]
             startup_ids = [s.get("_id") for s in startups_data]
 

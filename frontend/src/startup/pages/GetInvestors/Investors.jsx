@@ -10,7 +10,7 @@ const InvestorsList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://innoventure-api.vercel.app/investors");
+        const response = await fetch("http://localhost:3000/investors");
         const data = await response.json();
         setInvestors(data);
       } catch (error) {

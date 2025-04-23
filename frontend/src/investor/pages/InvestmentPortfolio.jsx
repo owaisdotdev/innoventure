@@ -8,7 +8,7 @@ const InvestmentPortfolio = () => {
   useEffect(() => {
     // Fetch data from the API
     axios
-      .get('https://innoventure-api.vercel.app/investor-dashboard/675d8f1bdfaebd7bdfb533cc/portfolio')
+      .get('http://localhost:3000/investor-dashboard/675d8f1bdfaebd7bdfb533cc/portfolio')
       .then((response) => {
         // Update the state with the API response
         const apiData = response.data.map((item) => ({

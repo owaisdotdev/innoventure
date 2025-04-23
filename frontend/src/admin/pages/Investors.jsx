@@ -11,7 +11,7 @@ function Investors() {
 
   useEffect(() => {
     const fetchCustomers = async () => {
-      const response = await fetch('https://innoventure-api.vercel.app/investors');
+      const response = await fetch('http://localhost:3000/investors');
       const data = await response.json();
       setCustomers(data);
       setIsLoading(false)

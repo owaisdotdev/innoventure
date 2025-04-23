@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const devUrl = "http://localhost:3001/";
-const mainUrl = "https://innoventure-api.vercel.app/";
+const mainUrl = "http://localhost:3000/";
 
 const API = axios.create({ baseURL: mainUrl });
 

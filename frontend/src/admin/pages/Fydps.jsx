@@ -12,7 +12,7 @@ function Fydps() {
   useEffect(() => {
     const fetchStartups = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/startups');
+        const response = await fetch('http://localhost:3000/startups');
         let data = await response.json();
         data = data.filter(result => result?.isFydp === true);
         

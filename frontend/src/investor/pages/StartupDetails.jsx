@@ -22,7 +22,7 @@ const StartupDetails = () => {
     const fetchStartupDetails = async () => {
       try {
         const response = await fetch(
-          `https://innoventure-api.vercel.app/startups/${id}`,
+          `http://localhost:3000/startups/${id}`,
           {
             headers: { accept: "application/json" },
           }
