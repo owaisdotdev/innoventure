@@ -3,9 +3,11 @@ from transformers import AutoTokenizer, AutoModel
 import torch
 import torch.nn.functional as F
 import requests
+from flask_cors import CORS
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 print("hello")
 # Load model and tokenizer once when the application starts
 tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
