@@ -1,47 +1,69 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Headers,
-  UnauthorizedException,
-  InternalServerErrorException,
-  Get,
-  Param,
-  Patch,
-} from '@nestjs/common';
-import { ProposalsService } from './proposal.service'; // Correct path assumed
-// import { NotificationService } from '../notification/notification.service'; // Import NotificationService
-import { NotificationsService } from 'src/notification/notification.service';
-import { CreateProposalDto } from './dtos/create-proposal.dto';
-import * as jwt from 'jsonwebtoken';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Proposal } from './schemas/proposal.schema';
+import { CreateProposalDto } from './dtos/create-proposal.dto';
 import { UpdateProposalDto } from './dtos/update-proposal.dto';
 
-@Controller('proposals')
-export class ProposalsController {
-  constructor(private readonly proposalsService: ProposalsService) {}
+@Injectable()
+export class ProposalsService {
+  constructor(@InjectModel(Proposal.name) private proposalModel: Model<Proposal>) {}
 
-  @Post()
-  async create(@Body() createProposalDto: CreateProposalDto) {
-    return this.proposalsService.create(createProposalDto);
+  async create(createProposalDto: CreateProposalDto): Promise<Proposal> {
+    try {
+      const createdProposal = new this.proposalModel({
+        ...createProposalDto,
+        status: 'pending',
+      });
+      console.log('Saving proposal:', createdProposal);
+      return await createdProposal.save();
+    } catch (error) {
+      console.error('Error saving proposal:', error.message, error.stack);
+      throw new InternalServerErrorException('Failed to save proposal.', error);
+    }
   }
 
-  @Get('startup/:startupId')
-  async findByStartupId(@Param('startupId') startupId: string) {
-    return this.proposalsService.findByStartupId(startupId);
+  async findByStartupId(startupId: string): Promise<Proposal[]> {
+    try {
+      const proposals = await this.proposalModel.find({ startupId }).exec();
+      if (!proposals.length) {
+        throw new NotFoundException('No proposals found for this startup.');
+      }
+      return proposals;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  @Get('investor/:investorId')
-  async findByInvestorId(@Param('investorId') investorId: string) {
-    return this.proposalsService.findByInvestorId(investorId);
+  async findByInvestorId(investorId: string): Promise<Proposal[]> {
+    try {
+      const proposals = await this.proposalModel.find({ investorId }).exec();
+      if (!proposals.length) {
+        throw new NotFoundException('No proposals found for this investor.');
+      }
+      return proposals;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  @Patch(':id')
-  async updateProposal(
-    @Param('id') id: string,
-    @Body() updateProposalDto: UpdateProposalDto,
-  ) {
-    return this.proposalsService.updateProposal(id, updateProposalDto);
+  async updateProposal(id: string, updateProposalDto: UpdateProposalDto): Promise<Proposal> {
+    try {
+      const updatedProposal = await this.proposalModel.findByIdAndUpdate(
+        id,
+        { $set: updateProposalDto },
+        { new: true }
+      );
+      if (!updatedProposal) {
+        throw new NotFoundException('Proposal not found.');
+      }
+      return updatedProposal;
+    } catch (error) {
+      console.error('Error updating proposal:', error.message, error.stack);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to update proposal.', error);
+    }
   }
 }
