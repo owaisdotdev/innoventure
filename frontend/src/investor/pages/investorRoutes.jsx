@@ -16,13 +16,14 @@ import InvestorDashboard from './Dashboard';
 const InvestorRoutes = () => {
   return (
     <Routes>
-      <Route path="/investor/dashboard/:userId" element={<InvestorDashboard />} />
-      <Route path="/investor/investment-portfolio" element={<InvestmentPortfolio />} />
-      <Route path="/investor/featured-startups" element={<FeaturedStartups />} />
-      <Route path="/investor/recommended-startups" element={<RecommendedStartups />} />
-      <Route path="/investor/fydp-projects" element={<FydpsList />} />
-      <Route path="/investor/startup/:id" element={<StartupDetails />} />
-    </Routes>
+    <Route path="dashboard/:userId" element={<InvestorDashboard />} />
+    <Route path="investment-portfolio" element={<InvestmentPortfolio />} />
+    <Route path="featured-startups" element={<FeaturedStartups />} />
+    <Route path="recommended-startups" element={<RecommendedStartups />} />
+    <Route path="fydp-projects" element={<FydpsList />} />
+    <Route path="startup/:id" element={<StartupDetails />} />
+  </Routes>
+  
   );
 };
 

@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import Loader from '@/utils/Loader';
-
+import Sidebar from "../components/Sidebar";
+import Header from "../../partials/Header";
 
 const RecommendedStartups = () => {
   const [startups, setStartups] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track loading state
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchStartups = async () => {
       try {
-        const response = await fetch('https://innoventure-api.vercel.app/startups', {
+        const response = await fetch('http://localhost:3000/startups', {
           headers: { accept: 'application/json' },
         });
         if (response.ok) {
@@ -36,7 +38,10 @@ const RecommendedStartups = () => {
   };
 
   return (
-    <Layout>
+      <div className="flex h-screen overflow-hidden bg-gray-900">
+          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+            <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="px-6 py-4">
         <h1 className="text-xl text-gray-800 font-bold mb-4">Recommended Startups</h1>
 
@@ -89,8 +94,7 @@ const RecommendedStartups = () => {
             )}
           </div>
         )}
-      </div>
-    </Layout>
+      </div></div></div>
   );
 };
 

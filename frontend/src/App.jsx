@@ -107,7 +107,7 @@ function App() {
   return (
     <>
       <Floating />
-      <AuthContextProvider>
+      {/* <AuthContextProvider> */}
        {showNavbar && <Navbar />}
         <Routes>
           {/* Public Routes */}
@@ -122,10 +122,11 @@ function App() {
           <Route path="/startup/proposals" element={<RedirectToStartupProposals />} />
           <Route path="/startup/accepted-proposals" element={<RedirectToAcceptedProposals />} /> {/* Added */}
           <Route path="/investor/milestones" element={<Milestones />} />
+          <Route path =""/>
           {/* Protected Routes */}
           <Route>
             {adminRoutes}
-            {InvestorRoutes}
+            <Route path="/investor/*" element={<InvestorRoutes />} />
             <Route path="/investor/dashboard/:userId" element={<InvestorDashboard />} />
             <Route path="/investor/send-proposals" element={<SendProposal />} />
             <Route path="/startup/dashboard/:userId" element={<StartupDashboard />} />
@@ -136,7 +137,7 @@ function App() {
           {/* Additional Startup Routes */}
           <Route path="/*" element={<StartupRoutes />} />
         </Routes>
-      </AuthContextProvider>
+      {/* </AuthContextProvider> */}
     </>
   );
 }

@@ -10,19 +10,19 @@ const StartupDetails = () => {
   const [formData, setFormData] = useState({
     name: "",
     industry: "",
-    proposal: "",
     investmentAmount: "",
     equity: "",
-    keyDeliverables: "",
-    milestones: "",
-    terms: false,
+    attachment: "",
+    message: "",
+    sentBy:"investor",
+    terms:true
   });
 
   useEffect(() => {
     const fetchStartupDetails = async () => {
       try {
         const response = await fetch(
-          `https://innoventure-api.vercel.app/startups/${id}`,
+          `http://localhost:3000/startups/${id}`,
           {
             headers: { accept: "application/json" },
           }
@@ -34,12 +34,12 @@ const StartupDetails = () => {
           setFormData({
             name: data.name || "",
             industry: data.businessPlan?.industry || "",
-            proposal: "",
+            industry: "",
             investmentAmount: "",
             equity: "",
-            keyDeliverables: "",
-            milestones: "",
-            terms: false,
+            attachment: "",
+            message: "",
+            sentBy:"investor"
           });
         } else {
           console.error("Failed to fetch startup details");
@@ -57,9 +57,33 @@ const StartupDetails = () => {
     setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit =async (e) => {
     e.preventDefault();
     console.log("Proposal Submitted:", formData);
+      // Include startupId in the formData
+      const investor = localStorage.getItem("userId");
+      const token= localStorage.getItem("token");
+console.log(token)
+  const payload = {
+    ...formData,
+    startupId: id,
+    investorId:investor,title:"aasdad"// assuming `id` from useParams is the startup's ID
+  };
+    const response = await fetch('http://localhost:3000/proposals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit proposal');
+    }
+
+    const result = await response.json();
+    console.log("Proposal Submitted:", result);
+
     setIsDialogOpen(false);
   };
   const closeModal = () => {
@@ -191,85 +215,90 @@ const StartupDetails = () => {
                 />
               </div>
               <div className="mb-2">
-                <label
-                  htmlFor="investmentAmount"
-                  className="block text-gray-700 font-semibold"
-                >
-                  Investment Amount (in USD)
-                </label>
-                <input
-                  type="number"
-                  id="investmentAmount"
-                  name="investmentAmount"
-                  value={formData.investmentAmount}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-2 px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-2">
-                <label htmlFor="equity" className="block text-gray-700 font-semibold">
-                  Equity Offered (in %)
-                </label>
-                <input
-                  type="number"
-                  id="equity"
-                  name="equity"
-                  value={formData.equity}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-2 px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-2 ">
-                <label
-                  htmlFor="keyDeliverables"
-                  className="block text-gray-700 font-semibold"
-                >
-                  Key Deliverables
-                </label>
-                <textarea
-                  id="keyDeliverables"
-                  name="keyDeliverables"
-                  value={formData.keyDeliverables}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-2 px-4 py-2 border rounded-lg"
-                  placeholder="List the deliverables you will provide"
-                />
-              </div>
-              <div className="mb-2 ">
-                <label
-                  htmlFor="milestones"
-                  className="block text-gray-700 font-semibold"
-                >
-                  Milestones & Timeline
-                </label>
-                <textarea
-                  id="milestones"
-                  name="milestones"
-                  value={formData.milestones}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-2 px-4 py-2 border rounded-lg"
-                  placeholder="Provide milestones and expected timeline"
-                />
-              </div>
-              <div className="mb-2 col-span-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    name="terms"
-                    checked={formData.terms}
-                    onChange={handleInputChange}
-                    required
-                    className="form-checkbox h-5 w-5 text-blue-600"
-                  />
-                  <span className="ml-2 text-gray-700">
-                    I agree to the terms and conditions.
-                  </span>
-                </label>
-              </div>
+  <label
+    htmlFor="investmentAmount"
+    className="block text-gray-700 font-semibold"
+  >
+    Investment Amount (in USD)
+  </label>
+  <input
+    type="number"
+    id="investmentAmount"
+    name="investmentAmount"
+    value={formData.investmentAmount}
+    onChange={handleInputChange}
+    required
+    className="w-full mt-2 px-4 py-2 border rounded-lg"
+  />
+</div>
+
+<div className="mb-2">
+  <label htmlFor="equity" className="block text-gray-700 font-semibold">
+    Equity Interest (in %)
+  </label>
+  <input
+    type="number"
+    id="equity"
+    name="equity"
+    value={formData.equity}
+    onChange={handleInputChange}
+    required
+    className="w-full mt-2 px-4 py-2 border rounded-lg"
+  />
+</div>
+
+<div className="mb-2">
+  <label
+    htmlFor="attachment"
+    className="block text-gray-700 font-semibold"
+  >
+    Attachments (URL or description)
+  </label>
+  <input
+    type="text"
+    id="attachment"
+    name="attachment"
+    value={formData.attachment}
+    onChange={handleInputChange}
+    className="w-full mt-2 px-4 py-2 border rounded-lg"
+    placeholder="Link to a document or file"
+  />
+</div>
+
+
+<div className="mb-2">
+  <label
+    htmlFor="message"
+    className="block text-gray-700 font-semibold"
+  >
+    Message
+  </label>
+  <textarea
+    id="message"
+    name="message"
+    value={formData.message}
+    onChange={handleInputChange}
+    required
+    className="w-full mt-2 px-4 py-2 border rounded-lg"
+    placeholder="Brief introduction or context for this proposal"
+  />
+</div>
+
+<div className="mb-2 col-span-2">
+  <label className="inline-flex items-center">
+    <input
+      type="checkbox"
+      name="terms"
+      checked={formData.terms}
+      onChange={handleInputChange}
+      required
+      className="form-checkbox h-5 w-5 text-blue-600"
+    />
+    <span className="ml-2 text-gray-700 text-sm">
+      I agree to the terms and conditions.
+    </span>
+  </label>
+</div>
               <div className="col-span-2 flex justify-end">
                 <button
                   type="submit"
