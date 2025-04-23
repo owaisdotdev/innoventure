@@ -34,7 +34,6 @@ const StartupDetails = () => {
           setFormData({
             name: data.name || "",
             industry: data.businessPlan?.industry || "",
-            industry: "",
             investmentAmount: "",
             equity: "",
             attachment: "",

@@ -1,12 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { Investor  } from '../../schemas/investor.schema';
+import { Startup } from '../../schemas/startup.schema';
 
 @Schema({ timestamps: true })
 export class Proposal extends Document {
-  @Prop({ required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Startup', required: true })
   startupId: string;
 
-  @Prop({ required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Investor', required: true })
   investorId: string;
 
   @Prop({ enum: ['startup', 'investor'], required: true })

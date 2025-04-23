@@ -26,11 +26,11 @@ export class ProposalsService {
   }
 
   async findByStartupId(startupId: string): Promise<Proposal[]> {
-    return this.proposalModel.find({ startupId }).exec();
+    return this.proposalModel.find({ startupId }).populate('investorId').populate('startupId').exec();
   }
 
   async findByInvestorId(investorId: string): Promise<Proposal[]> {
-    return this.proposalModel.find({ investorId }).exec();
+    return this.proposalModel.find({ investorId }).populate('investorId').populate('startupId').exec();
   }
 
   async updateProposal(
