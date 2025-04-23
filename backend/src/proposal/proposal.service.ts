@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Proposal } from './schemas/proposal.schema';
 import { CreateProposalDto } from './dtos/create-proposal.dto';
-import { UpdateProposalDto } from 'src/dto/updateProposal.dto';
+import { UpdateProposalDto } from './dtos/update-proposal.dto';
 
 @Injectable()
 export class ProposalsService {

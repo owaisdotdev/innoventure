@@ -15,8 +15,8 @@ import { NotificationsService } from 'src/notification/notification.service';
 import { CreateProposalDto } from './dtos/create-proposal.dto';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { Proposal } from 'src/schemas/proposal.schema';
-import { UpdateProposalDto } from 'src/dto/updateProposal.dto';
+import { Proposal } from './schemas/proposal.schema';
+import { UpdateProposalDto } from './dtos/update-proposal.dto';
 
 @Controller('proposals')
 export class ProposalsController {

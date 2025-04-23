@@ -117,26 +117,26 @@ export class InvestorDashboardController {
     return this.investorDashboardService.getActiveInvestments(investorId);
   }
 
-  @ApiOperation({ summary: 'Get all proposals submitted by an investor' })
-  @ApiParam({ name: 'investorId', description: 'ID of the investor' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of proposals with startup details and status',
-    type: [Object],
-  })
-  @Get(':investorId/proposals')
-  async getInvestorProposals(@Param('investorId') investorId: string): Promise<
-    {
-      id: string;
-      startupName: string;
-      industry: string;
-      investmentAmount: number;
-      terms: { equity: number; conditions: string };
-      escrowStatus: string | { amount: number; releaseDate: Date; status: string };
-      status: string;
-      createdAt: Date;
-    }[]
-  > {
-    return this.investorDashboardService.getInvestorProposals(investorId);
-  }
+  // @ApiOperation({ summary: 'Get all proposals submitted by an investor' })
+  // @ApiParam({ name: 'investorId', description: 'ID of the investor' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'List of proposals with startup details and status',
+  //   type: [Object],
+  // })
+  // @Get(':investorId/proposals')
+  // async getInvestorProposals(@Param('investorId') investorId: string): Promise<
+  //   {
+  //     id: string;
+  //     startupName: string;
+  //     industry: string;
+  //     investmentAmount: number;
+  //     terms: { equity: number; conditions: string };
+  //     escrowStatus: string | { amount: number; releaseDate: Date; status: string };
+  //     status: string;
+  //     createdAt: Date;
+  //   }[]
+  // > {
+  //   return this.investorDashboardService.getInvestorProposals(investorId);
+  // }
 }

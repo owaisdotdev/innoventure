@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Investor } from '../schemas/investor.schema';
 import { Startup } from '../schemas/startup.schema';
 import { Investment } from '../schemas/investment.schema';
-import { Proposal } from '../schemas/proposal.schema';
+import { Proposal } from '../proposal/schemas/proposal.schema';
 
 @Injectable()
 export class InvestorDashboardService {
@@ -118,36 +118,36 @@ export class InvestorDashboardService {
    * @param investorId - ID of the investor
    * @returns List of proposals with startup details and status
    */
-  async getInvestorProposals(investorId: string): Promise<
-    {
-      id: string;
-      startupName: string;
-      industry: string;
-      investmentAmount: number;
-      terms: { equity: number; conditions: string };
-      escrowStatus: string | { amount: number; releaseDate: Date; status: string }; // Updated type
-      status: string;
-      createdAt: Date;
-    }[]
-  > {
-    const proposals = await this.proposalModel
-      .find({ investorId: new Types.ObjectId(investorId) })
-      .populate('startupId', 'name')
-      .sort({ _id: -1 })
-      .exec();
+  // async getInvestorProposals(investorId: string): Promise<
+  //   {
+  //     id: string;
+  //     startupName: string;
+  //     industry: string;
+  //     investmentAmount: number;
+  //     terms: { equity: number; conditions: string };
+  //     escrowStatus: string | { amount: number; releaseDate: Date; status: string }; // Updated type
+  //     status: string;
+  //     createdAt: Date;
+  //   }[]
+  // > {
+  //   const proposals = await this.proposalModel
+  //     .find({ investorId: new Types.ObjectId(investorId) })
+  //     .populate('startupId', 'name')
+  //     .sort({ _id: -1 })
+  //     .exec();
 
-    return proposals.map((proposal) => ({
-      id: proposal._id.toString(),
-      startupName: proposal.startupId && 'name' in proposal.startupId ? (proposal.startupId as any).name : 'Unknown',
-      industry: proposal.industry || 'N/A',
-      investmentAmount: proposal.investmentAmount || 0,
-      terms: {
-        equity: proposal.terms?.equity || 0,
-        conditions: proposal.terms?.conditions || 'N/A',
-      },
-      escrowStatus: proposal.escrowStatus || 'N/A', // Keep as-is, TypeScript will handle union type
-      status: proposal.status || 'Pending',
-      createdAt: (proposal._id as Types.ObjectId).getTimestamp(),
-    }));
-  }
+  //   return proposals.map((proposal) => ({
+  //     id: proposal._id.toString(),
+  //     startupName: proposal.startupId && 'name' in proposal.startupId ? (proposal.startupId as any).name : 'Unknown',
+  //     industry: proposal.industry || 'N/A',
+  //     investmentAmount: proposal.investmentAmount || 0,
+  //     terms: {
+  //       equity: proposal.terms?.equity || 0,
+  //       conditions: proposal.terms?.conditions || 'N/A',
+  //     },
+  //     escrowStatus: proposal.escrowStatus || 'N/A', // Keep as-is, TypeScript will handle union type
+  //     status: proposal.status || 'Pending',
+  //     createdAt: (proposal._id as Types.ObjectId).getTimestamp(),
+  //   }));
+  // }
 }
