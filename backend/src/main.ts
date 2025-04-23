@@ -4,6 +4,7 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,10 +20,22 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // Serve static assets (e.g., uploaded images)
   app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads/' });
+
+  // Swagger setup
+  const config = new DocumentBuilder()
+    .setTitle('My API Docs')
+    .setDescription('The API description')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document); // Swagger UI at /swagger
 
   await app.listen(port);
   console.log(`HTTP Server running on http://localhost:${port}`);
+  console.log(`Swagger Docs available at http://localhost:${port}/swagger`);
 }
 
 bootstrap();
