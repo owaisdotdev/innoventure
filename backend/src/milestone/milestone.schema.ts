@@ -7,7 +7,7 @@ export interface Milestone extends Document {
   description: string;
   budgetSpent: number;
   completionDate: Date;
-  fileUrl: string;
+  fileUrl: string;  
   financialAnalysis: string;
   submittedAt: Date;
   startupId: string;
