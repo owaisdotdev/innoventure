@@ -1,29 +1,29 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "dist/main.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "dist/main.js"
-      }
-    ],
-    "env": {
-      "PORT": "3000",
-      "MONGODB_URI": "your-mongodb-uri"
-    },
-    "headers": [
-      {
-        "source": "/(.*)",
-        "headers": [
-          { "key": "Access-Control-Allow-Origin", "value": "http://localhost:5173" },
-          { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,PATCH,DELETE,OPTIONS" },
-          { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-        ]
-      }
-    ]
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/main.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "env": {
+    "PORT": "3000",
+    "MONGODB_URI": "your-mongodb-uri"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/dist/main.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "http://localhost:5173" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,PATCH,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
+}
