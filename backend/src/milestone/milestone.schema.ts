@@ -1,5 +1,4 @@
-import { Schema, Document } from 'mongoose';
-import { Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 
 export interface Milestone extends Document {
   milestoneId: string;
@@ -7,10 +6,11 @@ export interface Milestone extends Document {
   description: string;
   budgetSpent: number;
   completionDate: Date;
-  fileUrl: string;  
+  fileUrl: string;
   financialAnalysis: string;
   submittedAt: Date;
   startupId: string;
+  proposalId: Types.ObjectId;
   status: 'pending' | 'approved' | 'rejected';
   smartContractIds: Types.ObjectId[];
 }
@@ -25,6 +25,7 @@ export const MilestoneSchema = new Schema<Milestone>({
   financialAnalysis: { type: String, required: true },
   submittedAt: { type: Date, default: Date.now },
   startupId: { type: String, required: true },
+  proposalId: { type: Schema.Types.ObjectId, ref: 'Proposal', required: true }, 
   status: { type: String, default: 'pending', enum: ['pending', 'approved', 'rejected'] },
   smartContractIds: [{ type: Schema.Types.ObjectId, ref: 'SmartContract', default: [] }],
 });
