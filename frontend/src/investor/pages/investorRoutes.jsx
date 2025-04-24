@@ -12,7 +12,7 @@ import FydpsList from './RecommendedFydp';
 import ActiveProjects from './ActiveProjects';
 import StartupDetails from './StartupDetails';
 import ProjectDetails from './ProjectDetails';
-
+import InvestorAnalysisCharts from './MarketAnalysis';
 import InvestorDashboard from './Dashboard';
 
 const InvestorRoutes = () => {
@@ -27,6 +27,8 @@ const InvestorRoutes = () => {
 
     <Route path="active-projects/:id" element={<ProjectDetails />} />
     <Route path="recommended-startups" element={<RecommendedStartups />} />
+    <Route path="analysis" element={<InvestorAnalysisCharts />} />
+
     <Route path="fydp-projects" element={<FydpsList />} />
     <Route path="startup/:id" element={<StartupDetails />} />
   </Routes>

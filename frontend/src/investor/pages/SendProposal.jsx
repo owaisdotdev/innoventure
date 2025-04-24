@@ -71,22 +71,20 @@ function SendProposal() {
 
 const handleAccept = async (proposal) => {
   try {
-    // Update local or backend status
-    await updateProposalStatus(proposal.id, "accepted");
+
 
     if (!window.ethereum) {
       alert("MetaMask not detected");
       return;
     }
-    const provider = new ethers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const escrowContract = new ethers.Contract("0x8564beAD87fe250E0E9Fb4d93D7FCf27D5F9e9C7", abi, signer);
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const escrowContract = new ethers.Contract("0x8564beAD87fe250E0E9Fb4d93D7FCf27D5F9e9C7", ABI, signer);
 
-    const startup = proposal.startupAddress; 
-    const totalAmount = ethers.utils.parseUnits(proposal.amount, 6);
-    const deadline = Math.floor(new Date(proposal.deadline).getTime() / 1000);
+    const startup = "0x824D60943baeF85a6BFf6E0be68E94b921CDCfbE"; 
+    const totalAmount = ethers.parseUnits(String(proposal?.fundingRequired || "0"), 6);
+    const deadline = Math.floor(Date.now() / 1000) + 2 * 365 * 24 * 60 * 60;
 
-    // Call createInvestment
     const tx = await escrowContract.createInvestment(startup, totalAmount, deadline);
     const receipt = await tx.wait();
 
@@ -94,10 +92,12 @@ const handleAccept = async (proposal) => {
     console.log("Investment created with ID:", investmentId);
 
     // Optional: Store `investmentId` in your DB or state
-    alert(`Investment #${investmentId} created successfully!`);
+    toast.success(`Investment #${investmentId} created successfully!`);
+    await updateProposalStatus(proposal._id, "accepted");
+
   } catch (err) {
     console.error("Error during investment creation:", err);
-    alert("Investment creation failed.");
+    toast.error("Investment creation failed.");
   }
 };
 
@@ -115,17 +115,19 @@ const handleAccept = async (proposal) => {
     >
       <div className="p-6">
         <div className="font-bold text-xl text-blue-600 mb-2">{proposal.title}</div>
-        <p className="text-gray-700 text-sm mb-4">{proposal.message}</p>
+        <p className="text-gray-700 text-sm mb-4">{proposal?.message}</p>
         <div className="text-sm text-gray-600 space-y-1">
-          <p><strong>Investment:</strong> ${proposal.investmentAmount}</p>
+          <p><strong>Investment:</strong> ${proposal?.fundingRequired}</p>
           <p><strong>Status:</strong> {proposal.status}</p>
           <p><strong>Industry:</strong> {proposal.industry || "Not provided"}</p>
           <p><strong>Attachment:</strong> {proposal.attachment}</p>
+          <p><strong>Message:</strong> {proposal.message || "Not provided"}</p>
+
         </div>
         {showActions && proposal.status === "pending" && (
           <div className="mt-4 flex gap-2">
             <button
-              onClick={() => handleAccept(proposal._id)}
+              onClick={() => handleAccept(proposal)}
               className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
             >
               Accept
