@@ -107,7 +107,7 @@ function App() {
   return (
     <>
       <Floating />
-      {/* <AuthContextProvider> */}
+      <AuthContextProvider>
        {showNavbar && <Navbar />}
         <Routes>
           {/* Public Routes */}
@@ -137,7 +137,7 @@ function App() {
           {/* Additional Startup Routes */}
           <Route path="/*" element={<StartupRoutes />} />
         </Routes>
-      {/* </AuthContextProvider> */}
+      </AuthContextProvider>
     </>
   );
 }

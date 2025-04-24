@@ -6,4 +6,14 @@ export declare class MilestoneController {
         message: string;
         milestone: import("./milestone.schema").Milestone;
     }>;
+    getMilestoneById(id: string): Promise<import("./milestone.schema").Milestone>;
+    addSmartContract(milestoneId: string, smartContractId: string): Promise<{
+        message: string;
+        milestone: import("./milestone.schema").Milestone;
+    }>;
+    getAllMilestones(startupId?: string, status?: string): Promise<import("./milestone.schema").Milestone[]>;
+    updateMilestoneStatus(id: string, status: 'pending' | 'approved' | 'rejected'): Promise<{
+        message: string;
+        milestone: import("./milestone.schema").Milestone;
+    }>;
 }

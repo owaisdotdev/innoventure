@@ -16,6 +16,7 @@ exports.MilestoneController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const milestone_service_1 = require("./milestone.service");
+const mongoose_1 = require("mongoose");
 let MilestoneController = class MilestoneController {
     constructor(milestoneService) {
         this.milestoneService = milestoneService;
@@ -23,6 +24,43 @@ let MilestoneController = class MilestoneController {
     async submitMilestone(body, file) {
         const milestone = await this.milestoneService.submitMilestone(body, file);
         return { message: 'Milestone submitted', milestone };
+    }
+    async getMilestoneById(id) {
+        try {
+            const milestone = await this.milestoneService.findMilestoneById(id);
+            return milestone;
+        }
+        catch (error) {
+            throw new common_1.BadRequestException(error.message);
+        }
+    }
+    async addSmartContract(milestoneId, smartContractId) {
+        if (!mongoose_1.Types.ObjectId.isValid(smartContractId)) {
+            throw new common_1.BadRequestException('Invalid smartContractId format');
+        }
+        const updated = await this.milestoneService.addSmartContractToMilestone(milestoneId, new mongoose_1.Types.ObjectId(smartContractId));
+        return {
+            message: 'Smart contract added to milestone',
+            milestone: updated,
+        };
+    }
+    async getAllMilestones(startupId, status) {
+        const query = {};
+        if (startupId)
+            query.startupId = startupId;
+        if (status)
+            query.status = status;
+        return this.milestoneService.findMilestones(query);
+    }
+    async updateMilestoneStatus(id, status) {
+        if (!['pending', 'approved', 'rejected'].includes(status)) {
+            throw new common_1.BadRequestException('Invalid status value');
+        }
+        const updated = await this.milestoneService.updateMilestoneStatus(id, status);
+        return {
+            message: `Milestone ${status}`,
+            milestone: updated,
+        };
     }
 };
 exports.MilestoneController = MilestoneController;
@@ -35,6 +73,37 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], MilestoneController.prototype, "submitMilestone", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MilestoneController.prototype, "getMilestoneById", null);
+__decorate([
+    (0, common_1.Patch)(':id/add-smart-contract'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('smartContractId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], MilestoneController.prototype, "addSmartContract", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('startupId')),
+    __param(1, (0, common_1.Query)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], MilestoneController.prototype, "getAllMilestones", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], MilestoneController.prototype, "updateMilestoneStatus", null);
 exports.MilestoneController = MilestoneController = __decorate([
     (0, common_1.Controller)('milestones'),
     __metadata("design:paramtypes", [milestone_service_1.MilestoneService])

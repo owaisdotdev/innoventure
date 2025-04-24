@@ -9,4 +9,6 @@ export declare class MilestoneService {
     submitMilestone(data: any, file: Express.Multer.File): Promise<Milestone>;
     findMilestoneById(id: string): Promise<Milestone>;
     addSmartContractToMilestone(milestoneId: string, smartContractId: Types.ObjectId): Promise<Milestone>;
+    findMilestones(filter?: any): Promise<Milestone[]>;
+    updateMilestoneStatus(id: string, status: 'pending' | 'approved' | 'rejected'): Promise<Milestone>;
 }

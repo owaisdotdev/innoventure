@@ -84,6 +84,20 @@ let MilestoneService = class MilestoneService {
         milestone.smartContractIds.push(smartContractId);
         return milestone.save();
     }
+    async findMilestones(filter = {}) {
+        return this.milestoneModel.find(filter).exec();
+    }
+    async updateMilestoneStatus(id, status) {
+        if (!mongoose_3.Types.ObjectId.isValid(id)) {
+            throw new Error('Invalid Milestone ID format');
+        }
+        const milestone = await this.milestoneModel.findById(id).exec();
+        if (!milestone) {
+            throw new Error('Milestone not found');
+        }
+        milestone.status = status;
+        return milestone.save();
+    }
 };
 exports.MilestoneService = MilestoneService;
 exports.MilestoneService = MilestoneService = __decorate([
