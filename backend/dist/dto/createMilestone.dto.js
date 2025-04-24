@@ -57,4 +57,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateMilestoneDto.prototype, "associatedSmartContractId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Associated Proposal ID', type: String }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateMilestoneDto.prototype, "proposalId", void 0);
 //# sourceMappingURL=createMilestone.dto.js.map

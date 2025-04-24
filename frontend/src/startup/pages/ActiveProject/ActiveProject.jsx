@@ -132,6 +132,7 @@ const ActiveProject = () => {
                                         {proposals.map((proposal) => (
                                             <div
                                                 key={proposal._id}
+                                                onClick={() => navigate(`/startup/active-projects/${proposal._id}`)}
                                                 className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-700"
                                             >
                                                 <div className="space-y-4">
