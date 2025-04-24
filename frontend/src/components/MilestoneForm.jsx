@@ -65,9 +65,8 @@ function MilestoneForm({ onClose, addMilestone }) {
     let financialAnalysis = "Analysis unavailable";
 
     try {
-      let reportContent = formData.reportSummary; // Default to summary if no file or parsing fails
+      let reportContent = formData.reportSummary; 
 
-      // If a file is uploaded, attempt to extract text from the PDF
       if (formData.file) {
         try {
           await loadPDFWorker(); // Ensure worker is loaded

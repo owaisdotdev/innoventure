@@ -1,237 +1,231 @@
-import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState } from 'react';
+import PdfToText from 'react-pdftotext';
+import axios from 'axios';
+import { ethers } from 'ethers';
 
-const Milestones = () => {
-  const [loading, setLoading] = useState(true);
-  const [matchedStartups, setMatchedStartups] = useState([]);
-  const [selectedStartup, setSelectedStartup] = useState(null); // For modal
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-  const startupId = "675d8f1bdfaebd7bdfb533d2"; 
-  const investorId = "675d8f1bdfaebd7bdfb533cc";
+const PdfUploader = ({ startupData }) => {
+  const [file, setFile] = useState(null);
+  const [extractedText, setExtractedText] = useState('');
+  const [milestoneMessage, setMilestoneMessage] = useState('');
+  
+  // Pinata credentials
+  const pinataApiKey = "21780ea40c3777501825";
+  const pinataSecretApiKey = "035da19b1e31d31ee41e578c48b3b4d104a1cdf76817ddd53648258c57afe731";
 
-  useEffect(() => {
-    const fetchMatches = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("http://localhost:3000/match", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ investor_id: investorId }),
-        });
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile && uploadedFile.type === 'application/pdf') {
+      setFile(uploadedFile);
+    } else {
+      alert('Please upload a valid PDF file');
+    }
+  };
+  const updateMilestoneProgress = async ( newIpfsHash,financialAnalysis,milestoneMessage) => {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner(); 
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+      const contract = new ethers.Contract("0x076503410d2e5db11c66f0ed5f3b07659d2268b5", abi, signer);
 
-        const data = await response.json();
-        // console.log("Response from NestJS in Milestones:", data);
-
-        if (data.potential_startups) {
-          setMatchedStartups(data.potential_startups);
-        } else {
-          toast.error("No matched startups found.");
-        }
-      } catch (err) {
-        console.error("Fetch error:", err.message);
-        toast.error("Error fetching matched startups: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMatches();
-  }, [investorId]);
-
-  const openModal = (startup) => {
-    setSelectedStartup(startup);
-    setIsModalOpen(true);
+      const tx = await contract.updateMilestoneProgress(0, 0, newIpfsHash,financialAnalysis,milestoneMessage, true);
+      await tx.wait();  
+      console.log("Milestone progress updated successfully");
+    } catch (error) {
+      console.error("Error updating milestone progress:", error);
+    }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedStartup(null);
+  // Handle milestone message input change
+  const handleMessageChange = (e) => {
+    setMilestoneMessage(e.target.value);
   };
 
-  if (loading) return <div className="text-center mt-20 text-white">Loading...</div>;
+  // Extract text from PDF and send for analysis
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!file || !milestoneMessage) {
+      alert("Please fill in the milestone message and upload a PDF file.");
+      return;
+    }
+
+    try {
+      
+      // Extract text from PDF
+      const text = await PdfToText(file);
+      setExtractedText(text);
+
+      // Send the text to Gemini for financial analysis
+      const financialAnalysis = await sendToGemini(text);
+
+      // Upload PDF to IPFS
+      const ipfsHash = await uploadFileToIPFS(file);
+
+      // Send the form data along with the analysis and IPFS hash to your database
+      // sendToDatabase({ 
+      //   ...startupData, 
+      //   milestoneMessage, 
+      //   reportContent: text, 
+      //   financialAnalysis, 
+      //   ipfsHash 
+      // });
+      updateMilestoneProgress(ipfsHash,financialAnalysis,milestoneMessage)
+    } catch (error) {
+      console.error('Error processing PDF:', error);
+    }
+  };
+
+  // Function to send extracted text to Gemini API
+  const sendToGemini = async (reportContent) => {
+    const apiKey = "YOUR_GEMINI_API_KEY"; // Replace with your actual API key
+    let financialAnalysis = "Analysis unavailable";
+
+    try {
+      console.log("Sending request to Gemini API...");
+      const response = await axios.post(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent",
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: `You are a professional financial analyst AI.
+
+                  Please analyze the following financial report and return the results in **STRICT JSON format** with the following structure:
+
+                  {
+                    "summary": "A concise summary of the financial situation (max 100 words)",
+                    "keyMetrics": {
+                      "totalRevenue": "Extracted revenue or 'N/A'",
+                      "totalExpenses": "Extracted expenses or 'N/A'",
+                      "netProfitOrLoss": "Calculated profit or loss or 'N/A'",
+                      "profitMargin": "Profit margin as a percentage or 'N/A'"
+                    },
+                    "highlights": [
+                      "Important finding 1",
+                      "Important finding 2",
+                      "Other relevant financial insight..."
+                    ]
+                  }
+                  
+                  Analyze this report:
+                  '''${reportContent}'''`
+                }
+              ]
+            }
+          ]
+        },
+        {
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: { key: apiKey }
+        }
+      );
+
+      // Log the response
+      console.log("Gemini API response:", response);
+
+      // Extract and return the analysis
+      financialAnalysis = response.data.candidates[0].content.parts[0].text;
+      console.log("Financial Analysis:", financialAnalysis);    
+
+      // Clean the financial analysis response (remove backticks and make it user-friendly)
+      const cleanedAnalysis = financialAnalysis.replace(/```json|```/g, '').trim();
+      console.log(JSON.parse(cleanedAnalysis));
+      return cleanedAnalysis;
+    } catch (error) {
+      console.error("Gemini API Error:", error.response || error.message);
+      return financialAnalysis;
+    }
+  };
+
+  // Function to upload file to Pinata (IPFS)
+  const uploadFileToIPFS = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          pinata_api_key: pinataApiKey,
+          pinata_secret_api_key: pinataSecretApiKey,
+        },
+      });
+
+      // Extract IPFS hash from response
+      const ipfsHash = res.data.IpfsHash;
+      console.log("File uploaded to IPFS with hash:", ipfsHash);
+      return ipfsHash;
+    } catch (error) {
+      console.error("Error uploading to IPFS:", error);
+      return null;
+    }
+  };
+
+  // Function to send all form data + Gemini analysis to the database
+  const sendToDatabase = async (formData) => {
+    try {
+      const response = await axios.post("/api/submitMilestone", formData);
+      console.log("Database Response:", response);
+      alert("Milestone submission successful!");
+    } catch (error) {
+      console.error("Error submitting to database:", error);
+      alert("There was an error submitting your milestone.");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
-      {/* Breadcrumb Link */}
-      <div className="mb-6">
-        <span className="text-sm text-gray-400">
-          <NavLink
-            to="/investor/dashboard"
-            className="text-indigo-400 hover:text-indigo-300 font-medium"
-          >
-            Dashboard
-          </NavLink>{" "}
-          &gt; Milestones
-        </span>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-16 px-6">
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
+        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">Submit Milestone</h2>
 
-      <h1 className="text-4xl font-extrabold text-white mb-10 text-center tracking-tight">
-        Milestones
-      </h1>
-
-      {/* Matched Startups Section */}
-      <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
-        {/* <h2 className="text-2xl font-semibold mb-8 text-gray-100 flex items-center justify-center">
-          <span className="mr-3 text-indigo-400">🤝</span> Matched Startups
-        </h2> */}
-        {matchedStartups.length === 0 ? (
-          <p className="text-gray-400 text-center py-6 text-lg">
-            No matched startups found yet.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {matchedStartups.map((startup) => (
-              <div
-                key={startup._id}
-                className="relative bg-gray-850 p-6 rounded-lg shadow-md border border-gray-700 hover:shadow-xl hover:border-indigo-500 transition-all duration-300"
-              >
-                {/* Startup ID Badge */}
-                <div className="mb-5">
-                  <span className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg">
-                    ID: {startup._id.slice(0, 8)}...{startup._id.slice(-4)}
-                  </span>
-                </div>
-
-                {/* Card Content */}
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <span className="inline-block w-3 h-3 bg-indigo-400 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
-                    <p className="text-gray-200">
-                      <span className="font-semibold text-indigo-300">Description:</span>{" "}
-                      {startup.businessPlan?.description?.substring(0, 80) || "N/A"}
-                      {startup.businessPlan?.description?.length > 80 && "..."}
-                    </p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-3 h-3 bg-indigo-400 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
-                    <p className="text-gray-200">
-                      <span className="font-semibold text-indigo-300">Business Model:</span>{" "}
-                      {startup.businessPlan?.businessModel?.substring(0, 80) || "N/A"}
-                      {startup.businessPlan?.businessModel?.length > 80 && "..."}
-                    </p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-3 h-3 bg-indigo-400 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
-                    <p className="text-gray-200">
-                      <span className="font-semibold text-indigo-300">Market Potential:</span>{" "}
-                      {startup.businessPlan?.marketPotential?.substring(0, 80) || "N/A"}
-                      {startup.businessPlan?.marketPotential?.length > 80 && "..."}
-                    </p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-3 h-3 bg-indigo-400 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
-                    <p className="text-gray-200">
-                      <span className="font-semibold text-indigo-300">Financial Health:</span>{" "}
-                      {startup.businessPlan?.financialHealth?.substring(0, 80) || "N/A"}
-                      {startup.businessPlan?.financialHealth?.length > 80 && "..."}
-                    </p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="inline-block w-3 h-3 bg-indigo-400 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
-                    <p className="text-gray-200">
-                      <span className="font-semibold text-indigo-300">Team:</span>{" "}
-                      {startup.teamBackground?.substring(0, 80) || "N/A"}
-                      {startup.teamBackground?.length > 80 && "..."}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-6 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-300 bg-indigo-900/50 px-3 py-1 rounded-lg">
-                    Match: {(startup.similarity * 100).toFixed(2)}%
-                  </span>
-                  <button
-                    onClick={() => openModal(startup)}
-                    className="text-indigo-400 hover:text-indigo-300 font-semibold text-sm transition-colors"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Milestone Message */}
+          <div>
+            <label htmlFor="milestoneMessage" className="block text-lg font-semibold text-gray-700 mb-2">
+              Milestone Message
+            </label>
+            <textarea
+              name="milestoneMessage"
+              value={milestoneMessage}
+              onChange={handleMessageChange}
+              required
+              placeholder="Add any additional comments or details about this milestone"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              rows="5"
+            />
           </div>
-        )}
-      </div>
 
-      {/* Modal */}
-      {isModalOpen && selectedStartup && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto border border-gray-700">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-white">Startup Details</h3>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-gray-200 text-2xl font-bold"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="space-y-6 text-gray-200">
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Startup ID:</p>
-                <p className="text-lg bg-gray-700 p-3 rounded-lg mt-1">{selectedStartup._id}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Description:</p>
-                <p className="text-base bg-gray-700 p-3 rounded-lg mt-1">
-                  {selectedStartup.businessPlan?.description || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Business Model:</p>
-                <p className="text-base bg-gray-700 p-3 rounded-lg mt-1">
-                  {selectedStartup.businessPlan?.businessModel || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Market Potential:</p>
-                <p className="text-base bg-gray-700 p-3 rounded-lg mt-1">
-                  {selectedStartup.businessPlan?.marketPotential || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Financial Health:</p>
-                <p className="text-base bg-gray-700 p-3 rounded-lg mt-1">
-                  {selectedStartup.businessPlan?.financialHealth || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Team:</p>
-                <p className="text-base bg-gray-700 p-3 rounded-lg mt-1">
-                  {selectedStartup.teamBackground || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-indigo-300">Similarity Score:</p>
-                <p className="text-base bg-gray-700 p-3 rounded-lg mt-1">
-                  {(selectedStartup.similarity * 100).toFixed(2)}%
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={closeModal}
-                className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                Close
-              </button>
-            </div>
+          {/* Upload PDF */}
+          <div>
+            <label htmlFor="pdfUpload" className="block text-lg font-semibold text-gray-700 mb-2">
+              Upload PDF
+            </label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+              required
+              className="w-full file:border-gray-300 file:bg-indigo-600 file:text-white file:rounded-lg file:px-4 file:py-2 focus:outline-none"
+            />
           </div>
-        </div>
-      )}
 
-      <ToastContainer />
+          {/* Submit Button */}
+          <div className="text-center">
+            <button
+              type="submit"
+              className="bg-indigo-600 text-white py-3 px-6 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition duration-300"
+            >
+              Submit Milestone
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
 
-export default Milestones;
+export default PdfUploader

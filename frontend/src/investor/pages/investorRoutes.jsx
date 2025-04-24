@@ -14,7 +14,7 @@ import StartupDetails from './StartupDetails';
 import ProjectDetails from './ProjectDetails';
 import InvestorAnalysisCharts from './MarketAnalysis';
 import InvestorDashboard from './Dashboard';
-
+import MilestoneForm from './Milestones';
 const InvestorRoutes = () => {
   return (
     <Routes>
@@ -24,8 +24,9 @@ const InvestorRoutes = () => {
 
     <Route path="active-projects" element={<ActiveProjects />} />
 
-
     <Route path="active-projects/:id" element={<ProjectDetails />} />
+
+    <Route path="milestone" element={<MilestoneForm />} />
     <Route path="recommended-startups" element={<RecommendedStartups />} />
     <Route path="analysis" element={<InvestorAnalysisCharts />} />
 
