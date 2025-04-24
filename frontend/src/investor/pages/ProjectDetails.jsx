@@ -14,7 +14,7 @@ import {
     FaTimes 
   } from 'react-icons/fa';
 import Layout from "./Layout";
-
+import { ABI } from "@/abi";
 const ProjectDetails = () => {
     const { id } = useParams();
     const [proposal, setProposal] = useState(null);
@@ -22,7 +22,7 @@ const ProjectDetails = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [startupDetails, setStartupDetails] = useState();
 const [investorDetails, setInvestorDetails] = useState();
-
+const contractAddress=""
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -82,29 +82,65 @@ const [investorDetails, setInvestorDetails] = useState();
     };
 
     const submitMilestone = async () => {
-        const formData = new FormData();
-        Object.entries(milestoneForm).forEach(([key, value]) => {
-            if (key !== "file") formData.append(key, value);
-        });
-        if (milestoneForm.file) formData.append("file", milestoneForm.file);
-
-        formData.append("startupId", proposal?.startupId?._id);
-
-        try {
-            const res = await fetch("http://localhost:3000/milestones/submit", {
-                method: "POST",
-                body: formData,
-            });
-
-            const result = await res.json();
-            console.log("Milestone submitted:", result);
-            alert("Milestone submitted successfully");
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error("Error submitting milestone:", error);
-            alert("Failed to submit milestone");
-        }
-    };
+      if (!milestoneForm.file) {
+          alert("No file selected");
+          return;
+      }
+  
+      const pinataApiKey = "21780ea40c3777501825";
+      const pinataSecretApiKey = "035da19b1e31d31ee41e578c48b3b4d104a1cdf76817ddd53648258c57afe731";
+  
+      const fileData = new FormData();
+      fileData.append("file", milestoneForm.file);
+  
+      try {
+          const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+              method: "POST",
+              body: fileData,
+              headers: {
+                  pinata_api_key: pinataApiKey,
+                  pinata_secret_api_key: pinataSecretApiKey
+              }
+          });
+  
+          const result = await res.json();
+          const ipfsHash = result.IpfsHash;
+          console.log("IPFS File Hash:", ipfsHash);
+  
+          // Connect to wallet
+          if (!window.ethereum) throw new Error("MetaMask not found");
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+  
+          const escrowContract = new ethers.Contract(
+              "0x8564beAD87fe250E0E9Fb4d93D7FCf27D5F9e9C7",
+              StartupEscrowAbi,
+              signer
+          );
+  
+          const investmentId = milestoneForm.investmentId;
+          const amount = ethers.utils.parseUnits(milestoneForm.amount, 6); // Adjust decimals if needed
+          const deadline = Math.floor(new Date(milestoneForm.completionDate).getTime() / 1000);
+          const title = milestoneForm.title;
+          const description = milestoneForm.description;
+  
+          const tx = await escrowContract.addMilestone(
+              investmentId,
+              amount,
+              deadline,
+              ipfsHash,
+              title,
+              description
+          );
+          await tx.wait();
+  
+          alert("Milestone submitted successfully!");
+      } catch (error) {
+          console.error("Milestone submission failed:", error);
+          alert("Error submitting milestone");
+      }
+  };
+  
 
     const fundMilestone = async () => {
         setFunding(true);

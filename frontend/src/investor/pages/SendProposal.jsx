@@ -3,6 +3,8 @@ import Sidebar from "../components/Sidebar";
 import Header from "../../partials/Header";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ethers } from "ethers";
+import { ABI } from "@/abi";
 
 function SendProposal() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,9 +69,37 @@ function SendProposal() {
     }
   };
 
-  const handleAccept = (id) => {
-    updateProposalStatus(id, "accepted");
-  };
+const handleAccept = async (proposal) => {
+  try {
+    // Update local or backend status
+    await updateProposalStatus(proposal.id, "accepted");
+
+    if (!window.ethereum) {
+      alert("MetaMask not detected");
+      return;
+    }
+    const provider = new ethers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const escrowContract = new ethers.Contract("0x8564beAD87fe250E0E9Fb4d93D7FCf27D5F9e9C7", abi, signer);
+
+    const startup = proposal.startupAddress; 
+    const totalAmount = ethers.utils.parseUnits(proposal.amount, 6);
+    const deadline = Math.floor(new Date(proposal.deadline).getTime() / 1000);
+
+    // Call createInvestment
+    const tx = await escrowContract.createInvestment(startup, totalAmount, deadline);
+    const receipt = await tx.wait();
+
+    const investmentId = receipt.events.find(e => e.event === "InvestmentCreated").args.investmentId.toString();
+    console.log("Investment created with ID:", investmentId);
+
+    // Optional: Store `investmentId` in your DB or state
+    alert(`Investment #${investmentId} created successfully!`);
+  } catch (err) {
+    console.error("Error during investment creation:", err);
+    alert("Investment creation failed.");
+  }
+};
 
   const handleReject = (id) => {
     updateProposalStatus(id, "rejected");
