@@ -350,7 +350,6 @@ function Dashboard() {
               <h1 className="text-2xl md:text-3xl text-white font-bold">Investor Dashboard</h1>
               <div className="relative flex items-center gap-4">
                 <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                  <FilterButton selected={selectedFilter} setSelected={setSelectedFilter} />
                   <Datepicker selected={selectedDate} setSelected={setSelectedDate} />
                 </div>
                 <div className="relative">
@@ -439,32 +438,7 @@ function Dashboard() {
                 >
                   Send Proposal
                 </Link>
-                {project.milestones.length < project.totalMilestones && project.status === "active" && (
-                  <button
-                    onClick={() => setIsMilestoneFormOpen(true)}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600"
-                  >
-                    Submit Milestone ({project.milestones.length + 1}/{project.totalMilestones})
-                  </button>
-                )}
-                {project.status === "active" && (
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={endReason}
-                      onChange={(e) => setEndReason(e.target.value)}
-                      placeholder="Reason to terminate"
-                      className="bg-gray-600 text-white px-2 py-1 rounded"
-                    />
-                    <button
-                      onClick={terminateProject}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                      disabled={!endReason}
-                    >
-                      Terminate Project
-                    </button>
-                  </div>
-                )}
+
               </div>
 
               <div className="mt-6">

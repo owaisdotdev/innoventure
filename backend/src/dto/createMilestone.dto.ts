@@ -43,5 +43,10 @@ export class CreateMilestoneDto {
   @IsString()
   @IsOptional()
   associatedSmartContractId?: string;
+
+  @ApiProperty({ description: 'Associated Proposal ID', type: String })
+  @IsString()
+  @IsOptional()
+  proposalId: string;
 }
 
