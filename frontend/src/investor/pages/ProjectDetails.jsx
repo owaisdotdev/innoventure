@@ -121,7 +121,7 @@ const ProjectDetails = () => {
           const signer = await provider.getSigner();
   
           const escrowContract = new ethers.Contract(
-              "0x8564beAD87fe250E0E9Fb4d93D7FCf27D5F9e9C7",
+              "0xb9196f8633ea1eEB9ab749ddE5Df3cD901D49C9D",
               ABI,
               signer
           );
