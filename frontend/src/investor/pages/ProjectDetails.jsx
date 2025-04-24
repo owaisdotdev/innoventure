@@ -14,7 +14,9 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import Layout from "./Layout";
-import { ABI } from "@/abi";
+import { ethers } from "ethers";
+import {ABI} from '../../abi.js'
+
 const ProjectDetails = () => {
     const { id } = useParams();
     const [proposal, setProposal] = useState(null);
@@ -27,7 +29,7 @@ const ProjectDetails = () => {
         milestoneId: "",
         title: "",
         description: "",
-        budgetSpent: "",
+        amount: "",
         completionDate: "",
         file: null,
     });
@@ -99,44 +101,53 @@ const ProjectDetails = () => {
       fileData.append("file", milestoneForm.file);
   
       try {
-          const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
-              method: "POST",
-              body: fileData,
-              headers: {
-                  pinata_api_key: pinataApiKey,
-                  pinata_secret_api_key: pinataSecretApiKey
-              }
-          });
+        //   const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+        //       method: "POST",
+        //       body: fileData,
+        //       headers: {
+        //           pinata_api_key: pinataApiKey,
+        //           pinata_secret_api_key: pinataSecretApiKey
+        //       }
+        //   });
   
-          const result = await res.json();
-          const ipfsHash = result.IpfsHash;
+        //   const result = await res.json();
+        //   const ipfsHash = result.IpfsHash;
+          const ipfsHash = 'QmWyodjJwhTRTr2tPQmifKnDMLB8d3WaorQ5LjEwRJ79ko'
           console.log("IPFS File Hash:", ipfsHash);
   
           // Connect to wallet
           if (!window.ethereum) throw new Error("MetaMask not found");
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
   
           const escrowContract = new ethers.Contract(
               "0x8564beAD87fe250E0E9Fb4d93D7FCf27D5F9e9C7",
-              StartupEscrowAbi,
+              ABI,
               signer
           );
-  
-          const investmentId = milestoneForm.investmentId;
-          const amount = ethers.utils.parseUnits(milestoneForm.amount, 6); // Adjust decimals if needed
-          const deadline = Math.floor(new Date(milestoneForm.completionDate).getTime() / 1000);
-          const title = milestoneForm.title;
-          const description = milestoneForm.description;
-  
-          const tx = await escrowContract.addMilestone(
-              investmentId,
+ 
+            const investmentId = 0;
+            const amount = ethers.parseUnits(milestoneForm.amount, 6); // Adjust decimals if needed
+            const deadline = Math.floor(new Date(milestoneForm.completionDate).getTime() / 1000);
+            const title = milestoneForm.title;
+            const description = milestoneForm.description;
+    
+            console.log(            investmentId,
               amount,
               deadline,
               ipfsHash,
               title,
-              description
-          );
+              description)
+  
+              const tx = await escrowContract.addMilestone(
+                investmentId,
+                title,
+                description,
+                amount,
+                deadline,
+                ipfsHash
+              );
+              
           await tx.wait();
   
           alert("Milestone submitted successfully!");
@@ -145,27 +156,7 @@ const ProjectDetails = () => {
           alert("Error submitting milestone");
       }
   };
-  
 
-    const fundMilestone = async () => {
-        setFunding(true);
-        try {
-            // Replace this with actual Web3 or Ethers.js logic to interact with the smart contract
-            console.log("Calling smart contract to fund milestone...");
-
-            // Simulate contract call delay
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-
-            // Set as funded
-            setMilestoneFunded(true);
-            alert("Milestone funded successfully.");
-        } catch (error) {
-            console.error("Funding failed:", error);
-            alert("Funding the milestone failed.");
-        } finally {
-            setFunding(false);
-        }
-    };
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case "approved":
@@ -411,158 +402,148 @@ const ProjectDetails = () => {
 
                 {/* Milestone Modal */}
                 <Modal
-                    isOpen={isModalOpen}
-                    onRequestClose={() => setIsModalOpen(false)}
-                    className="max-w-2xl mx-auto mt-20 p-6 bg-gray-800 rounded-lg border border-gray-700 outline-none shadow-2xl"
-                    overlayClassName="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50"
-                >
-                    <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-700">
-                        <h2 className="text-2xl font-semibold text-indigo-300 flex items-center">
-                            <FaCalendarAlt className="mr-2" /> Create Milestone
-                        </h2>
-                        <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="p-1 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-                        >
-                            <FaTimes size={20} />
-                        </button>
+    isOpen={isModalOpen}
+    onRequestClose={() => setIsModalOpen(false)}
+    className="max-w-2xl mx-auto my-8 p-6 bg-gray-800 rounded-lg border border-gray-700 outline-none shadow-2xl max-h-[85vh] overflow-auto"
+    overlayClassName="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    style={{
+        content: {
+            maxWidth: '95vw'
+        }
+    }}
+>
+    <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-700 sticky top-0 bg-gray-800 z-10">
+        <h2 className="text-2xl font-semibold text-indigo-300 flex items-center">
+            <FaCalendarAlt className="mr-2" /> Create Milestone
+        </h2>
+        <button
+            onClick={() => setIsModalOpen(false)}
+            className="p-1 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+        >
+            <FaTimes size={20} />
+        </button>
+    </div>
+
+    <div className="space-y-4">
+        <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300">
+                Milestone Title
+            </label>
+            <input
+                type="text"
+                name="title"
+                placeholder="e.g., MVP Development"
+                value={milestoneForm.title}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            />
+        </div>
+
+        <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300">
+                Description
+            </label>
+            <textarea
+                name="description"
+                placeholder="Describe what will be accomplished in this milestone..."
+                value={milestoneForm.description}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                    Amount
+                </label>
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <FaMoneyBillWave className="text-gray-400" />
                     </div>
+                    <input
+                        type="number"
+                        name="amount"
+                        placeholder="Amount"
+                        value={milestoneForm.amount}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    />
+                </div>
+            </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-300">
-                                Milestone Title
-                            </label>
-                            <input
-                                type="text"
-                                name="title"
-                                placeholder="e.g., MVP Development"
-                                value={milestoneForm.title}
-                                onChange={handleInputChange}
-                                className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-300">
-                                Description
-                            </label>
-                            <textarea
-                                name="description"
-                                placeholder="Describe what will be accomplished in this milestone..."
-                                value={milestoneForm.description}
-                                onChange={handleInputChange}
-                                rows={4}
-                                className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-300">
-                                    Budget Required
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <FaMoneyBillWave className="text-gray-400" />
-                                    </div>
-                                    <input
-                                        type="number"
-                                        name="budgetSpent"
-                                        placeholder="Amount"
-                                        value={milestoneForm.budgetSpent}
-                                        onChange={handleInputChange}
-                                        className="w-full pl-10 px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-300">
-                                    Completion Date
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <FaCalendarAlt className="text-gray-400" />
-                                    </div>
-                                    <input
-                                        type="date"
-                                        name="completionDate"
-                                        value={milestoneForm.completionDate}
-                                        onChange={handleInputChange}
-                                        className="w-full pl-10 px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-300">
-                                Supporting Documents
-                            </label>
-                            <div className="flex items-center justify-center w-full">
-                                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors">
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <FaFileUpload className="w-8 h-8 mb-3 text-gray-400" />
-                                        <p className="mb-2 text-sm text-gray-400">
-                                            <span className="font-semibold">
-                                                Click to upload
-                                            </span>{" "}
-                                            or drag and drop
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            PDF, DOC, DOCX, XLS (MAX. 10MB)
-                                        </p>
-                                    </div>
-                                    <input
-                                        type="file"
-                                        name="file"
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                    />
-                                </label>
-                            </div>
-                            {milestoneForm.file && (
-                                <p className="text-sm text-green-400 flex items-center">
-                                    <FaCheckCircle className="mr-1" />{" "}
-                                    {milestoneForm.file.name}
-                                </p>
-                            )}
-                        </div>
+            <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                    Completion Date
+                </label>
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <FaCalendarAlt className="text-gray-400" />
                     </div>
+                    <input
+                        type="date"
+                        name="completionDate"
+                        value={milestoneForm.completionDate}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    />
+                </div>
+            </div>
+        </div>
 
-                    <div className="flex justify-between items-center space-x-4 mt-8">
-                        {!milestoneFunded ? (
-                            <button
-                                onClick={fundMilestone}
-                                disabled={funding}
-                                className={`flex-1 px-4 py-3 rounded-lg font-medium flex items-center justify-center ${
-                                    funding
-                                        ? "bg-gray-600 cursor-not-allowed"
-                                        : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-lg shadow-green-500/20"
-                                }`}
-                            >
-                                <FaMoneyBillWave className="mr-2" />
-                                {funding ? "Processing..." : "Fund Milestone"}
-                            </button>
-                        ) : (
-                            <button
-                                onClick={submitMilestone}
-                                className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-lg font-medium shadow-lg shadow-indigo-500/20 flex items-center justify-center"
-                            >
-                                <FaCheckCircle className="mr-2" />
-                                Submit Milestone
-                            </button>
-                        )}
-
-                        <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium text-gray-300 flex items-center"
-                        >
-                            <FaTimes className="mr-2" /> Cancel
-                        </button>
+        <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300">
+                Supporting Documents
+            </label>
+            <div className="flex items-center justify-center w-full">
+                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-4 pb-4">
+                        <FaFileUpload className="w-7 h-7 mb-2 text-gray-400" />
+                        <p className="mb-1 text-sm text-gray-400">
+                            <span className="font-semibold">
+                                Click to upload
+                            </span>{" "}
+                            or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            PDF, DOC, DOCX, XLS (MAX. 10MB)
+                        </p>
                     </div>
-                </Modal>
+                    <input
+                        type="file"
+                        name="file"
+                        onChange={handleFileChange}
+                        className="hidden"
+                    />
+                </label>
+            </div>
+            {milestoneForm.file && (
+                <p className="text-sm text-green-400 flex items-center mt-1">
+                    <FaCheckCircle className="mr-1" />{" "}
+                    {milestoneForm.file.name}
+                </p>
+            )}
+        </div>
+    </div>
+
+    <div className="flex justify-between items-center space-x-4 mt-6">
+        <button
+            onClick={submitMilestone}
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-lg font-medium shadow-lg shadow-indigo-500/20 flex items-center justify-center"
+        >
+            <FaCheckCircle className="mr-2" />
+            Submit Milestone
+        </button>
+
+        <button
+            onClick={() => setIsModalOpen(false)}
+            className="px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium text-gray-300 flex items-center"
+        >
+            <FaTimes className="mr-2" /> Cancel
+        </button>
+    </div>
+</Modal>
             </div>
         </Layout>
     );
