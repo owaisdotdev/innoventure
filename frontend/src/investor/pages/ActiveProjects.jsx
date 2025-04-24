@@ -132,7 +132,7 @@ const ActiveProject = () => {
                       {proposals.map((proposal) => (
                         <div
                           key={proposal._id}
-                          onClick={() => navigate(`/active-projects/${proposal._id}`)}
+                          onClick={() => navigate(`/investor/active-projects/${proposal._id}`)}
                           className="cursor-pointer bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-700"
                         >
                           <h2 className="text-xl font-semibold text-indigo-300">
