@@ -7,4 +7,5 @@ export declare class CreateMilestoneDto {
     amountToBeReleased: number;
     status: string;
     associatedSmartContractId?: string;
+    proposalId: string;
 }

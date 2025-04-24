@@ -11,6 +11,7 @@ import Milestone from '../pages/Milestones/Milestone';
 import Active_Investors from '../pages/ActiveInvestment/ActiveInvestment';
 import AllOffers from '../pages/OfferByInvestor/AllOffers';
 import Proposals from '../pages/Proposals/Proposals';
+import ProjectDetails from '../pages/ProjectDetails';
 
 const StartupRoutes = () => {
   const [startup, setStartup] = useState(null); // Single startup fetched by ID
@@ -41,6 +42,7 @@ const StartupRoutes = () => {
     <Routes>
       <Route path="/startup/dashboard" element={<StartupDashboard startup={startup} />} />
       <Route path="/startup/active-projects" element={<ActiveProject />} />
+      <Route path="/startup/active-projects/:id" element={<ProjectDetails />} />
       <Route path="/startup/find-investors" element={<Investors startup={startup} />} />
       <Route path="/startup/investor/:id" element={<InvestorDetail startup={startup} />} />
       <Route path="/startup/milestones" element={<Milestone startup={startup} />} />
