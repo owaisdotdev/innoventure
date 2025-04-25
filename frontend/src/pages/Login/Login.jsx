@@ -101,107 +101,110 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen h-screen bg-gray-100 text-gray-900 flex justify-center">
-      <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-          <div className="flex justify-center items-center pt-2">
-            <h1 className="text-2xl pb-4 font-bold">Login To Innoventures</h1>
+    <div className="min-h-screen h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 text-gray-900 flex justify-center items-center px-4">
+  <div className="max-w-6xl w-full bg-white shadow-2xl rounded-3xl overflow-hidden flex flex-col lg:flex-row transition-all duration-500">
+    <div className="w-full lg:w-1/2 p-8 sm:p-12">
+      <div className="flex justify-center items-center mb-8">
+        <h1 className="text-3xl font-extrabold text-blue-700">Login to Innoventures</h1>
+      </div>
+
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className="flex justify-center space-x-4 border-b border-gray-200 pb-4 mb-6">
+            {["investor", "admin", "startup"].map((role) => (
+              <button
+                key={role}
+                className={`capitalize px-4 py-2 font-medium text-sm transition-all duration-300 ${
+                  activeTab === role
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+                onClick={() => handleTabClick(role)}
+              >
+                {role}
+              </button>
+            ))}
           </div>
 
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <div className="mt-3 flex flex-col items-center">
-              <div className="w-full mb-5">
-                <div className="flex justify-center space-x-4 border-b">
-                  {["investor", "admin", "startup"].map((role) => (
-                    <button
-                      key={role}
-                      className={`py-2 px-4 font-medium ${
-                        activeTab === role ? "border-b-2 border-blue-500 text-blue-500" : ""
-                      }`}
-                      onClick={() => handleTabClick(role)}
-                    >
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <input
+              className="w-full px-5 py-3 rounded-lg border border-gray-300 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
 
-              <div className="w-full flex-1 mt-3">
-                <form onSubmit={handleSubmit}>
-                  <div className="mx-auto max-w-xs">
-                    <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                    <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder="Password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={toggleShowPassword}
-                      className="text-sm text-blue-600 hover:underline mt-1"
-                    >
-                      {showPassword ? "Hide Password" : "Show Password"}
-                    </button>
-                    <button
-                      className="mt-5 tracking-wide font-semibold bg-blue-400 text-white w-full py-4 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-in-out flex items-center justify-center"
-                      type="submit"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <svg
-                          className="w-6 h-6 animate-spin"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 4v1m0 14v1m8-8h1M4 12H3m16.364 4.364l-.707.707m-11.314 0l-.707-.707m16.364-11.314l-.707-.707M4.636 4.636l-.707-.707"
-                          />
-                        </svg>
-                      ) : (
-                        "Sign In"
-                      )}
-                    </button>
-                  </div>
-                </form>
-                <p className="mt-6 text-sm text-gray-600 text-center">
-                  Not a member?{" "}
-                  <Link className="text-blue-500" to="/signup">
-                    Sign up
-                  </Link>{" "}
-                  now!
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="hidden lg:flex flex-1">
-          <img
-            src="https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg"
-            alt="Background"
-            className="object-cover w-full h-full rounded-r-lg"
-          />
-        </div>
-      </div>
-      <ToastContainer />
+            <input
+              className="w-full px-5 py-3 rounded-lg border border-gray-300 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+
+            <button
+              type="button"
+              onClick={toggleShowPassword}
+              className="text-sm text-blue-500 hover:underline focus:outline-none"
+            >
+              {showPassword ? "Hide Password" : "Show Password"}
+            </button>
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center shadow-md"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <svg
+                  className="w-5 h-5 animate-spin text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v1m0 14v1m8-8h1M4 12H3m16.364 4.364l-.707.707m-11.314 0l-.707-.707m16.364-11.314l-.707-.707M4.636 4.636l-.707-.707"
+                  />
+                </svg>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Not a member?{" "}
+            <Link to="/signup" className="text-blue-600 font-medium hover:underline">
+              Sign up
+            </Link>{" "}
+            now!
+          </p>
+        </>
+      )}
     </div>
+
+    <div className="hidden lg:block lg:w-1/2">
+      <img
+        src="https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg"
+        alt="Login Visual"
+        className="object-cover w-full h-full"
+      />
+    </div>
+
+    <ToastContainer />
+  </div>
+</div>
+
   );
 }
 

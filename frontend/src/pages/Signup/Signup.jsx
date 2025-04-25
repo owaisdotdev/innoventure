@@ -324,328 +324,439 @@ function SignUp() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-      <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-          <div className="flex justify-center items-center pt-10">
-            <h1 className="h1 heading text-3xl">Join Innoventures, Now!</h1>
-          </div>
-          {isLoading ? (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 text-gray-900 flex justify-center items-center p-4">
+  <div className="max-w-6xl w-full bg-white shadow-xl rounded-2xl overflow-hidden flex flex-col lg:flex-row">
+    {/* Left Column - Form */}
+    <div className="w-full lg:w-1/2 p-6 sm:p-12">
+      <div className="flex flex-col items-center">
+        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+          <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Join Innoventures</h1>
+        <p className="text-gray-500 mb-8">Start your innovation journey today</p>
+        
+        {isLoading ? (
+          <div className="w-full flex justify-center py-12">
             <Loader />
-          ) : (
-            <div className="mt-3 flex flex-col items-center">
-              <div className="w-full flex-1 mt-3">
-                <form onSubmit={handleSubmit}>
-                  <div className="mx-auto max-w-xs">
-                    <label className="block text-sm text-gray-600 mb-1">
-                      Name <span className="text-red-500">*</span>
+          </div>
+        ) : (
+          <div className="w-full">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  type="text"
+                  name="name"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  type="email"
+                  name="email"
+                  placeholder="john@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleShowPassword}
+                    className="absolute right-3 top-3 text-gray-500 hover:text-blue-600"
+                  >
+                    {showPassword ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Business Plan */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Plan Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all min-h-[100px]"
+                  name="description"
+                  placeholder="Describe your business idea or investment interests..."
+                  value={formData.businessPlan.description}
+                  onChange={handleBusinessPlanChange}
+                  required
+                />
+              </div>
+              
+              {/* Industry */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Industry <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  type="text"
+                  name="industry"
+                  placeholder="Technology, Healthcare, Finance..."
+                  value={formData.businessPlan.industry}
+                  onChange={handleBusinessPlanChange}
+                  required
+                />
+              </div>
+              
+              {/* Role Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleRoleChange({ target: { value: "investor" } })}
+                    className={`py-3 px-4 rounded-lg border transition-all ${role === "investor" ? "border-blue-500 bg-blue-50 text-blue-600" : "border-gray-300 hover:border-blue-300"}`}
+                  >
+                    Investor
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRoleChange({ target: { value: "startup" } })}
+                    className={`py-3 px-4 rounded-lg border transition-all ${role === "startup" ? "border-blue-500 bg-blue-50 text-blue-600" : "border-gray-300 hover:border-blue-300"}`}
+                  >
+                    Startup/FYP
+                  </button>
+                </div>
+              </div>
+              
+              {/* Investor Fields */}
+              {role === "investor" && (
+                <div className="space-y-6 bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-700">Investor Preferences</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preferred Sectors <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       type="text"
-                      name="name"
-                      placeholder="Name"
-                      value={formData.name}
-                      onChange={handleChange}
+                      name="sectors"
+                      placeholder="Tech, Finance, Healthcare (comma separated)"
+                      value={formData.preferences.sectors.join(",")}
+                      onChange={handlePreferencesChange}
                       required
                     />
-                    <label className="block text-sm text-gray-600 mb-1 mt-5">
-                      Email <span className="text-red-500">*</span>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preferred Regions <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label className="block text-sm text-gray-600 mb-1 mt-5">
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder="Password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={toggleShowPassword}
-                      className="text-sm text-blue-600 hover:underline my-1"
-                    >
-                      {showPassword ? "Hide Password" : "Show Password"}
-                    </button>
-                    <label className="block text-sm text-gray-600 mb-1 mt-5">
-                      Business Plan Description <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       type="text"
-                      name="description"
-                      placeholder="Business Plan Description"
-                      value={formData.businessPlan.description}
-                      onChange={handleBusinessPlanChange}
+                      name="regions"
+                      placeholder="North America, Europe, Asia (comma separated)"
+                      value={formData.preferences.regions.join(",")}
+                      onChange={handlePreferencesChange}
                       required
                     />
-                    <label className="block text-sm text-gray-600 mb-1 mt-5">
-                      Industry <span className="text-red-500">*</span>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Risk Tolerance <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                      type="text"
-                      name="industry"
-                      placeholder="Industry"
-                      value={formData.businessPlan.industry}
-                      onChange={handleBusinessPlanChange}
-                      required
-                    />
-                    <label className="block text-sm text-gray-600 mb-1 mt-5">
-                      Role <span className="text-red-500">*</span>
+                    <div className="grid grid-cols-3 gap-3">
+                      {["Low", "Medium", "High"].map((level) => (
+                        <button
+                          key={level}
+                          type="button"
+                          onClick={() => handlePreferencesChange({ target: { name: "riskTolerance", value: level } })}
+                          className={`py-2 px-3 rounded-lg border transition-all ${formData.preferences.riskTolerance === level ? "border-blue-500 bg-blue-50 text-blue-600" : "border-gray-300 hover:border-blue-300"}`}
+                        >
+                          {level}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Min Investment ($) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        type="number"
+                        name="minInvestment"
+                        placeholder="1000"
+                        value={formData.criteria.minInvestment}
+                        onChange={handleCriteriaChange}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Max Investment ($) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        type="number"
+                        name="maxInvestment"
+                        placeholder="100000"
+                        value={formData.criteria.maxInvestment}
+                        onChange={handleCriteriaChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Investment Horizon <span className="text-red-500">*</span>
                     </label>
                     <select
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                      name="role"
-                      value={role}
-                      onChange={handleRoleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      name="investmentHorizon"
+                      value={formData.criteria.investmentHorizon}
+                      onChange={handleCriteriaChange}
                       required
                     >
-                      <option value="">Select Role</option>
-                      <option value="investor">Investor</option>
-                      <option value="startup">Startup/Fyp</option>
+                      <option value="">Select Horizon</option>
+                      <option value="Short-term (1-2 years)">Short-term (1-2 years)</option>
+                      <option value="Medium-term (3-5 years)">Medium-term (3-5 years)</option>
+                      <option value="Long-term (5+ years)">Long-term (5+ years)</option>
                     </select>
-                    {role === "investor" && (
-                      <>
-                        <label className="block text-sm text-gray-600 mb-1 mt-5">
-                          Preferred Sectors <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                          type="text"
-                          name="sectors"
-                          placeholder="Preferred Sectors (tech, finance)"
-                          value={formData.preferences.sectors.join(",")}
-                          onChange={handlePreferencesChange}
-                          required
-                        />
-                        <label className="block text-sm text-gray-600 mb-1 mt-5">
-                          Preferred Regions <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                          type="text"
-                          name="regions"
-                          placeholder="Preferred Regions (comma separated)"
-                          value={formData.preferences.regions.join(",")}
-                          onChange={handlePreferencesChange}
-                          required
-                        />
-                        <label className="block text-sm text-gray-600 mb-1 mt-5">
-                          Risk Tolerance <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                          name="riskTolerance"
-                          value={formData.preferences.riskTolerance}
-                          onChange={handlePreferencesChange}
-                          required
-                        >
-                          <option value="">Select Risk Tolerance</option>
-                          <option value="Low">Low</option>
-                          <option value="Medium">Medium</option>
-                          <option value="High">High</option>
-                        </select>
-                        <label className="block text-sm text-gray-600 mb-1 mt-5">
-                          Minimum Investment <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                          type="number"
-                          name="minInvestment"
-                          placeholder="Minimum Investment"
-                          value={formData.criteria.minInvestment}
-                          onChange={handleCriteriaChange}
-                          required
-                        />
-                        <label className="block text-sm text-gray-600 mb-1 mt-5">
-                          Maximum Investment <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                          type="number"
-                          name="maxInvestment"
-                          placeholder="Maximum Investment"
-                          value={formData.criteria.maxInvestment}
-                          onChange={handleCriteriaChange}
-                          required
-                        />
-                        <label className="block text-sm text-gray-600 mb-1 mt-5">
-                          Investment Horizon <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                          type="text"
-                          name="investmentHorizon"
-                          placeholder="Investment Horizon"
-                          value={formData.criteria.investmentHorizon}
-                          onChange={handleCriteriaChange}
-                          required
-                        />
-                      </>
-                    )}
-                    {role === "startup" && (
-                      <>
-                        <label className="mt-5 block text-sm text-gray-600">
-                          Is this a Final Year Design Project (FYDP)?
-                          <input
-                            type="checkbox"
-                            checked={formData.isFydp}
-                            onChange={(e) =>
-                              setFormData({ ...formData, isFydp: e.target.checked })
-                            }
-                            className="ml-2"
-                          />
-                        </label>
-                        {formData.isFydp && (
-                          <>
-                            <label className="block text-sm text-gray-600 mb-1 mt-5">
-                              University <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                              type="text"
-                              name="university"
-                              placeholder="University"
-                              value={formData.fydpDetails.university}
-                              onChange={handleFydpDetailsChange}
-                              required
-                            />
-                            <label className="block text-sm text-gray-600 mb-1 mt-5">
-                              Year <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                              type="number"
-                              name="year"
-                              placeholder="Year"
-                              value={formData.fydpDetails.year}
-                              onChange={handleFydpDetailsChange}
-                              required
-                            />
-                            <label className="block text-sm text-gray-600 mb-1 mt-5">
-                              Supervisor Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                              type="text"
-                              name="supervisorName"
-                              placeholder="Supervisor Name"
-                              value={formData.fydpDetails.supervisorName}
-                              onChange={handleFydpDetailsChange}
-                              required
-                            />
-                            <label className="block text-sm text-gray-600 mb-1 mt-5">
-                              GitHub Repository URL <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                              type="text"
-                              name="githubRepoUrl"
-                              placeholder="GitHub Repository URL"
-                              value={formData.fydpDetails.githubRepoUrl}
-                              onChange={handleFydpDetailsChange}
-                              required
-                            />
-                            <label className="block text-sm text-gray-600 mb-1 mt-5">
-                              Tags <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                              type="text"
-                              name="tags"
-                              placeholder="Tags (comma separated)"
-                              value={formData.fydpDetails.tags.join(",")}
-                              onChange={handleFydpDetailsChange}
-                              required
-                            />
-                            <label className="block text-sm text-gray-600 mb-1 mt-5">
-                              Remarks
-                            </label>
-                            <input
-                              className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                              type="text"
-                              name="remarks"
-                              placeholder="Remarks"
-                              value={formData.fydpDetails.remarks}
-                              onChange={handleFydpDetailsChange}
-                            />
-                          </>
-                        )}
-                      </>
-                    )}
-                    <button
-                      className="mt-5 tracking-wide font-semibold bg-blue-400 text-white w-full py-4 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-                      type="submit"
-                      disabled={isLoading}
-                    >
-                      <svg
-                        className="w-6 h-6 -ml-2"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                        <circle cx="8.5" cy="7" r="4" />
-                        <path d="M20 8v6M23 11h-6" />
-                      </svg>
-                      <span className="ml-3">{isLoading ? "Signing Up..." : "Sign Up"}</span>
-                    </button>
-                    <p className="mt-6 text-sm text-gray-600 text-center">
-                      Already a member?{" "}
-                      <Link className="text-blue-500" to="/login">
-                        Login
-                      </Link>{" "}
-                      now!
-                    </p>
-                    <p className="mt-6 text-xs text-gray-600 text-center">
-                      I agree to abide by Blocklance{" "}
-                      <a href="#" className="border-b border-gray-500 border-dotted">
-                        Terms of Service{" "}
-                      </a>
-                      and its{" "}
-                      <a href="#" className="border-b border-gray-500 border-dotted">
-                        Privacy Policy
-                      </a>
-                    </p>
                   </div>
-                </form>
+                </div>
+              )}
+              
+              {/* Startup Fields */}
+              {role === "startup" && (
+                <div className="space-y-6">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="isFydp"
+                      checked={formData.isFydp}
+                      onChange={(e) => setFormData({ ...formData, isFydp: e.target.checked })}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="isFydp" className="ml-2 block text-sm text-gray-700">
+                      This is a Final Year Design Project (FYDP)
+                    </label>
+                  </div>
+                  
+                  {formData.isFydp && (
+                    <div className="space-y-6 bg-blue-50 p-4 rounded-lg">
+                      <h3 className="font-medium text-blue-700">FYDP Details</h3>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          University <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          type="text"
+                          name="university"
+                          placeholder="University Name"
+                          value={formData.fydpDetails.university}
+                          onChange={handleFydpDetailsChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Year <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            type="number"
+                            name="year"
+                            placeholder="2023"
+                            value={formData.fydpDetails.year}
+                            onChange={handleFydpDetailsChange}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Supervisor <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            type="text"
+                            name="supervisorName"
+                            placeholder="Dr. Smith"
+                            value={formData.fydpDetails.supervisorName}
+                            onChange={handleFydpDetailsChange}
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          GitHub Repository URL <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          type="url"
+                          name="githubRepoUrl"
+                          placeholder="https://github.com/your-repo"
+                          value={formData.fydpDetails.githubRepoUrl}
+                          onChange={handleFydpDetailsChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Tags <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          type="text"
+                          name="tags"
+                          placeholder="AI, Blockchain, IoT (comma separated)"
+                          value={formData.fydpDetails.tags.join(",")}
+                          onChange={handleFydpDetailsChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Remarks
+                        </label>
+                        <textarea
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all min-h-[80px]"
+                          name="remarks"
+                          placeholder="Any additional information..."
+                          value={formData.fydpDetails.remarks}
+                          onChange={handleFydpDetailsChange}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Submit Button */}
+              <button
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-300 flex items-center justify-center"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                    </svg>
+                    Sign Up
+                  </>
+                )}
+              </button>
+              
+              {/* Login Link */}
+              <div className="text-center text-sm text-gray-500">
+                Already have an account?{' '}
+                <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+                  Log in here
+                </Link>
               </div>
+              
+              {/* Terms */}
+              <div className="text-xs text-gray-400 text-center">
+                By signing up, you agree to our{' '}
+                <a href="#" className="text-blue-500 hover:underline">Terms of Service</a> and{' '}
+                <a href="#" className="text-blue-500 hover:underline">Privacy Policy</a>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+    
+    {/* Right Column - Image */}
+    <div className="hidden lg:block lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-400 relative">
+      <div className="absolute inset-0 bg-black/20 flex items-center justify-center p-12">
+        <div className="text-white text-center">
+          <h2 className="text-4xl font-bold mb-4">Innovate. Collaborate. Succeed.</h2>
+          <p className="text-xl mb-8">Join our platform to connect with like-minded innovators and investors</p>
+          <div className="flex justify-center space-x-4">
+            <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+              <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+              <p>Growth</p>
             </div>
-          )}
-        </div>
-        <div
-          style={{
-            backgroundSize: "fill",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-          className="flex-1 bg-blue-100 text-center hidden lg:flex"
-        >
-          <img
-            src="https://www.shutterstock.com/image-photo/blockchain-technology-concept-revolutionizing-industries-600nw-2481711293.jpg"
-            className="text-center hidden lg:flex object-cover"
-            alt=""
-          />
+            <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+              <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+              <p>Security</p>
+            </div>
+            <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm">
+              <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <p>Community</p>
+            </div>
+          </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
+  </div>
+  <ToastContainer position="top-center" autoClose={3000} />
+</div>
   );
 }
 

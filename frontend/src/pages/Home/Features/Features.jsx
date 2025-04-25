@@ -2,149 +2,123 @@ import React from 'react';
 
 const AboutUs = () => {
   return (
-    <section className="py-16 bg-slate-900 px-8">
-      {/* Text at the top */}
-      <div className="text-center mt-12 mb-20">
-        <h2 className="text-3xl font-bold text-white mb-4">
-          Empowering Blockchain-Driven Investments for Innovative Ventures.
+    <section className="py-24 px-6 sm:px-12 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      {/* Heading */}
+      <div className="text-center max-w-4xl mx-auto mb-20">
+        <h2 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-6">
+          Empowering Blockchain-Driven Investments for Innovative Ventures
         </h2>
-        <p className="text-gray-300 flex mb-6 px-40 text-center">
+        <p className="text-lg sm:text-xl text-gray-300">
           This platform bridges the gap between investors and startups by enabling secure, AI-driven investment opportunities, transforming Final Year Design Projects (FYDPs) into real-world solutions.
         </p>
       </div>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="flex flex-col items-center space-y-20 justify-center">
-          <div className="flex items-center space-x-4">
-            <div className="bg-indigo-900 p-3 rounded-full">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+
+      {/* Feature Blocks */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+        {/* Left Features */}
+        <div className="flex flex-col gap-16 justify-center">
+          {[
+            {
+              title: 'Secure Investments',
+              desc: 'Our platform ensures security with blockchain technology, safeguarding data and transactions for reliable investment opportunities.',
+              icon: (
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M5.121 19l6.879-6.879M5.121 5l6.879 6.879"
-                ></path>
-              </svg>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg text-white">Secure Investments</h4>
-              <p className="text-gray-300">
-                Our platform ensures security with blockchain technology, safeguarding data and transactions for reliable investment opportunities.
-              </p>
-            </div>
-          </div>
-          {/* Feature 2 */}
-          <div className="flex items-center space-x-4">
-            <div className="bg-indigo-900 p-3 rounded-full">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+                />
+              ),
+            },
+            {
+              title: 'AI-Powered Matching',
+              desc: 'Using AI algorithms, our platform connects investors with startups and FYDPs, enhancing investment precision and decision-making.',
+              icon: (
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M12 8v4m0 4h.01M20.374 18.353A8.001 8.001 0 0116.343 4.516 8.001 8.001 0 013.627 18.353M20.374 18.353A8.001 8.001 0 003.627 18.353M12 8c1.656 0 3 1.344 3 3v4m0 0c0 1.656-1.344 3-3 3s-3-1.344-3-3v-4"
-                ></path>
-              </svg>
+                  d="M12 8v4m0 4h.01M20.374 18.353A8.001 8.001 0 0116.343 4.516 8.001 8.001 0 013.627 18.353M12 8c1.656 0 3 1.344 3 3v4c0 1.656-1.344 3-3 3s-3-1.344-3-3v-4"
+                />
+              ),
+            },
+          ].map((item, idx) => (
+            <div key={idx} className="flex items-start gap-6">
+              <div className="bg-blue-700 p-4 rounded-full">
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {item.icon}
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
+                <p className="text-gray-300 text-base leading-relaxed">{item.desc}</p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-bold text-lg text-white">AI-Powered Matching</h4>
-              <p className="text-gray-300">
-                Using AI algorithms, our platform connects investors with startups and FYDPs, enhancing investment precision and decision-making.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Middle - Image */}
-        {/* <div className="flex  justify-center">
-          <div className="h-[80vh] w-full rounded-lg overflow-hidden">
-            <img
-              src="https://miro.medium.com/v2/resize:fit:1400/1*4-ZMRssGThgE6iMtAEmZAw.jpeg"
-              alt="Blockchain platform interface"
-              className="object-cover h-full w-full"
-            />
-          </div>
-        </div> */}
-
-        {/* Right Side - 2 Features */}
-        <div className="flex flex-col space-y-20 justify-center">
-          {/* Feature 3 */}
-          <div className="flex items-center space-x-4">
-            <div className="bg-indigo-900 p-3 rounded-full">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7"></path>
-              </svg>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg text-white">Smart Contract Automation</h4>
-              <p className="text-gray-300">
-                Our platform leverages smart contracts for automating equity distribution and milestone-based funding, streamlining investments.
-              </p>
-            </div>
-          </div>
-          {/* Feature 4 */}
-          <div className="flex items-center space-x-4">
-            <div className="bg-indigo-900 p-3 rounded-full">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+        {/* Right Features */}
+        <div className="flex flex-col gap-16 justify-center">
+          {[
+            {
+              title: 'Smart Contract Automation',
+              desc: 'Our platform leverages smart contracts for automating equity distribution and milestone-based funding, streamlining investments.',
+              icon: <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />,
+            },
+            {
+              title: 'Transparent Governance',
+              desc: 'Through decentralized governance (DAO), users can vote on key platform decisions, ensuring transparency and fair participation.',
+              icon: (
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M9 12l2 2 4-4m1 5h.01m-.01-4h.01M9 12v10m0 0h6m-6 0v-6h6v6z"
-                ></path>
-              </svg>
+                />
+              ),
+            },
+          ].map((item, idx) => (
+            <div key={idx} className="flex items-start gap-6">
+              <div className="bg-blue-700 p-4 rounded-full">
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {item.icon}
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
+                <p className="text-gray-300 text-base leading-relaxed">{item.desc}</p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-bold text-lg text-white">Transparent Governance</h4>
-              <p className="text-gray-300">
-                Through decentralized governance (DAO), users can vote on key platform decisions, ensuring transparency and fair participation.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
-        
       </div>
-      <div className="text-center mt-28">
-  <div className="flex justify-center space-x-12">
-    <div className="text-gray-300">
-      <h4 className="text-xl font-semibold text-blue-600">Startups Connected</h4>
-      <p className="text-2xl font-bold">20+</p>
-    </div>
-    <div className="text-gray-300">
-      <h4 className="text-xl font-semibold text-blue-600">Funding Opportunities</h4>
-      <p className="text-2xl font-bold">$100k+</p>
-    </div>
-    <div className="text-gray-300">
-      <h4 className="text-xl font-semibold text-blue-600">Investors Engaged</h4>
-      <p className="text-2xl font-bold">50+</p>
-    </div>
-  </div>
 
-</div>
-
+      {/* Stats */}
+      <div className="mt-28 text-center">
+        <div className="flex flex-wrap justify-center gap-12 text-gray-300">
+          {[
+            { title: 'Startups Connected', value: '20+' },
+            { title: 'Funding Opportunities', value: '$100k+' },
+            { title: 'Investors Engaged', value: '50+' },
+          ].map((item, idx) => (
+            <div key={idx} className="min-w-[150px]">
+              <h4 className="text-lg font-medium text-blue-500">{item.title}</h4>
+              <p className="text-3xl font-extrabold">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 };
