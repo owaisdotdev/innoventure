@@ -7,10 +7,11 @@ import StartupService from '../api/api';
 import ActiveProject from '../pages/ActiveProject/ActiveProject';
 import Investors from '../pages/GetInvestors/Investors';
 import InvestorDetail from '../pages/GetInvestors/InvestorDetail.jsx';
-import Milestone from '../pages/Milestones/Milestone';
+// import Milestone from '../pages/Milestones/Milestone';
 import Active_Investors from '../pages/ActiveInvestment/ActiveInvestment';
 import AllOffers from '../pages/OfferByInvestor/AllOffers';
 import Proposals from '../pages/Proposals/Proposals';
+import Milestone from '../pages/ActiveProject/Milestone';
 import ProjectDetails from '../pages/ProjectDetails';
 
 const StartupRoutes = () => {
@@ -45,7 +46,9 @@ const StartupRoutes = () => {
       <Route path="/startup/active-projects/:id" element={<ProjectDetails />} />
       <Route path="/startup/find-investors" element={<Investors startup={startup} />} />
       <Route path="/startup/investor/:id" element={<InvestorDetail startup={startup} />} />
-      <Route path="/startup/milestones" element={<Milestone startup={startup} />} />
+      {/* <Route path="/startup/milestone" element={<Milestone startup={startup} />} /> */}
+      <Route path="/startup/milestone" element={<Milestone startup={startup} />} />
+
       <Route path="/startup/active-investor" element={<Active_Investors startup={startup} />} />
       <Route path="/startup/all-offers" element={<AllOffers startup={startup} />} />
       <Route path="/startup/proposals" element={<Proposals startup={startup} />} />

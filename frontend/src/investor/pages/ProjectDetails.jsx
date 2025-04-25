@@ -46,7 +46,7 @@ const ProjectDetails = () => {
               const signer = await provider.getSigner();
   
               const contract = new ethers.Contract(
-                  "0x076503410d2e5db11c66f0ed5f3b07659d2268b5",
+                  "0x261CA8476C227202b752fa3399e506424408af15",
                   ABI,
                   signer
               );
@@ -172,7 +172,7 @@ const ProjectDetails = () => {
             const signer = await provider.getSigner();
 
             const escrowContract = new ethers.Contract(
-                "0x076503410d2e5db11c66f0ed5f3b07659d2268b5",
+                "0x261CA8476C227202b752fa3399e506424408af15",
                 ABI,
                 signer
             );
@@ -194,7 +194,7 @@ const ProjectDetails = () => {
             );
 
             const tx1 = await usdcContract.approve(
-                "0x076503410d2e5db11c66f0ed5f3b07659d2268b5", // your escrow contract address
+                "0x261CA8476C227202b752fa3399e506424408af15", // your escrow contract address
                 amount
             );
 

@@ -3,6 +3,7 @@ import PdfToText from 'react-pdftotext';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import { ABI } from '@/abi';
+import Layout from '../Layout';
 
 const PdfUploader = ({ startupData }) => {
   const [file, setFile] = useState(null);
@@ -179,6 +180,7 @@ const PdfUploader = ({ startupData }) => {
   };
 
   return (
+    <Layout>
     <div className="min-h-screen bg-gray-50 py-16 px-6">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
         <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">Submit Milestone</h2>
@@ -226,6 +228,7 @@ const PdfUploader = ({ startupData }) => {
         </form>
       </div>
     </div>
+    </Layout>
   );
 };
 
