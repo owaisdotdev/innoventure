@@ -62,29 +62,29 @@ const ProjectDetails = () => {
                 totalAmount: inv[2].toString(),
                 deadline: new Date(Number(inv[5]) * 1000).toLocaleString(),
                 state: inv[6],
-                milestoneCount: Number(inv[7])
-              });
-              
-              const milestonesArray = [];
-              for (let i = 0; i < Number(inv[7]); i++) {
+                milestoneCount: Number(inv[7]),
+            });
+
+            const milestonesArray = [];
+            for (let i = 0; i < Number(inv[7]); i++) {
                 const m = await contract.getMilestone(investmentId, i);
                 console.log(m);
                 milestonesArray.push({
-                  title: m[0],
-                  description: m[1],
-                  amount: m[2].toString(),
-                  approved: m[3],
-                  deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
-                  ipfsHash: m[5],
-                  state: m[6]
+                    title: m[0],
+                    description: m[1],
+                    amount: m[2].toString(),
+                    approved: m[3],
+                    deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
+                    ipfsHash: m[5],
+                    state: m[6],
                 });
-              }                       
-  
-              setMilestones(milestonesArray);
-          } catch (error) {
-              console.error("Error fetching investment and milestones:", error);
-          }
-      };
+            }
+
+            setMilestones(milestonesArray);
+        } catch (error) {
+            console.error("Error fetching investment and milestones:", error);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -215,6 +215,20 @@ const ProjectDetails = () => {
         } catch (error) {
             console.error("Milestone submission failed:", error);
             alert("Error submitting milestone");
+        }
+    };
+
+    const handleApprove = async (investmentId, milestoneIndex) => {
+        try {
+        } catch (error) {
+            console.error("Approval failed:", error);
+        }
+    };
+
+    const handleReject = async (investmentId, milestoneIndex) => {
+        try {
+        } catch (error) {
+            console.error("Rejection failed:", error);
         }
     };
 
@@ -606,21 +620,58 @@ const ProjectDetails = () => {
                     </div>
                 </Modal>
                 <div>
-
-  <h3>Milestones</h3>
-  {milestones.map((m, idx) => (
-    <div key={idx} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px" }}>
-      <h4>Title: {m.title}</h4>
-      <p>Description: {m.description}</p>
-      <p>Amount: {m.amount}</p>
-      <p>Approved: {m.approved ? "Yes" : "No"}</p>
-      <p>Deadline: {m.deadline}</p>
-      <p>State: {m.state == 0 ? "PENDING" : m.state == 1 ? "APPROVED" : "REJECTED"}</p>
-      <p>IPFS: <a href={`https://ipfs.io/ipfs/${m.ipfsHash}`} target="_blank" rel="noopener noreferrer">View File</a></p>
-    </div>
-  ))}
-</div>
-
+                    <h3>Milestones</h3>
+                    {milestones.map((m, idx) => (
+                        <div
+                            key={idx}
+                            style={{
+                                border: "1px solid #ccc",
+                                padding: "10px",
+                                marginBottom: "10px",
+                            }}
+                        >
+                            <h4>Title: {m.title}</h4>
+                            <p>Description: {m.description}</p>
+                            <p>Amount: {m.amount}</p>
+                            <p>Approved: {m.approved ? "Yes" : "No"}</p>
+                            <p>Deadline: {m.deadline}</p>
+                            <p>
+                                State:{" "}
+                                {m.state == 0
+                                    ? "PENDING"
+                                    : m.state == 1
+                                    ? "APPROVED"
+                                    : "REJECTED"}
+                            </p>
+                            <p>
+                                IPFS:{" "}
+                                <a
+                                    href={`https://ipfs.io/ipfs/${m.ipfsHash}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    View File
+                                </a>
+                            </p>
+                            {m.submitted && (
+                                <div className="mt-2 flex gap-2">
+                                    <button
+                                        onClick={() => handleApprove()}
+                                        className="bg-green-500 text-white px-4 py-2 rounded"
+                                    >
+                                        Accept
+                                    </button>
+                                    <button
+                                        onClick={() => handleReject()}
+                                        className="bg-red-500 text-white px-4 py-2 rounded"
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
         </Layout>
     );
