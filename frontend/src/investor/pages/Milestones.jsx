@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PdfToText from 'react-pdftotext';
 import axios from 'axios';
 import { ethers } from 'ethers';
+import { ABI } from '@/abi';
 
 const PdfUploader = ({ startupData }) => {
   const [file, setFile] = useState(null);
@@ -26,7 +27,7 @@ const PdfUploader = ({ startupData }) => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner(); 
 
-      const contract = new ethers.Contract("0x076503410d2e5db11c66f0ed5f3b07659d2268b5", abi, signer);
+      const contract = new ethers.Contract("0x076503410d2e5db11c66f0ed5f3b07659d2268b5", ABI, signer);
 
       const tx = await contract.updateMilestoneProgress(0, 0, newIpfsHash,financialAnalysis,milestoneMessage, true);
       await tx.wait();  
