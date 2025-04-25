@@ -101,7 +101,7 @@ const [milestones, setMilestones] = useState([
                     const signer = await provider.getSigner();
         
                     const contract = new ethers.Contract(
-                        "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
+                        "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7",
                         ABI,
                         signer
                     );

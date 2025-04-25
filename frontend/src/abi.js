@@ -496,6 +496,21 @@ export const ABI = [
 				"internalType": "enum StartupEscrow.MilestoneState",
 				"name": "state",
 				"type": "uint8"
+			},
+			{
+				"internalType": "bool",
+				"name": "submitted",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "message",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "analysis",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",

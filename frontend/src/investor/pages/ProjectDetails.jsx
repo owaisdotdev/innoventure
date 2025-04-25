@@ -12,6 +12,14 @@ import {
     FaFileUpload,
     FaCheckCircle,
     FaTimes,
+    FaClock,
+    FaDollarSign,
+    FaChevronDown,
+    FaTimesCircle,
+    FaChevronUp,
+    FaFileAlt,
+    FaCommentAlt,
+    FaChartLine,
 } from "react-icons/fa";
 import Layout from "./Layout";
 import { ethers } from "ethers";
@@ -25,41 +33,9 @@ const ProjectDetails = () => {
     const [startupDetails, setStartupDetails] = useState();
     const [investorDetails, setInvestorDetails] = useState();
     const [investment, setInvestment] = useState(null);
-    const [milestones, setMilestones] = useState([
-        {
-          title: "Design Phase",
-          description: "Complete UI/UX design for the app",
-          amount: "100",
-          approved: false,
-          deadline: "2025-05-05",
-          state: 0,
-          ipfsHash: "QmXyzExampleHash1",
-          submitted: true,
-        },
-        {
-          title: "Development Phase",
-          description: "Build the core functionality",
-          amount: "300",
-          approved: true,
-          deadline: "2025-06-10",
-          state: 1,
-          ipfsHash: "QmXyzExampleHash2",
-          submitted: false,
-        },
-        {
-          title: "Testing & Deployment",
-          description: "Test the application and deploy to production",
-          amount: "150",
-          approved: false,
-          deadline: "2025-07-01",
-          state: 2,
-          ipfsHash: "QmXyzExampleHash3",
-          submitted: true,
-        },
-      ]
-      );
+    const [expandedMilestone, setExpandedMilestone] = useState(null);
+    const [milestones, setMilestones] = useState([]);
 
-    
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -70,26 +46,26 @@ const ProjectDetails = () => {
     });
 
     useEffect(() => {
-        fetchInvestmentDetails(0); 
-      }, []);
-  
-      const fetchInvestmentDetails = async (investmentId) => {
-          try {
-              const provider = new ethers.BrowserProvider(window.ethereum);
-              const signer = await provider.getSigner();
-  
-              const contract = new ethers.Contract(
-                  "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
-                  ABI,
-                  signer
-              );
-  
-              // Fetch investment details
-              const inv = await contract.getInvestment(investmentId);
-              const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
-              console.log(inv)
-              // Fetch each milestone
-              setInvestment({
+        fetchInvestmentDetails(0);
+    }, []);
+
+    const fetchInvestmentDetails = async (investmentId) => {
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+
+            const contract = new ethers.Contract(
+                "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7",
+                ABI,
+                signer
+            );
+
+            // Fetch investment details
+            const inv = await contract.getInvestment(investmentId);
+            const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
+            console.log(inv);
+            // Fetch each milestone
+            setInvestment({
                 investor: inv[0],
                 startup: inv[1],
                 totalAmount: inv[2].toString(),
@@ -101,7 +77,6 @@ const ProjectDetails = () => {
             const milestonesArray = [];
             for (let i = 0; i < Number(inv[7]); i++) {
                 const m = await contract.getMilestone(investmentId, i);
-                console.log(m);
                 milestonesArray.push({
                     title: m[0],
                     description: m[1],
@@ -109,7 +84,22 @@ const ProjectDetails = () => {
                     approved: m[3],
                     deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
                     ipfsHash: m[5],
-                    state: m[6],
+                    state: Number(m[6]),
+                    submitted: m[7],
+                    message: m[8],
+                    financialAnalysis: JSON.parse(m[9]),
+                });
+                console.log({
+                    title: m[0],
+                    description: m[1],
+                    amount: m[2].toString(),
+                    approved: m[3],
+                    deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
+                    ipfsHash: m[5],
+                    state: Number(m[6]),
+                    submitted: m[7],
+                    message: m[8],
+                    financialAnalysis: JSON.parse(m[9]),
                 });
             }
 
@@ -171,6 +161,27 @@ const ProjectDetails = () => {
         }
     };
 
+    const toggleExpand = (index) => {
+        setExpandedMilestone(expandedMilestone === index ? null : index);
+    };
+
+    const getStateColor = (state) => {
+        switch (state) {
+            case 0:
+                return "text-yellow-500"; // PENDING
+            case 1:
+                return "text-green-500"; // APPROVED
+            case 2:
+                return "text-red-500"; // REJECTED
+            default:
+                return "text-gray-500";
+        }
+    };
+
+    const getStateName = (state) => {
+        return state === 0 ? "PENDING" : state === 1 ? "APPROVED" : "REJECTED";
+    };
+
     const submitMilestone = async () => {
         if (!milestoneForm.file) {
             alert("No file selected");
@@ -205,7 +216,7 @@ const ProjectDetails = () => {
             const signer = await provider.getSigner();
 
             const escrowContract = new ethers.Contract(
-                "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
+                "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7",
                 ABI,
                 signer
             );
@@ -227,7 +238,7 @@ const ProjectDetails = () => {
             );
 
             const tx1 = await usdcContract.approve(
-                "0x5422e2f20862cffa4aa16c33dae12152f1ce810f", // your escrow contract address
+                "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7", // your escrow contract address
                 amount
             );
 
@@ -253,10 +264,22 @@ const ProjectDetails = () => {
 
     const handleApprove = async (investmentId, milestoneIndex) => {
         try {
-            const tx = await contract.approveMilestone(investmentId, milestoneIndex);
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+
+            const contract = new ethers.Contract(
+                "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7",
+                ABI,
+                signer
+            );
+            
+            const tx = await contract.approveMilestone(
+                investmentId,
+                milestoneIndex
+            );
             await tx.wait();
             alert("Milestone approved!");
-            fetchInvestmentDetails(); 
+            fetchInvestmentDetails();
         } catch (error) {
             console.error("Approval failed:", error);
         }
@@ -264,7 +287,10 @@ const ProjectDetails = () => {
 
     const handleReject = async (investmentId, milestoneIndex) => {
         try {
-            const tx = await contract.disputeMilestone(investmentId, milestoneIndex);
+            const tx = await contract.disputeMilestone(
+                investmentId,
+                milestoneIndex
+            );
             await tx.wait();
             alert("Milestone disputed!");
             fetchInvestmentDetails();
@@ -661,55 +687,217 @@ const ProjectDetails = () => {
                     </div>
                 </Modal>
                 <div className="space-y-4">
-  <h3 className="text-xl font-semibold mb-2">Milestones</h3>
-  {milestones.map((m, idx) => (
-    <div
-      key={idx}
-      className="flex flex-col md:flex-row items-start md:items-center justify-between border border-gray-300 p-4 rounded-md shadow-sm"
-    >
-      <div className="flex flex-col gap-1 w-full md:w-3/4">
-        <p><span className="font-semibold">Title:</span> {m.title}</p>
-        <p><span className="font-semibold">Description:</span> {m.description}</p>
-        <p><span className="font-semibold">Amount:</span> {m.amount}</p>
-        <p><span className="font-semibold">Approved:</span> {m.approved ? "Yes" : "No"}</p>
-        <p><span className="font-semibold">Deadline:</span> {m.deadline}</p>
-        <p>
-          <span className="font-semibold">State:</span>{" "}
-          {m.state === 0 ? "PENDING" : m.state === 1 ? "APPROVED" : "REJECTED"}
-        </p>
-        <p>
-          <span className="font-semibold">IPFS:</span>{" "}
-          <a
-            href={`https://ipfs.io/ipfs/${m.ipfsHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline"
-          >
-            View File
-          </a>
-        </p>
-      </div>
+                    <h3 className="text-xl font-semibold mb-2">Milestones</h3>
+                    <div className="space-y-6">
+                        {milestones?.map((milestone, idx) => (
+                            <div
+                                key={idx}
+                                className="bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-700"
+                            >
+                                <div
+                                    className="flex items-center justify-between p-4 cursor-pointer"
+                                    onClick={() => toggleExpand(idx)}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <div
+                                            className={`p-2 rounded-full ${getStateColor(
+                                                milestone.state
+                                            )
+                                                .replace("text-", "bg-")
+                                                .replace(
+                                                    "-400",
+                                                    "-900"
+                                                )} bg-opacity-50`}
+                                        >
+                                            {milestone.state === 1 ? (
+                                                <FaCheckCircle
+                                                    className={getStateColor(
+                                                        milestone.state
+                                                    )}
+                                                    size={20}
+                                                />
+                                            ) : milestone.state === 2 ? (
+                                                <FaTimesCircle
+                                                    className={getStateColor(
+                                                        milestone.state
+                                                    )}
+                                                    size={20}
+                                                />
+                                            ) : (
+                                                <FaClock
+                                                    className={getStateColor(
+                                                        milestone.state
+                                                    )}
+                                                    size={20}
+                                                />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-lg text-white">
+                                                {milestone.title}
+                                            </h3>
+                                            <div className="flex items-center text-sm text-gray-300">
+                                                <span
+                                                    className={`font-semibold ${getStateColor(
+                                                        milestone.state
+                                                    )}`}
+                                                >
+                                                    {getStateName(
+                                                        milestone.state
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-      {m.submitted && (
-        <div className="flex gap-2 mt-4 md:mt-0 md:ml-4">
-          <button
-            onClick={() => handleApprove(0, idx)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-          >
-            Accept
-          </button>
-          <button
-            onClick={() => handleReject(0, idx)}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-          >
-            Reject
-          </button>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="text-right">
+                                            <div className="flex items-center font-bold text-green-400">
+                                                <FaDollarSign
+                                                    size={14}
+                                                    className="mr-1"
+                                                />
+                                                {milestone.amount.replace(
+                                                    "$",
+                                                    ""
+                                                )}
+                                            </div>
+                                            <div className="flex items-center text-sm text-gray-300">
+                                                <FaCalendarAlt
+                                                    size={12}
+                                                    className="mr-1"
+                                                />
+                                                {milestone.deadline}
+                                            </div>
+                                        </div>
+                                        {expandedMilestone === idx ? (
+                                            <FaChevronUp className="text-gray-400" />
+                                        ) : (
+                                            <FaChevronDown className="text-gray-400" />
+                                        )}
+                                    </div>
+                                </div>
+
+                                {expandedMilestone === idx && (
+                                    <div className="p-4 bg-gray-700 border-t border-gray-600">
+                                        <p className="text-gray-300 mb-4">
+                                            {milestone.description}
+                                        </p>
+
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center space-x-2 text-sm text-gray-300">
+                                                <FaFileAlt />
+                                                <a
+                                                    href={`https://ipfs.io/ipfs/${milestone.ipfsHash}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-400 hover:text-blue-300 hover:underline"
+                                                >
+                                                    View File
+                                                </a>
+                                            </div>
+
+                                            <div className="flex items-center text-sm text-gray-300">
+                                                <span className="mr-2">
+                                                    Approved:
+                                                </span>
+                                                {milestone.approved ? (
+                                                    <FaCheckCircle
+                                                        className="text-green-400"
+                                                        size={16}
+                                                    />
+                                                ) : (
+                                                    <FaTimesCircle
+                                                        className="text-red-400"
+                                                        size={16}
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {milestone.submitted &&
+                                            milestone.state === 0 && (
+                                                <>
+                                                    <div className="mb-4 bg-gray-800 p-3 rounded border border-gray-600">
+                                                        <h4 className="text-white font-semibold mb-2 flex items-center">
+                                                            <FaCommentAlt className="mr-2 text-blue-400" />
+                                                            Message from
+                                                            Submitter
+                                                        </h4>
+                                                        <p className="text-gray-300 text-sm">
+                                                            {milestone.message ||
+                                                                "No message provided with this submission."}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="mb-4 bg-gray-800 p-3 rounded border border-gray-600">
+    <h4 className="text-white font-semibold mb-2 flex items-center">
+        <FaChartLine className="mr-2 text-green-400" />
+        Financial Analysis
+    </h4>
+    <div className="text-gray-300 text-sm space-y-3">
+        <p>
+            {milestone.financialAnalysis?.summary}
+        </p>
+        
+        <div className="mt-2">
+            <h5 className="text-white text-xs uppercase tracking-wide mb-1">Key Metrics</h5>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-gray-850 p-2 rounded">
+                <span className="text-gray-400">Total Revenue:</span>
+                <span>{milestone.financialAnalysis?.keyMetrics.totalRevenue}</span>
+                <span className="text-gray-400">Total Expenses:</span>
+                <span>{milestone.financialAnalysis?.keyMetrics.totalExpenses}</span>
+                <span className="text-gray-400">Net Profit/Loss:</span>
+                <span>{milestone.financialAnalysis?.keyMetrics.netProfitOrLoss}</span>
+                <span className="text-gray-400">Profit Margin:</span>
+                <span>{milestone.financialAnalysis?.keyMetrics.profitMargin}</span>
+            </div>
         </div>
-      )}
+        
+        <div className="mt-2">
+            <h5 className="text-white text-xs uppercase tracking-wide mb-1">Highlights</h5>
+            <ul className="list-disc list-inside space-y-1 pl-1">
+            {milestone.financialAnalysis?.highlights.map(m =><li>{m}</li> )}
+
+            </ul>
+        </div>
     </div>
-  ))}
 </div>
 
+                                                    <div className="flex space-x-3">
+                                                        <button
+                                                            onClick={() =>
+                                                                handleApprove(
+                                                                    0,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
+                                                        >
+                                                            <FaCheckCircle className="mr-2" />{" "}
+                                                            Accept
+                                                        </button>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleReject(
+                                                                    0,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
+                                                        >
+                                                            <FaTimesCircle className="mr-2" />{" "}
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </Layout>
     );
