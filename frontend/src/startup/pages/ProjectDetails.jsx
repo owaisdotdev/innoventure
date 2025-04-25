@@ -77,7 +77,7 @@ const [milestones, setMilestones] = useState([
     const [milestoneFunded, setMilestoneFunded] = useState(false);
     const [funding, setFunding] = useState(false);
     const navigateToSubmitMilestone = () => {
-        navigate('/milestone');
+        navigate('/startup/milestone');
       };
     const toggleExpand = (index) => {
         setExpandedMilestone(expandedMilestone === index ? null : index);
@@ -473,7 +473,7 @@ const [milestones, setMilestones] = useState([
                         </div>
                     </div>
     
-                    {/* Action Button - Enhanced */}
+                    {/* Action Button - Enhanced
                     <div className="mt-10 flex justify-center">
                         <button
                             onClick={() => setIsModalOpen(true)}
@@ -485,7 +485,7 @@ const [milestones, setMilestones] = useState([
                             </div>
                             <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 rounded-xl"></div>
                         </button>
-                    </div>
+                    </div> */}
     
     
       
@@ -616,7 +616,7 @@ const [milestones, setMilestones] = useState([
 >
     <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-700 sticky top-0 bg-gray-800 z-10">
         <h2 className="text-xl font-semibold text-indigo-300 flex items-center">
-            <FaCalendarCheck className="mr-2" size={20} /> Submit Milestone
+            <FaCalendarCheck className="mr-2" size={20} /> Submit asMilestone
         </h2>
         <button
             onClick={() => setIsModalOpen(false)}

@@ -4,10 +4,14 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import { ABI } from '@/abi';
 import Layout from '../Layout';
+import { useEffect } from 'react';
+import Loader from '@/utils/Loader';
 
-const PdfUploader = ({ startupData }) => {
+const SubmitMlestone = ({ startupData }) => {
+  
   const [file, setFile] = useState(null);
   const [extractedText, setExtractedText] = useState('');
+  const [loading, setLoading] = useState(false)
   const [milestoneMessage, setMilestoneMessage] = useState('');
   const [milestones, setMilestones] = useState([
         {
@@ -86,7 +90,7 @@ const PdfUploader = ({ startupData }) => {
     }
 
     try {
-      
+      setLoading(true)
       // Extract text from PDF
       const text = await PdfToText(file);
       setExtractedText(text);
@@ -106,7 +110,9 @@ const PdfUploader = ({ startupData }) => {
       //   ipfsHash 
       // });
       updateMilestoneProgress(ipfsHash,financialAnalysis,milestoneMessage)
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       console.error('Error processing PDF:', error);
     }
   };
@@ -171,8 +177,10 @@ const PdfUploader = ({ startupData }) => {
       console.log(JSON.parse(cleanedAnalysis));
       return cleanedAnalysis;
     } catch (error) {
+      setLoading(false)
       console.error("Gemini API Error:", error.response || error.message);
       return financialAnalysis;
+
     }
   };
 
@@ -265,55 +273,57 @@ const PdfUploader = ({ startupData }) => {
 
   return (
     <Layout>
-    <div className="min-h-screen bg-gray-50 py-16 px-6">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl">
-        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">Submit Milestone</h2>
+    { loading && <Loader/>}
+    <div className="min-h-screen bg-gray-900 py-16 px-6">
+  <div className="max-w-4xl mx-auto bg-gray-800 p-8 rounded-xl shadow-xl">
+    <h2 className="text-3xl font-bold text-center text-indigo-400 mb-6">Submit Milestone</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Milestone Message */}
-          <div>
-            <label htmlFor="milestoneMessage" className="block text-lg font-semibold text-gray-700 mb-2">
-              Milestone Message
-            </label>
-            <textarea
-              name="milestoneMessage"
-              value={milestoneMessage}
-              onChange={handleMessageChange}
-              required
-              placeholder="Add any additional comments or details about this milestone"
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              rows="5"
-            />
-          </div>
-
-          {/* Upload PDF */}
-          <div>
-            <label htmlFor="pdfUpload" className="block text-lg font-semibold text-gray-700 mb-2">
-              Upload PDF
-            </label>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={handleFileChange}
-              required
-              className="w-full file:border-gray-300 file:bg-indigo-600 file:text-white file:rounded-lg file:px-4 file:py-2 focus:outline-none"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <div className="text-center">
-            <button
-              type="submit"
-              className="bg-indigo-600 text-white py-3 px-6 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition duration-300"
-            >
-              Submit Milestone
-            </button>
-          </div>
-        </form>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Milestone Message */}
+      <div>
+        <label htmlFor="milestoneMessage" className="block text-lg font-semibold text-gray-200 mb-2">
+          Milestone Message
+        </label>
+        <textarea
+          name="milestoneMessage"
+          value={milestoneMessage}
+          onChange={handleMessageChange}
+          required
+          placeholder="Add any additional comments or details about this milestone"
+          className="w-full p-4 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          rows="5"
+        />
       </div>
-    </div>
+
+      {/* Upload PDF */}
+      <div>
+        <label htmlFor="pdfUpload" className="block text-lg font-semibold text-gray-200 mb-2">
+          Upload PDF
+        </label>
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={handleFileChange}
+          required
+          className="w-full file:border-gray-600 file:bg-indigo-600 file:text-white file:rounded-lg file:px-4 file:py-2 focus:outline-none bg-gray-700 text-white"
+        />
+      </div>
+
+      {/* Submit Button */}
+      <div className="text-center">
+        <button
+          type="submit"
+          className="bg-indigo-600 text-white py-3 px-6 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition duration-300"
+        >
+          Submit Milestone
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
     </Layout>
   );
 };
 
-export default PdfUploader
+export default SubmitMlestone

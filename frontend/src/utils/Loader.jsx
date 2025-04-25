@@ -1,13 +1,10 @@
-import React from 'react'
-import './Loader.css'
+import React from 'react';
+import './Loader.css'; // keep your animation styles here
 
 export default function Loader() {
   return (
-    <>
-    <div className='h-100 flex justify-center items-center'>
-
-    <span class="loader "></span>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+      <span className="loader"></span>
     </div>
-    </>
-  )
+  );
 }
