@@ -4,145 +4,169 @@ const HowItWorks = () => {
   const [activeTab, setActiveTab] = useState('investors');
 
   return (
-    <div className='bg-white'>
-      <div className="container mx-auto p-6">
-        <h1 className="text-4xl font-bold text-center text-gray-700 mb-6">
-          How It Works
-        </h1>
+    <div className='bg-gradient-to-b from-gray-50 to-white'>
+      <div className="container mx-auto px-6 py-16 max-w-7xl">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            How It Works
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Discover how our platform revolutionizes investment and funding through blockchain and AI technology
+          </p>
+        </div>
 
-        <div className="flex justify-center mb-4">
-          <button
-            className={`px-6 py-2 mr-4 text-lg font-semibold ${
-              activeTab === 'investors' ? 'bg-blue-500 text-white' : 'text-blue-500'
-            }`}
-            onClick={() => setActiveTab('investors')}
-          >
-            For Investors
-          </button>
-          <button
-            className={`px-6 py-2 text-lg font-semibold ${
-              activeTab === 'startups' ? 'bg-blue-500 text-white' : 'text-blue-500'
-            }`}
-            onClick={() => setActiveTab('startups')}
-          >
-            For Startups/FYDPs
-          </button>
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex bg-gray-100 rounded-full p-1 shadow-sm">
+            <button
+              className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ${
+                activeTab === 'investors' 
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
+              }`}
+              onClick={() => setActiveTab('investors')}
+            >
+              For Investors
+            </button>
+            <button
+              className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ${
+                activeTab === 'startups' 
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
+              }`}
+              onClick={() => setActiveTab('startups')}
+            >
+              For Startups/FYDPs
+            </button>
+          </div>
         </div>
 
         <div className="mt-8">
           {activeTab === 'investors' ? (
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                How Investors Benefit
-              </h2>
-              <p className="text-lg text-gray-700 mb-4">
-                Our platform empowers investors with secure and transparent access to equity-based investments in startups and FYDPs.<br />
-                Here's how it works:
-              </p>
+            <div className="space-y-12">
+              <div className="text-center max-w-4xl mx-auto">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  How Investors Benefit
+                </h2>
+                <p className="text-xl text-gray-600">
+                  Our platform empowers investors with secure and transparent access to equity-based investments in startups and FYDPs through cutting-edge blockchain technology and AI-powered matching.
+                </p>
+              </div>
 
               {/* Cards for Investors */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">1. Secure Investment via Blockchain</h3>
-                  <p className="text-lg text-gray-700">
-                    All transactions are powered by blockchain technology, ensuring complete transparency and security. Investments are managed through smart contracts, and all funds are securely held in escrow until conditions are met. Investors have the confidence that their money is safe.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">2. ERC20-Based Equity Tokens</h3>
-                  <p className="text-lg text-gray-700">
-                    Each investment is represented by an ERC20 token, which acts as a digital share in the startup. These tokens are easily tradeable and transferable, offering liquidity to investors while ensuring that equity ownership is securely managed on the blockchain.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">3. AI-Powered Investor Matching</h3>
-                  <p className="text-lg text-gray-700">
-                    Our AI-powered matching system helps investors find the best opportunities based on their preferences, investment history, and risk tolerance. The platform uses machine learning and NLP algorithms to analyze both investor profiles and startup data for optimized matching.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">4. Escrow and Milestone-Based Funding</h3>
-                  <p className="text-lg text-gray-700">
-                    Investments are held in escrow and released according to milestones, ensuring that funds are used effectively. This reduces risk for both investors and startups. Investors can track the progress of their investments and approve or reject future funding releases based on performance.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">5. Real-Time Analytics and Reporting</h3>
-                  <p className="text-lg text-gray-700">
-                    Investors have access to real-time analytics on the startups they're invested in, including financial health reports, performance updates, and projected ROI. AI-driven insights help investors make data-informed decisions on whether to continue or withdraw from investments.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">6. Decentralized Governance</h3>
-                  <p className="text-lg text-gray-700">
-                    As part of our decentralized governance (DAO) model, investors have a say in key decisions affecting the platform. Investors can vote on project direction, funding rounds, and more, ensuring that the platform is driven by the collective will of its users.
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {[
+                  {
+                    title: "Secure Investment via Blockchain",
+                    content: "All transactions are powered by blockchain technology, ensuring complete transparency and security. Investments are managed through smart contracts, and all funds are securely held in escrow until conditions are met.",
+                    icon: "🔒"
+                  },
+                  {
+                    title: "ERC20-Based Equity Tokens",
+                    content: "Each investment is represented by an ERC20 token, which acts as a digital share in the startup. These tokens are easily tradeable and transferable, offering liquidity to investors.",
+                    icon: "🪙"
+                  },
+                  {
+                    title: "AI-Powered Investor Matching",
+                    content: "Our AI-powered matching system helps investors find the best opportunities based on their preferences, investment history, and risk tolerance using machine learning and NLP algorithms.",
+                    icon: "🤖"
+                  },
+                  {
+                    title: "Escrow and Milestone-Based Funding",
+                    content: "Investments are held in escrow and released according to milestones, ensuring that funds are used effectively. Investors can track progress and approve future funding releases.",
+                    icon: "📊"
+                  },
+                  {
+                    title: "Real-Time Analytics and Reporting",
+                    content: "Investors have access to real-time analytics on the startups they're invested in, including financial health reports, performance updates, and projected ROI with AI-driven insights.",
+                    icon: "📈"
+                  },
+                  {
+                    title: "Decentralized Governance",
+                    content: "As part of our decentralized governance (DAO) model, investors have a say in key decisions affecting the platform through voting on project direction and funding rounds.",
+                    icon: "🗳️"
+                  }
+                ].map((item, index) => (
+                  <div 
+                    key={index}
+                    className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 hover:border-blue-100"
+                  >
+                    <div className="text-4xl mb-4">{item.icon}</div>
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-3">{item.title}</h3>
+                    <p className="text-lg text-gray-600">
+                      {item.content}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           ) : (
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                How Startups/FYDPs Benefit
-              </h2>
-              <p className="text-lg text-gray-700 mb-4">
-                Startups and Final Year Design Projects (FYDPs) benefit from our platform by gaining access to a global network of investors, automated funding solutions, and AI-backed analytics to showcase their potential. Here’s how it works:
-              </p>
+            <div className="space-y-12">
+              <div className="text-center max-w-4xl mx-auto">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  How Startups/FYDPs Benefit
+                </h2>
+                <p className="text-xl text-gray-600">
+                  Startups and Final Year Design Projects (FYDPs) gain access to a global network of investors, automated funding solutions, and AI-backed analytics to showcase their potential.
+                </p>
+              </div>
 
               {/* Cards for Startups/FYDPs */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">1. Gaining Investor Exposure</h3>
-                  <p className="text-lg text-gray-700">
-                    Your startup or FYDP will be visible to a wide range of investors. Our platform offers detailed profiles of each project, including milestones, financial reports, and market potential, increasing your chances of securing investment.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">2. AI-Driven Investment Matching</h3>
-                  <p className="text-lg text-gray-700">
-                    The platform’s AI system matches startups with investors based on the project’s potential and investor preferences. This helps ensure that your project reaches the right audience of investors who are likely to support your vision.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">3. Secure Funding with Smart Contracts</h3>
-                  <p className="text-lg text-gray-700">
-                    Our platform uses smart contracts to automate the funding process. As milestones are met, funds are released from escrow to keep your project moving forward. This ensures that investors' funds are used effectively and that the project is completed on time.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">4. Transparent Milestone Tracking</h3>
-                  <p className="text-lg text-gray-700">
-                    Startups and FYDPs can showcase their progress through transparent milestone tracking, which gives investors confidence that funds are being used appropriately. This system helps both parties stay on track and aligned with project goals.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">5. AI-Assisted Financial Reporting</h3>
-                  <p className="text-lg text-gray-700">
-                    To increase credibility with investors, startups are required to provide regular financial reports. AI tools will analyze these reports to offer insights on the financial health of your project, helping guide future funding rounds and strategic decisions.
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-semibold text-gray-700">6. Exposure to University FYDPs</h3>
-                  <p className="text-lg text-gray-700">
-                    For academic projects, the platform offers visibility and support for Final Year Design Projects (FYDPs), turning student ideas into market-ready products. The platform bridges the gap between academia and industry, allowing students to access funding and mentorship.
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {[
+                  {
+                    title: "Gaining Investor Exposure",
+                    content: "Your startup or FYDP will be visible to a wide range of investors with detailed profiles including milestones, financial reports, and market potential.",
+                    icon: "👁️"
+                  },
+                  {
+                    title: "AI-Driven Investment Matching",
+                    content: "The platform's AI system matches startups with investors based on project potential and investor preferences, ensuring you reach the right audience.",
+                    icon: "🔍"
+                  },
+                  {
+                    title: "Secure Funding with Smart Contracts",
+                    content: "Our platform uses smart contracts to automate the funding process, releasing funds from escrow as milestones are met to keep your project moving forward.",
+                    icon: "🤝"
+                  },
+                  {
+                    title: "Transparent Milestone Tracking",
+                    content: "Showcase your progress through transparent milestone tracking, giving investors confidence that funds are being used appropriately.",
+                    icon: "✅"
+                  },
+                  {
+                    title: "AI-Assisted Financial Reporting",
+                    content: "AI tools analyze financial reports to offer insights on your project's health, helping guide future funding rounds and strategic decisions.",
+                    icon: "📑"
+                  },
+                  {
+                    title: "Exposure to University FYDPs",
+                    content: "For academic projects, the platform offers visibility and support for Final Year Design Projects, turning student ideas into market-ready products.",
+                    icon: "🎓"
+                  }
+                ].map((item, index) => (
+                  <div 
+                    key={index}
+                    className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 hover:border-blue-100"
+                  >
+                    <div className="text-4xl mb-4">{item.icon}</div>
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-3">{item.title}</h3>
+                    <p className="text-lg text-gray-600">
+                      {item.content}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}
         </div>
-        <div className='mt-5 flex justify-center items-center'>
-          <button className='bg-black px-4 py-2 my-3 text-white rounded'>Let's Get Started</button>
+        
+        <div className="mt-16 text-center">
+          <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            Let's Get Started
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

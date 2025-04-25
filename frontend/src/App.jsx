@@ -19,6 +19,7 @@ import AuthGuard from "./AuthGuard";
 import adminRoutes from "./admin/pages/adminRoutes";
 import InvestorRoutes from "./investor/pages/investorRoutes";
 import Milestones from "./investor/pages/Milestones";
+import About from "./pages/Home/About/About";
 
 const getUserIdSomehow = () => {
   return localStorage.getItem("userId");
@@ -115,6 +116,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/about" element={<About />} />
 
           {/* Redirects for Dashboards */}
           <Route path="/investor/dashboard" element={<RedirectToUserDashboard />} />
