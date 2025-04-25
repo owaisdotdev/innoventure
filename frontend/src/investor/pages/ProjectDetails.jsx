@@ -46,7 +46,7 @@ const ProjectDetails = () => {
               const signer = await provider.getSigner();
   
               const contract = new ethers.Contract(
-                  "0x076503410d2e5db11c66f0ed5f3b07659d2268b5",
+                  "0x261CA8476C227202b752fa3399e506424408af15",
                   ABI,
                   signer
               );
@@ -54,7 +54,7 @@ const ProjectDetails = () => {
               // Fetch investment details
               const inv = await contract.getInvestment(investmentId);
               const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
-  console.log(inv)
+              console.log(inv)
               // Fetch each milestone
               setInvestment({
                 investor: inv[0],
@@ -172,7 +172,7 @@ const ProjectDetails = () => {
             const signer = await provider.getSigner();
 
             const escrowContract = new ethers.Contract(
-                "0x076503410d2e5db11c66f0ed5f3b07659d2268b5",
+                "0x261CA8476C227202b752fa3399e506424408af15",
                 ABI,
                 signer
             );
@@ -194,7 +194,7 @@ const ProjectDetails = () => {
             );
 
             const tx1 = await usdcContract.approve(
-                "0x076503410d2e5db11c66f0ed5f3b07659d2268b5", // your escrow contract address
+                "0x261CA8476C227202b752fa3399e506424408af15", // your escrow contract address
                 amount
             );
 
@@ -220,6 +220,10 @@ const ProjectDetails = () => {
 
     const handleApprove = async (investmentId, milestoneIndex) => {
         try {
+            const tx = await contract.approveMilestone(investmentId, milestoneIndex);
+            await tx.wait();
+            alert("Milestone approved!");
+            fetchInvestmentDetails(); 
         } catch (error) {
             console.error("Approval failed:", error);
         }
@@ -227,6 +231,10 @@ const ProjectDetails = () => {
 
     const handleReject = async (investmentId, milestoneIndex) => {
         try {
+            const tx = await contract.disputeMilestone(investmentId, milestoneIndex);
+            await tx.wait();
+            alert("Milestone disputed!");
+            fetchInvestmentDetails();
         } catch (error) {
             console.error("Rejection failed:", error);
         }
@@ -656,13 +664,13 @@ const ProjectDetails = () => {
                             {m.submitted && (
                                 <div className="mt-2 flex gap-2">
                                     <button
-                                        onClick={() => handleApprove()}
+                                        onClick={() => handleApprove(0, idx)}
                                         className="bg-green-500 text-white px-4 py-2 rounded"
                                     >
                                         Accept
                                     </button>
                                     <button
-                                        onClick={() => handleReject()}
+                                        onClick={() => handleReject(0, idx)}
                                         className="bg-red-500 text-white px-4 py-2 rounded"
                                     >
                                         Reject

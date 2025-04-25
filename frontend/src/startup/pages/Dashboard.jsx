@@ -43,7 +43,7 @@ function Dashboard() {
             const signer = await provider.getSigner();
 
             const contract = new ethers.Contract(
-                "0x24eCB59A2bd06100f9803CBC648266Eb5282fDE8",
+                "0x261CA8476C227202b752fa3399e506424408af15",
                 ABI,
                 signer
             );
