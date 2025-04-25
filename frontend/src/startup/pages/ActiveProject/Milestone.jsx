@@ -9,12 +9,45 @@ const PdfUploader = ({ startupData }) => {
   const [file, setFile] = useState(null);
   const [extractedText, setExtractedText] = useState('');
   const [milestoneMessage, setMilestoneMessage] = useState('');
+  const [milestones, setMilestones] = useState([
+        {
+          title: "Design Phase",
+          description: "Complete UI/UX design for the app",
+          amount: "100",
+          approved: false,
+          deadline: "2025-05-05",
+          state: 0,
+          ipfsHash: "QmXyzExampleHash1",
+          submitted: true,
+        },
+        {
+          title: "Development Phase",
+          description: "Build the core functionality",
+          amount: "300",
+          approved: true,
+          deadline: "2025-06-10",
+          state: 1,
+          ipfsHash: "QmXyzExampleHash2",
+          submitted: false,
+        },
+        {
+          title: "Testing & Deployment",
+          description: "Test the application and deploy to production",
+          amount: "150",
+          approved: false,
+          deadline: "2025-07-01",
+          state: 2,
+          ipfsHash: "QmXyzExampleHash3",
+          submitted: true,
+        },
+      ]
+      ); 
+      const [investment, setInvestment] = useState(null);
   
   // Pinata credentials
   const pinataApiKey = "21780ea40c3777501825";
   const pinataSecretApiKey = "035da19b1e31d31ee41e578c48b3b4d104a1cdf76817ddd53648258c57afe731";
 
-  // Handle file selection
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
     if (uploadedFile && uploadedFile.type === 'application/pdf') {
@@ -28,7 +61,7 @@ const PdfUploader = ({ startupData }) => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner(); 
 
-      const contract = new ethers.Contract("0x261CA8476C227202b752fa3399e506424408af15", ABI, signer);
+      const contract = new ethers.Contract("0x5422e2f20862cffa4aa16c33dae12152f1ce810f", ABI, signer);
 
       const tx = await contract.updateMilestoneProgress(0, 0, newIpfsHash,financialAnalysis,milestoneMessage, true);
       await tx.wait();  
@@ -178,6 +211,57 @@ const PdfUploader = ({ startupData }) => {
       alert("There was an error submitting your milestone.");
     }
   };
+
+  
+      useEffect(() => {
+          fetchInvestmentDetails(0); 
+        }, []);
+    
+     const fetchInvestmentDetails = async (investmentId) => {
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+    
+                const contract = new ethers.Contract(
+                    "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
+                    ABI,
+                    signer
+                );
+    
+                // Fetch investment details
+                const inv = await contract.getInvestment(investmentId);
+                const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
+                console.log(inv)
+                // Fetch each milestone
+                setInvestment({
+                  investor: inv[0],
+                  startup: inv[1],
+                  totalAmount: inv[2].toString(),
+                  deadline: new Date(Number(inv[5]) * 1000).toLocaleString(),
+                  state: inv[6],
+                  milestoneCount: Number(inv[7]),
+              });
+  
+              const milestonesArray = [];
+              for (let i = 0; i < Number(inv[7]); i++) {
+                  const m = await contract.getMilestone(investmentId, i);
+                  console.log(m);
+                  milestonesArray.push({
+                      title: m[0],
+                      description: m[1],
+                      amount: m[2].toString(),
+                      approved: m[3],
+                      deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
+                      ipfsHash: m[5],
+                      state: m[6],
+                  });
+              }
+  
+              setMilestones(milestonesArray);
+          } catch (error) {
+              console.error("Error fetching investment and milestones:", error);
+          }
+      };
 
   return (
     <Layout>

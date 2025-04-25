@@ -16,6 +16,12 @@ import {
     FaCalendarCheck,
 } from "react-icons/fa";
 import Layout from "./Layout";
+import { ethers } from "ethers";
+import { useNavigate } from 'react-router-dom';
+
+import { ABI } from "@/abi";
+import {  FaFileAlt,FaTimesCircle , FaChevronDown, FaChevronUp, FaDollarSign, FaClock } from 'react-icons/fa';
+
 
 const ProjectDetails = () => {
     const { id } = useParams();
@@ -24,7 +30,43 @@ const ProjectDetails = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [startupDetails, setStartupDetails] = useState();
     const [investorDetails, setInvestorDetails] = useState();
+    const [expandedMilestone, setExpandedMilestone] = useState(null);
+    const navigate = useNavigate();
+    const [investment, setInvestment] = useState(null);
 
+const [milestones, setMilestones] = useState([
+        {
+          title: "Design Phase",
+          description: "Complete UI/UX design for the app",
+          amount: "100",
+          approved: false,
+          deadline: "2025-05-05",
+          state: 0,
+          ipfsHash: "QmXyzExampleHash1",
+          submitted: true,
+        },
+        {
+          title: "Development Phase",
+          description: "Build the core functionality",
+          amount: "300",
+          approved: true,
+          deadline: "2025-06-10",
+          state: 1,
+          ipfsHash: "QmXyzExampleHash2",
+          submitted: false,
+        },
+        {
+          title: "Testing & Deployment",
+          description: "Test the application and deploy to production",
+          amount: "150",
+          approved: false,
+          deadline: "2025-07-01",
+          state: 2,
+          ipfsHash: "QmXyzExampleHash3",
+          submitted: true,
+        },
+      ]
+      ); 
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -34,7 +76,70 @@ const ProjectDetails = () => {
     });
     const [milestoneFunded, setMilestoneFunded] = useState(false);
     const [funding, setFunding] = useState(false);
-
+    const navigateToSubmitMilestone = () => {
+        navigate('/milestone');
+      };
+    const toggleExpand = (index) => {
+        setExpandedMilestone(expandedMilestone === index ? null : index);
+      };
+    
+      const getStateColor = (state) => {
+        switch (state) {
+          case 0: return "text-yellow-500"; // PENDING
+          case 1: return "text-green-500";  // APPROVED
+          case 2: return "text-red-500";    // REJECTED
+          default: return "text-gray-500";
+        }
+      };
+    useEffect(() => {
+              fetchInvestmentDetails(0); 
+            }, []);
+        
+         const fetchInvestmentDetails = async (investmentId) => {
+                try {
+                    const provider = new ethers.BrowserProvider(window.ethereum);
+                    const signer = await provider.getSigner();
+        
+                    const contract = new ethers.Contract(
+                        "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
+                        ABI,
+                        signer
+                    );
+        
+                    // Fetch investment details
+                    const inv = await contract.getInvestment(investmentId);
+                    const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
+                    console.log(inv)
+                    // Fetch each milestone
+                    setInvestment({
+                      investor: inv[0],
+                      startup: inv[1],
+                      totalAmount: inv[2].toString(),
+                      deadline: new Date(Number(inv[5]) * 1000).toLocaleString(),
+                      state: inv[6],
+                      milestoneCount: Number(inv[7]),
+                  });
+      
+                  const milestonesArray = [];
+                  for (let i = 0; i < Number(inv[7]); i++) {
+                      const m = await contract.getMilestone(investmentId, i);
+                      console.log(m);
+                      milestonesArray.push({
+                          title: m[0],
+                          description: m[1],
+                          amount: m[2].toString(),
+                          approved: m[3],
+                          deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
+                          ipfsHash: m[5],
+                          state: Number(m[6]),
+                      });
+                  }
+      
+                  setMilestones(milestonesArray);
+              } catch (error) {
+                  console.error("Error fetching investment and milestones:", error);
+              }
+          };
     useEffect(() => {
         const fetchData = async () => {
             const userId = localStorage.getItem("user");
@@ -144,6 +249,10 @@ const ProjectDetails = () => {
                 return "bg-blue-500";
         }
     };
+    const getStateName = (state) => {
+        return state === 0 ? "PENDING" : state === 1 ? "APPROVED" : "REJECTED";
+      };
+    
 
     return (
         <Layout>
@@ -378,6 +487,121 @@ const ProjectDetails = () => {
                         </button>
                     </div>
     
+    
+      
+      <div className="max-w-5xl mt-20 mx-auto p-6 bg-gray-900 rounded-xl shadow-lg">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+          Project Milestones
+        </h1>
+        
+        <button 
+          onClick={navigateToSubmitMilestone}
+          className="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+        >
+          <FaPlus className="mr-2" /> Submit Milestone
+        </button>
+      </div>
+      
+      <div className="space-y-6">
+        {milestones.map((milestone, idx) => (
+          <div 
+            key={idx} 
+            className="bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-700"
+          >
+            <div 
+              className="flex items-center justify-between p-4 cursor-pointer"
+              onClick={() => toggleExpand(idx)}
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-full ${getStateColor(milestone.state).replace('text-', 'bg-').replace('-400', '-900')} bg-opacity-50`}>
+                  {milestone.state === 1 ? (
+                    <FaCheckCircle className={getStateColor(milestone.state)} size={20} />
+                  ) : milestone.state === 2 ? (
+                    <FaTimesCircle className={getStateColor(milestone.state)} size={20} />
+                  ) : (
+                    <FaClock className={getStateColor(milestone.state)} size={20} />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-white">{milestone.title}</h3>
+                  <div className="flex items-center text-sm text-gray-300">
+                    <span className={`font-semibold ${getStateColor(milestone.state)}`}>
+                      {getStateName(milestone.state)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div className="text-right">
+                  <div className="flex items-center font-bold text-green-400">
+                    <FaDollarSign size={14} className="mr-1" />
+                    {milestone.amount.replace('$', '')}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-300">
+                    <FaCalendarAlt size={12} className="mr-1" />
+                    {milestone.deadline}
+                  </div>
+                </div>
+                {expandedMilestone === idx ? (
+                  <FaChevronUp className="text-gray-400" />
+                ) : (
+                  <FaChevronDown className="text-gray-400" />
+                )}
+              </div>
+            </div>
+            
+            {expandedMilestone === idx && (
+              <div className="p-4 bg-gray-700 border-t border-gray-600">
+                <p className="text-gray-300 mb-4">{milestone.description}</p>
+                
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2 text-sm text-gray-300">
+                    <FaFileAlt />
+                    <a 
+                      href={`https://ipfs.io/ipfs/${milestone.ipfsHash}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 hover:underline"
+                    >
+                      View File
+                    </a>
+                  </div>
+                  
+                  <div className="flex items-center text-sm text-gray-300">
+                    <span className="mr-2">Approved:</span>
+                    {milestone.approved ? (
+                      <FaCheckCircle className="text-green-400" size={16} />
+                    ) : (
+                      <FaTimesCircle className="text-red-400" size={16} />
+                    )}
+                  </div>
+                </div>
+                
+                {milestone.submitted && milestone.state === 0 && (
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleApprove(0, idx)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
+                    >
+                      <FaCheckCircle className="mr-2" /> Accept
+                    </button>
+                    <button
+                      onClick={() => handleReject(0, idx)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
+                    >
+                      <FaTimesCircle className="mr-2" /> Reject
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
 {/* Submit Milestone Modal - Fixed sizing and scrolling */}
 <Modal
     isOpen={isModalOpen}

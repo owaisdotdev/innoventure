@@ -81,7 +81,7 @@ function SendProposal() {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             const escrowContract = new ethers.Contract(
-                "0x261CA8476C227202b752fa3399e506424408af15",
+                "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
                 ABI,
                 signer
             );

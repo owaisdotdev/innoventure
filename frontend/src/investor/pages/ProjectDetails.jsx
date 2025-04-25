@@ -25,8 +25,41 @@ const ProjectDetails = () => {
     const [startupDetails, setStartupDetails] = useState();
     const [investorDetails, setInvestorDetails] = useState();
     const [investment, setInvestment] = useState(null);
-    const [milestones, setMilestones] = useState([]);
+    const [milestones, setMilestones] = useState([
+        {
+          title: "Design Phase",
+          description: "Complete UI/UX design for the app",
+          amount: "100",
+          approved: false,
+          deadline: "2025-05-05",
+          state: 0,
+          ipfsHash: "QmXyzExampleHash1",
+          submitted: true,
+        },
+        {
+          title: "Development Phase",
+          description: "Build the core functionality",
+          amount: "300",
+          approved: true,
+          deadline: "2025-06-10",
+          state: 1,
+          ipfsHash: "QmXyzExampleHash2",
+          submitted: false,
+        },
+        {
+          title: "Testing & Deployment",
+          description: "Test the application and deploy to production",
+          amount: "150",
+          approved: false,
+          deadline: "2025-07-01",
+          state: 2,
+          ipfsHash: "QmXyzExampleHash3",
+          submitted: true,
+        },
+      ]
+      );
 
+    
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -46,7 +79,7 @@ const ProjectDetails = () => {
               const signer = await provider.getSigner();
   
               const contract = new ethers.Contract(
-                  "0x261CA8476C227202b752fa3399e506424408af15",
+                  "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
                   ABI,
                   signer
               );
@@ -172,7 +205,7 @@ const ProjectDetails = () => {
             const signer = await provider.getSigner();
 
             const escrowContract = new ethers.Contract(
-                "0x261CA8476C227202b752fa3399e506424408af15",
+                "0x5422e2f20862cffa4aa16c33dae12152f1ce810f",
                 ABI,
                 signer
             );
@@ -194,7 +227,7 @@ const ProjectDetails = () => {
             );
 
             const tx1 = await usdcContract.approve(
-                "0x261CA8476C227202b752fa3399e506424408af15", // your escrow contract address
+                "0x5422e2f20862cffa4aa16c33dae12152f1ce810f", // your escrow contract address
                 amount
             );
 
@@ -627,59 +660,56 @@ const ProjectDetails = () => {
                         </button>
                     </div>
                 </Modal>
-                <div>
-                    <h3>Milestones</h3>
-                    {milestones.map((m, idx) => (
-                        <div
-                            key={idx}
-                            style={{
-                                border: "1px solid #ccc",
-                                padding: "10px",
-                                marginBottom: "10px",
-                            }}
-                        >
-                            <h4>Title: {m.title}</h4>
-                            <p>Description: {m.description}</p>
-                            <p>Amount: {m.amount}</p>
-                            <p>Approved: {m.approved ? "Yes" : "No"}</p>
-                            <p>Deadline: {m.deadline}</p>
-                            <p>
-                                State:{" "}
-                                {m.state == 0
-                                    ? "PENDING"
-                                    : m.state == 1
-                                    ? "APPROVED"
-                                    : "REJECTED"}
-                            </p>
-                            <p>
-                                IPFS:{" "}
-                                <a
-                                    href={`https://ipfs.io/ipfs/${m.ipfsHash}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    View File
-                                </a>
-                            </p>
-                            {m.submitted && (
-                                <div className="mt-2 flex gap-2">
-                                    <button
-                                        onClick={() => handleApprove(0, idx)}
-                                        className="bg-green-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Accept
-                                    </button>
-                                    <button
-                                        onClick={() => handleReject(0, idx)}
-                                        className="bg-red-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Reject
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                <div className="space-y-4">
+  <h3 className="text-xl font-semibold mb-2">Milestones</h3>
+  {milestones.map((m, idx) => (
+    <div
+      key={idx}
+      className="flex flex-col md:flex-row items-start md:items-center justify-between border border-gray-300 p-4 rounded-md shadow-sm"
+    >
+      <div className="flex flex-col gap-1 w-full md:w-3/4">
+        <p><span className="font-semibold">Title:</span> {m.title}</p>
+        <p><span className="font-semibold">Description:</span> {m.description}</p>
+        <p><span className="font-semibold">Amount:</span> {m.amount}</p>
+        <p><span className="font-semibold">Approved:</span> {m.approved ? "Yes" : "No"}</p>
+        <p><span className="font-semibold">Deadline:</span> {m.deadline}</p>
+        <p>
+          <span className="font-semibold">State:</span>{" "}
+          {m.state === 0 ? "PENDING" : m.state === 1 ? "APPROVED" : "REJECTED"}
+        </p>
+        <p>
+          <span className="font-semibold">IPFS:</span>{" "}
+          <a
+            href={`https://ipfs.io/ipfs/${m.ipfsHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            View File
+          </a>
+        </p>
+      </div>
+
+      {m.submitted && (
+        <div className="flex gap-2 mt-4 md:mt-0 md:ml-4">
+          <button
+            onClick={() => handleApprove(0, idx)}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Accept
+          </button>
+          <button
+            onClick={() => handleReject(0, idx)}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Reject
+          </button>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
             </div>
         </Layout>
     );
