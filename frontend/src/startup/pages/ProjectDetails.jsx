@@ -17,11 +17,19 @@ import {
 } from "react-icons/fa";
 import Layout from "./Layout";
 import { ethers } from "ethers";
-import { useNavigate } from 'react-router-dom';
+import ChatBox from "@/components/ChatBox";
+import ChatIcon from "@/components/ChatIcon";
+import { useNavigate } from "react-router-dom";
 
 import { ABI } from "@/abi";
-import {  FaFileAlt,FaTimesCircle , FaChevronDown, FaChevronUp, FaDollarSign, FaClock } from 'react-icons/fa';
-
+import {
+    FaFileAlt,
+    FaTimesCircle,
+    FaChevronDown,
+    FaChevronUp,
+    FaDollarSign,
+    FaClock,
+} from "react-icons/fa";
 
 const ProjectDetails = () => {
     const { id } = useParams();
@@ -33,40 +41,42 @@ const ProjectDetails = () => {
     const [expandedMilestone, setExpandedMilestone] = useState(null);
     const navigate = useNavigate();
     const [investment, setInvestment] = useState(null);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const startupId = "675d8f1bdfaebd7bdfb533d2";
+    const investorId = "675d8f1bdfaebd7bdfb533cc";
 
-const [milestones, setMilestones] = useState([
+    const [milestones, setMilestones] = useState([
         {
-          title: "Design Phase",
-          description: "Complete UI/UX design for the app",
-          amount: "100",
-          approved: false,
-          deadline: "2025-05-05",
-          state: 0,
-          ipfsHash: "QmXyzExampleHash1",
-          submitted: true,
+            title: "Design Phase",
+            description: "Complete UI/UX design for the app",
+            amount: "100",
+            approved: false,
+            deadline: "2025-05-05",
+            state: 0,
+            ipfsHash: "QmXyzExampleHash1",
+            submitted: true,
         },
         {
-          title: "Development Phase",
-          description: "Build the core functionality",
-          amount: "300",
-          approved: true,
-          deadline: "2025-06-10",
-          state: 1,
-          ipfsHash: "QmXyzExampleHash2",
-          submitted: false,
+            title: "Development Phase",
+            description: "Build the core functionality",
+            amount: "300",
+            approved: true,
+            deadline: "2025-06-10",
+            state: 1,
+            ipfsHash: "QmXyzExampleHash2",
+            submitted: false,
         },
         {
-          title: "Testing & Deployment",
-          description: "Test the application and deploy to production",
-          amount: "150",
-          approved: false,
-          deadline: "2025-07-01",
-          state: 2,
-          ipfsHash: "QmXyzExampleHash3",
-          submitted: true,
+            title: "Testing & Deployment",
+            description: "Test the application and deploy to production",
+            amount: "150",
+            approved: false,
+            deadline: "2025-07-01",
+            state: 2,
+            ipfsHash: "QmXyzExampleHash3",
+            submitted: true,
         },
-      ]
-      ); 
+    ]);
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -77,69 +87,73 @@ const [milestones, setMilestones] = useState([
     const [milestoneFunded, setMilestoneFunded] = useState(false);
     const [funding, setFunding] = useState(false);
     const navigateToSubmitMilestone = () => {
-        navigate('/startup/milestone');
-      };
+        navigate("/startup/milestone");
+    };
     const toggleExpand = (index) => {
         setExpandedMilestone(expandedMilestone === index ? null : index);
-      };
-    
-      const getStateColor = (state) => {
+    };
+
+    const getStateColor = (state) => {
         switch (state) {
-          case 0: return "text-yellow-500"; // PENDING
-          case 1: return "text-green-500";  // APPROVED
-          case 2: return "text-red-500";    // REJECTED
-          default: return "text-gray-500";
+            case 0:
+                return "text-yellow-500"; // PENDING
+            case 1:
+                return "text-green-500"; // APPROVED
+            case 2:
+                return "text-red-500"; // REJECTED
+            default:
+                return "text-gray-500";
         }
-      };
+    };
     useEffect(() => {
-              fetchInvestmentDetails(0); 
-            }, []);
-        
-         const fetchInvestmentDetails = async (investmentId) => {
-                try {
-                    const provider = new ethers.BrowserProvider(window.ethereum);
-                    const signer = await provider.getSigner();
-        
-                    const contract = new ethers.Contract(
-                        "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7",
-                        ABI,
-                        signer
-                    );
-        
-                    // Fetch investment details
-                    const inv = await contract.getInvestment(investmentId);
-                    const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
-                    console.log(inv)
-                    // Fetch each milestone
-                    setInvestment({
-                      investor: inv[0],
-                      startup: inv[1],
-                      totalAmount: inv[2].toString(),
-                      deadline: new Date(Number(inv[5]) * 1000).toLocaleString(),
-                      state: inv[6],
-                      milestoneCount: Number(inv[7]),
-                  });
-      
-                  const milestonesArray = [];
-                  for (let i = 0; i < Number(inv[7]); i++) {
-                      const m = await contract.getMilestone(investmentId, i);
-                      console.log(m);
-                      milestonesArray.push({
-                          title: m[0],
-                          description: m[1],
-                          amount: m[2].toString(),
-                          approved: m[3],
-                          deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
-                          ipfsHash: m[5],
-                          state: Number(m[6]),
-                      });
-                  }
-      
-                  setMilestones(milestonesArray);
-              } catch (error) {
-                  console.error("Error fetching investment and milestones:", error);
-              }
-          };
+        fetchInvestmentDetails(0);
+    }, []);
+
+    const fetchInvestmentDetails = async (investmentId) => {
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+
+            const contract = new ethers.Contract(
+                "0x995E12537B9AD84A3bbe91b67dF8afB4Bbabc8d7",
+                ABI,
+                signer
+            );
+
+            // Fetch investment details
+            const inv = await contract.getInvestment(investmentId);
+            const milestoneCount = Number(inv[7]); // index 7 is milestoneCount
+            console.log(inv);
+            // Fetch each milestone
+            setInvestment({
+                investor: inv[0],
+                startup: inv[1],
+                totalAmount: inv[2].toString(),
+                deadline: new Date(Number(inv[5]) * 1000).toLocaleString(),
+                state: inv[6],
+                milestoneCount: Number(inv[7]),
+            });
+
+            const milestonesArray = [];
+            for (let i = 0; i < Number(inv[7]); i++) {
+                const m = await contract.getMilestone(investmentId, i);
+                console.log(m);
+                milestonesArray.push({
+                    title: m[0],
+                    description: m[1],
+                    amount: m[2].toString(),
+                    approved: m[3],
+                    deadline: new Date(Number(m[4]) * 1000).toLocaleString(),
+                    ipfsHash: m[5],
+                    state: Number(m[6]),
+                });
+            }
+
+            setMilestones(milestonesArray);
+        } catch (error) {
+            console.error("Error fetching investment and milestones:", error);
+        }
+    };
     useEffect(() => {
         const fetchData = async () => {
             const userId = localStorage.getItem("user");
@@ -251,8 +265,7 @@ const [milestones, setMilestones] = useState([
     };
     const getStateName = (state) => {
         return state === 0 ? "PENDING" : state === 1 ? "APPROVED" : "REJECTED";
-      };
-    
+    };
 
     return (
         <Layout>
@@ -274,7 +287,7 @@ const [milestones, setMilestones] = useState([
                             </span>
                         </div>
                     </div>
-    
+
                     {/* Main Content - Improved grid and cards */}
                     <div className="grid gap-6 md:grid-cols-3">
                         {/* Left Column - Startup Info */}
@@ -291,7 +304,7 @@ const [milestones, setMilestones] = useState([
                                         Startup Details
                                     </h2>
                                 </div>
-    
+
                                 <div className="space-y-5">
                                     <div className="flex flex-col">
                                         <span className="text-xs uppercase tracking-wider text-indigo-300 font-medium">
@@ -302,7 +315,7 @@ const [milestones, setMilestones] = useState([
                                                 proposal?.startupId?.name}
                                         </span>
                                     </div>
-    
+
                                     <div className="flex items-start">
                                         <FaEnvelope
                                             size={16}
@@ -318,7 +331,7 @@ const [milestones, setMilestones] = useState([
                                             </span>
                                         </div>
                                     </div>
-    
+
                                     <div className="flex items-start">
                                         <FaBriefcase
                                             size={16}
@@ -333,11 +346,12 @@ const [milestones, setMilestones] = useState([
                                                     ?.industry ||
                                                     proposal?.startupId
                                                         ?.businessPlan
-                                                        ?.industry || "Not specified"}
+                                                        ?.industry ||
+                                                    "Not specified"}
                                             </span>
                                         </div>
                                     </div>
-    
+
                                     <div className="pt-3 border-t border-gray-700/60">
                                         <span className="text-xs uppercase tracking-wider text-indigo-300 font-medium">
                                             Business Description
@@ -351,7 +365,7 @@ const [milestones, setMilestones] = useState([
                                 </div>
                             </div>
                         </div>
-    
+
                         {/* Middle Column - Proposal Details */}
                         <div className="md:col-span-1">
                             <div className="bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl border border-gray-700/60 shadow-xl h-full transform transition-all hover:shadow-purple-800/10 hover:border-gray-600/60">
@@ -366,7 +380,7 @@ const [milestones, setMilestones] = useState([
                                         Proposal Details
                                     </h2>
                                 </div>
-    
+
                                 <div className="space-y-5">
                                     <div className="flex items-center p-4 bg-gradient-to-r from-gray-700/60 to-gray-700/40 rounded-xl">
                                         <FaMoneyBillWave
@@ -384,7 +398,7 @@ const [milestones, setMilestones] = useState([
                                             </p>
                                         </div>
                                     </div>
-    
+
                                     <div className="pt-2">
                                         <span className="text-xs uppercase tracking-wider text-purple-300 font-medium">
                                             Proposal Message
@@ -394,11 +408,11 @@ const [milestones, setMilestones] = useState([
                                                 "No message provided"}
                                         </p>
                                     </div>
-    
+
                                     <div className="flex items-center pt-3">
                                         <FaUser
                                             size={16}
-                                            className="text-purple-300 mr-2 flex-shrink-0" 
+                                            className="text-purple-300 mr-2 flex-shrink-0"
                                         />
                                         <span className="text-xs uppercase tracking-wider text-purple-300 font-medium mr-2">
                                             Sent By:
@@ -410,7 +424,7 @@ const [milestones, setMilestones] = useState([
                                 </div>
                             </div>
                         </div>
-    
+
                         {/* Right Column - Investor Info */}
                         <div className="md:col-span-1">
                             <div className="bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl border border-gray-700/60 shadow-xl h-full transform transition-all hover:shadow-blue-800/10 hover:border-gray-600/60">
@@ -425,7 +439,7 @@ const [milestones, setMilestones] = useState([
                                         Investor Details
                                     </h2>
                                 </div>
-    
+
                                 <div className="space-y-5">
                                     <div className="flex flex-col">
                                         <span className="text-xs uppercase tracking-wider text-blue-300 font-medium">
@@ -436,7 +450,7 @@ const [milestones, setMilestones] = useState([
                                                 proposal?.investorId?.name}
                                         </span>
                                     </div>
-    
+
                                     <div className="flex items-start">
                                         <FaEnvelope
                                             size={16}
@@ -452,7 +466,7 @@ const [milestones, setMilestones] = useState([
                                             </span>
                                         </div>
                                     </div>
-    
+
                                     <div className="flex items-start">
                                         <FaBriefcase
                                             size={16}
@@ -472,7 +486,7 @@ const [milestones, setMilestones] = useState([
                             </div>
                         </div>
                     </div>
-    
+
                     {/* Action Button - Enhanced
                     <div className="mt-10 flex justify-center">
                         <button
@@ -486,251 +500,325 @@ const [milestones, setMilestones] = useState([
                             <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 rounded-xl"></div>
                         </button>
                     </div> */}
-    
-    
-      
-      <div className="max-w-5xl mt-20 mx-auto p-6 bg-gray-900 rounded-xl shadow-lg">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-          Project Milestones
-        </h1>
-        
-        <button 
-          onClick={navigateToSubmitMilestone}
-          className="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
-        >
-          <FaPlus className="mr-2" /> Submit Milestone
-        </button>
-      </div>
-      
-      <div className="space-y-6">
-        {milestones.map((milestone, idx) => (
-          <div 
-            key={idx} 
-            className="bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-700"
-          >
-            <div 
-              className="flex items-center justify-between p-4 cursor-pointer"
-              onClick={() => toggleExpand(idx)}
-            >
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-full ${getStateColor(milestone.state).replace('text-', 'bg-').replace('-400', '-900')} bg-opacity-50`}>
-                  {milestone.state === 1 ? (
-                    <FaCheckCircle className={getStateColor(milestone.state)} size={20} />
-                  ) : milestone.state === 2 ? (
-                    <FaTimesCircle className={getStateColor(milestone.state)} size={20} />
-                  ) : (
-                    <FaClock className={getStateColor(milestone.state)} size={20} />
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-white">{milestone.title}</h3>
-                  <div className="flex items-center text-sm text-gray-300">
-                    <span className={`font-semibold ${getStateColor(milestone.state)}`}>
-                      {getStateName(milestone.state)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <div className="flex items-center font-bold text-green-400">
-                    <FaDollarSign size={14} className="mr-1" />
-                    {milestone.amount.replace('$', '')}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-300">
-                    <FaCalendarAlt size={12} className="mr-1" />
-                    {milestone.deadline}
-                  </div>
-                </div>
-                {expandedMilestone === idx ? (
-                  <FaChevronUp className="text-gray-400" />
-                ) : (
-                  <FaChevronDown className="text-gray-400" />
-                )}
-              </div>
-            </div>
-            
-            {expandedMilestone === idx && (
-              <div className="p-4 bg-gray-700 border-t border-gray-600">
-                <p className="text-gray-300 mb-4">{milestone.description}</p>
-                
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2 text-sm text-gray-300">
-                    <FaFileAlt />
-                    <a 
-                      href={`https://ipfs.io/ipfs/${milestone.ipfsHash}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 hover:underline"
-                    >
-                      View File
-                    </a>
-                  </div>
-                  
-                  <div className="flex items-center text-sm text-gray-300">
-                    <span className="mr-2">Approved:</span>
-                    {milestone.approved ? (
-                      <FaCheckCircle className="text-green-400" size={16} />
-                    ) : (
-                      <FaTimesCircle className="text-red-400" size={16} />
-                    )}
-                  </div>
-                </div>
-                
-                {milestone.submitted && milestone.state === 0 && (
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => handleApprove(0, idx)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
-                    >
-                      <FaCheckCircle className="mr-2" /> Accept
-                    </button>
-                    <button
-                      onClick={() => handleReject(0, idx)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
-                    >
-                      <FaTimesCircle className="mr-2" /> Reject
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
 
-{/* Submit Milestone Modal - Fixed sizing and scrolling */}
-<Modal
-    isOpen={isModalOpen}
-    onRequestClose={() => setIsModalOpen(false)}
-    className="max-w-2xl mx-auto my-8 p-6 bg-gray-800 rounded-xl border border-gray-700 outline-none shadow-2xl max-h-[90vh] overflow-auto"
-    overlayClassName="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-    style={{
-        content: {
-            maxWidth: '90vw'
-        }
-    }}
->
-    <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-700 sticky top-0 bg-gray-800 z-10">
-        <h2 className="text-xl font-semibold text-indigo-300 flex items-center">
-            <FaCalendarCheck className="mr-2" size={20} /> Submit asMilestone
-        </h2>
-        <button
-            onClick={() => setIsModalOpen(false)}
-            className="p-2 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-        >
-            <FaTimes size={18} />
-        </button>
-    </div>
+                    <div className="max-w-5xl mt-20 mx-auto p-6 bg-gray-900 rounded-xl shadow-lg">
+                        <div className="flex justify-between items-center mb-8">
+                            <h1 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                                Project Milestones
+                            </h1>
 
-    <div className="space-y-5">
-        {/* Title (disabled since it's already set) */}
-        <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">
-                Milestone Title
-            </label>
-            <input
-                type="text"
-                name="title"
-                value={milestoneForm.title}
-                disabled
-                className="w-full px-4 py-2 rounded-lg bg-gray-700/80 border border-gray-600 text-gray-400"
-            />
-        </div>
+                            <button
+                                onClick={navigateToSubmitMilestone}
+                                className="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                            >
+                                <FaPlus className="mr-2" /> Submit Milestone
+                            </button>
+                        </div>
 
-        {/* Completion Date - Adjusted sizing */}
-        <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">
-                Completion Date
-            </label>
-            <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <FaCalendarAlt className="text-indigo-400" />
-                </div>
-                <input
-                    type="date"
-                    name="completionDate"
-                    value={milestoneForm.completionDate}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 px-4 py-2 rounded-lg bg-gray-700/80 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                />
-            </div>
-        </div>
+                        <div className="space-y-6">
+                            {milestones.map((milestone, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-700"
+                                >
+                                    <div
+                                        className="flex items-center justify-between p-4 cursor-pointer"
+                                        onClick={() => toggleExpand(idx)}
+                                    >
+                                        <div className="flex items-center space-x-3">
+                                            <div
+                                                className={`p-2 rounded-full ${getStateColor(
+                                                    milestone.state
+                                                )
+                                                    .replace("text-", "bg-")
+                                                    .replace(
+                                                        "-400",
+                                                        "-900"
+                                                    )} bg-opacity-50`}
+                                            >
+                                                {milestone.state === 1 ? (
+                                                    <FaCheckCircle
+                                                        className={getStateColor(
+                                                            milestone.state
+                                                        )}
+                                                        size={20}
+                                                    />
+                                                ) : milestone.state === 2 ? (
+                                                    <FaTimesCircle
+                                                        className={getStateColor(
+                                                            milestone.state
+                                                        )}
+                                                        size={20}
+                                                    />
+                                                ) : (
+                                                    <FaClock
+                                                        className={getStateColor(
+                                                            milestone.state
+                                                        )}
+                                                        size={20}
+                                                    />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-lg text-white">
+                                                    {milestone.title}
+                                                </h3>
+                                                <div className="flex items-center text-sm text-gray-300">
+                                                    <span
+                                                        className={`font-semibold ${getStateColor(
+                                                            milestone.state
+                                                        )}`}
+                                                    >
+                                                        {getStateName(
+                                                            milestone.state
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-        {/* Financial Analysis - Reduced rows */}
-        <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">
-                Financial Analysis / Report
-            </label>
-            <textarea
-                name="financialAnalysis"
-                placeholder="Provide a brief financial summary of milestone completion..."
-                value={milestoneForm.financialAnalysis}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full px-4 py-2 rounded-lg bg-gray-700/80 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            />
-        </div>
+                                        <div className="flex items-center space-x-4">
+                                            <div className="text-right">
+                                                <div className="flex items-center font-bold text-green-400">
+                                                    <FaDollarSign
+                                                        size={14}
+                                                        className="mr-1"
+                                                    />
+                                                    {milestone.amount.replace(
+                                                        "$",
+                                                        ""
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center text-sm text-gray-300">
+                                                    <FaCalendarAlt
+                                                        size={12}
+                                                        className="mr-1"
+                                                    />
+                                                    {milestone.deadline}
+                                                </div>
+                                            </div>
+                                            {expandedMilestone === idx ? (
+                                                <FaChevronUp className="text-gray-400" />
+                                            ) : (
+                                                <FaChevronDown className="text-gray-400" />
+                                            )}
+                                        </div>
+                                    </div>
 
-        {/* File Upload - Height reduced */}
-        <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">
-                Attach Completion Proof (Docs)
-            </label>
-            <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/80 hover:bg-gray-600/80 transition-colors">
-                    <div className="flex flex-col items-center justify-center pt-4 pb-4">
-                        <FaFileUpload className="w-8 h-8 mb-2 text-indigo-400" />
-                        <p className="mb-1 text-sm text-gray-300">
-                            <span className="font-semibold text-indigo-300">
-                                Click to upload
-                            </span>{" "}
-                            or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500">
-                            PDF, DOC, DOCX, XLS (MAX. 10MB)
-                        </p>
+                                    {expandedMilestone === idx && (
+                                        <div className="p-4 bg-gray-700 border-t border-gray-600">
+                                            <p className="text-gray-300 mb-4">
+                                                {milestone.description}
+                                            </p>
+
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center space-x-2 text-sm text-gray-300">
+                                                    <FaFileAlt />
+                                                    <a
+                                                        href={`https://ipfs.io/ipfs/${milestone.ipfsHash}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-400 hover:text-blue-300 hover:underline"
+                                                    >
+                                                        View File
+                                                    </a>
+                                                </div>
+
+                                                <div className="flex items-center text-sm text-gray-300">
+                                                    <span className="mr-2">
+                                                        Approved:
+                                                    </span>
+                                                    {milestone.approved ? (
+                                                        <FaCheckCircle
+                                                            className="text-green-400"
+                                                            size={16}
+                                                        />
+                                                    ) : (
+                                                        <FaTimesCircle
+                                                            className="text-red-400"
+                                                            size={16}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {milestone.submitted &&
+                                                milestone.state === 0 && (
+                                                    <div className="flex space-x-3">
+                                                        <button
+                                                            onClick={() =>
+                                                                handleApprove(
+                                                                    0,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
+                                                        >
+                                                            <FaCheckCircle className="mr-2" />{" "}
+                                                            Accept
+                                                        </button>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleReject(
+                                                                    0,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center justify-center flex-1 transition-colors duration-200"
+                                                        >
+                                                            <FaTimesCircle className="mr-2" />{" "}
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <input
-                        type="file"
-                        name="file"
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
-                </label>
-            </div>
-            {milestoneForm.file && (
-                <p className="text-sm text-green-400 flex items-center mt-1">
-                    <FaCheckCircle className="mr-2" />{" "}
-                    {milestoneForm.file.name}
-                </p>
-            )}
-        </div>
-    </div>
 
-    {/* Submit + Cancel buttons - Compact version */}
-    <div className="flex justify-between items-center space-x-3 mt-6">
-        <button
-            onClick={submitMilestone}
-            className="flex-1 px-4 py-2 rounded-lg font-medium text-base flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30 transition-all"
-        >
-            <FaCheckCircle className="mr-2" size={16} />
-            {"Submit Milestone"}
-        </button>
+                    {/* Submit Milestone Modal - Fixed sizing and scrolling */}
+                    <Modal
+                        isOpen={isModalOpen}
+                        onRequestClose={() => setIsModalOpen(false)}
+                        className="max-w-2xl mx-auto my-8 p-6 bg-gray-800 rounded-xl border border-gray-700 outline-none shadow-2xl max-h-[90vh] overflow-auto"
+                        overlayClassName="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                        style={{
+                            content: {
+                                maxWidth: "90vw",
+                            },
+                        }}
+                    >
+                        <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-700 sticky top-0 bg-gray-800 z-10">
+                            <h2 className="text-xl font-semibold text-indigo-300 flex items-center">
+                                <FaCalendarCheck className="mr-2" size={20} />{" "}
+                                Submit asMilestone
+                            </h2>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="p-2 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+                            >
+                                <FaTimes size={18} />
+                            </button>
+                        </div>
 
-        <button
-            onClick={() => setIsModalOpen(false)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium text-gray-300 flex items-center transition-all"
-        >
-            <FaTimes className="mr-2" size={16} /> Cancel
-        </button>
-    </div>
-</Modal>
+                        <div className="space-y-5">
+                            {/* Title (disabled since it's already set) */}
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-300">
+                                    Milestone Title
+                                </label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={milestoneForm.title}
+                                    disabled
+                                    className="w-full px-4 py-2 rounded-lg bg-gray-700/80 border border-gray-600 text-gray-400"
+                                />
+                            </div>
+
+                            {/* Completion Date - Adjusted sizing */}
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-300">
+                                    Completion Date
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <FaCalendarAlt className="text-indigo-400" />
+                                    </div>
+                                    <input
+                                        type="date"
+                                        name="completionDate"
+                                        value={milestoneForm.completionDate}
+                                        onChange={handleInputChange}
+                                        className="w-full pl-10 px-4 py-2 rounded-lg bg-gray-700/80 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Financial Analysis - Reduced rows */}
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-300">
+                                    Financial Analysis / Report
+                                </label>
+                                <textarea
+                                    name="financialAnalysis"
+                                    placeholder="Provide a brief financial summary of milestone completion..."
+                                    value={milestoneForm.financialAnalysis}
+                                    onChange={handleInputChange}
+                                    rows={4}
+                                    className="w-full px-4 py-2 rounded-lg bg-gray-700/80 border border-gray-600 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                />
+                            </div>
+
+                            {/* File Upload - Height reduced */}
+                            <div className="space-y-1">
+                                <label className="block text-sm font-medium text-gray-300">
+                                    Attach Completion Proof (Docs)
+                                </label>
+                                <div className="flex items-center justify-center w-full">
+                                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/80 hover:bg-gray-600/80 transition-colors">
+                                        <div className="flex flex-col items-center justify-center pt-4 pb-4">
+                                            <FaFileUpload className="w-8 h-8 mb-2 text-indigo-400" />
+                                            <p className="mb-1 text-sm text-gray-300">
+                                                <span className="font-semibold text-indigo-300">
+                                                    Click to upload
+                                                </span>{" "}
+                                                or drag and drop
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                PDF, DOC, DOCX, XLS (MAX. 10MB)
+                                            </p>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            name="file"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                </div>
+                                {milestoneForm.file && (
+                                    <p className="text-sm text-green-400 flex items-center mt-1">
+                                        <FaCheckCircle className="mr-2" />{" "}
+                                        {milestoneForm.file.name}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Submit + Cancel buttons - Compact version */}
+                        <div className="flex justify-between items-center space-x-3 mt-6">
+                            <button
+                                onClick={submitMilestone}
+                                className="flex-1 px-4 py-2 rounded-lg font-medium text-base flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30 transition-all"
+                            >
+                                <FaCheckCircle className="mr-2" size={16} />
+                                {"Submit Milestone"}
+                            </button>
+
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium text-gray-300 flex items-center transition-all"
+                            >
+                                <FaTimes className="mr-2" size={16} /> Cancel
+                            </button>
+                        </div>
+                    </Modal>
                 </div>
             </div>
+
+            <ChatIcon
+                onClick={() => setIsChatOpen(!isChatOpen)}
+                userId={startupId}
+            />
+            <ChatBox
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                userId={startupId}
+                recipientId={investorId}
+            />
         </Layout>
     );
 };

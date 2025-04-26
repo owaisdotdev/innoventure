@@ -23,6 +23,8 @@ import {
 } from "react-icons/fa";
 import Layout from "./Layout";
 import { ethers } from "ethers";
+import ChatBox from "@/components/ChatBox";
+import ChatIcon from "@/components/ChatIcon"; 
 import { ABI } from "../../abi.js";
 
 const ProjectDetails = () => {
@@ -35,7 +37,9 @@ const ProjectDetails = () => {
     const [investment, setInvestment] = useState(null);
     const [expandedMilestone, setExpandedMilestone] = useState(null);
     const [milestones, setMilestones] = useState([]);
-
+  const [isChatOpen, setIsChatOpen] = useState(false);
+    const startupId = "675d8f1bdfaebd7bdfb533d2";
+    const investorId = "675d8f1bdfaebd7bdfb533cc";
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -87,7 +91,7 @@ const ProjectDetails = () => {
                     state: Number(m[6]),
                     submitted: m[7],
                     message: m[8],
-                    financialAnalysis: JSON.parse(m[9]),
+                    financialAnalysis:  m[9] ? JSON.parse(m[9]) : "",
                 });
                 console.log({
                     title: m[0],
@@ -99,7 +103,7 @@ const ProjectDetails = () => {
                     state: Number(m[6]),
                     submitted: m[7],
                     message: m[8],
-                    financialAnalysis: JSON.parse(m[9]),
+                    financialAnalysis: m[9] ? JSON.parse(m[9]) : "",
                 });
             }
 
@@ -277,6 +281,7 @@ const ProjectDetails = () => {
                 investmentId,
                 milestoneIndex
             );
+            console.log(tx)
             await tx.wait();
             alert("Milestone approved!");
             fetchInvestmentDetails();
@@ -899,6 +904,16 @@ const ProjectDetails = () => {
                     </div>
                 </div>
             </div>
+            <ChatIcon
+                onClick={() => setIsChatOpen(!isChatOpen)}
+                userId={startupId}
+            />
+            <ChatBox
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                userId={startupId}
+                recipientId={investorId}
+            />
         </Layout>
     );
 };
