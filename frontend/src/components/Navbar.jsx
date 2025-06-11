@@ -19,16 +19,6 @@ const Navbar = () => {
           />
           <Link to="/" className="text-2xl font-bold text-gray-800">
             Innoventures
-<<<<<<< HEAD
-          </Link>
-        </div>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-gray-600 hover:text-black transition duration-200">
-            Home
-          </Link>
-=======
           </Link>
         </div>
 
@@ -37,7 +27,6 @@ const Navbar = () => {
           <Link to="/invest" className="text-gray-600 hover:text-black transition duration-200">
             Invest
           </Link>
->>>>>>> e9050eebedf513709703c017fe0c9aa904fbef26
           <Link to="/how-it-works" className="text-gray-600 hover:text-black transition duration-200">
             How it works
           </Link>

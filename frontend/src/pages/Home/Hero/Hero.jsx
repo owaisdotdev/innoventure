@@ -44,11 +44,7 @@ const LandingPage = () => {
           {/* Main Image */}
           <div className="absolute top-0 right-0 w-4/5 h-4/5 rounded-2xl overflow-hidden shadow-2xl z-10">
             <img
-<<<<<<< HEAD
-              src="https://www.shutterstock.com/image-photo/analysis-finance-grow-graph-market-600nw-2478761707.jpg"
-=======
               src="https://www.neduet.edu.pk/sites/default/files/technologypark/nedpic.jpg"
->>>>>>> e9050eebedf513709703c017fe0c9aa904fbef26
               alt="Investment"
               className="w-full h-full object-cover"
             />
@@ -57,11 +53,7 @@ const LandingPage = () => {
           {/* Secondary Image */}
           <div className="absolute bottom-0 left-0 w-3/4 h-3/4 rounded-2xl overflow-hidden shadow-xl">
             <img
-<<<<<<< HEAD
-              src="https://images.pexels.com/photos/730564/pexels-photo-730564.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-=======
               src="https://www.shutterstock.com/image-photo/analysis-finance-grow-graph-market-600nw-2478761707.jpg"
->>>>>>> e9050eebedf513709703c017fe0c9aa904fbef26
               alt="Chart"
               className="w-full h-full object-cover"
             />
