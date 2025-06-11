@@ -45,38 +45,7 @@ const ProjectDetails = () => {
     const startupId = "675d8f1bdfaebd7bdfb533d2";
     const investorId = "675d8f1bdfaebd7bdfb533cc";
 
-    const [milestones, setMilestones] = useState([
-        {
-            title: "Design Phase",
-            description: "Complete UI/UX design for the app",
-            amount: "100",
-            approved: false,
-            deadline: "2025-05-05",
-            state: 0,
-            ipfsHash: "QmXyzExampleHash1",
-            submitted: true,
-        },
-        {
-            title: "Development Phase",
-            description: "Build the core functionality",
-            amount: "300",
-            approved: true,
-            deadline: "2025-06-10",
-            state: 1,
-            ipfsHash: "QmXyzExampleHash2",
-            submitted: false,
-        },
-        {
-            title: "Testing & Deployment",
-            description: "Test the application and deploy to production",
-            amount: "150",
-            approved: false,
-            deadline: "2025-07-01",
-            state: 2,
-            ipfsHash: "QmXyzExampleHash3",
-            submitted: true,
-        },
-    ]);
+    const [milestones, setMilestones] = useState([]);
     const [milestoneForm, setMilestoneForm] = useState({
         milestoneId: "",
         title: "",
@@ -105,6 +74,7 @@ const ProjectDetails = () => {
                 return "text-gray-500";
         }
     };
+
     useEffect(() => {
         fetchInvestmentDetails(0);
     }, []);
@@ -150,6 +120,7 @@ const ProjectDetails = () => {
             }
 
             setMilestones(milestonesArray);
+            console.log(milestonesArray);
         } catch (error) {
             console.error("Error fetching investment and milestones:", error);
         }

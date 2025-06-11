@@ -1,7 +1,7 @@
 
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import { sepolia } from "wagmi/chains";
+import { bscTestnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const WALLETCONNECT_PROJECT_ID = "99296b5d7acb2ca478909bd3e7b4f780";
@@ -12,7 +12,7 @@ const config = createConfig(
         alchemyId: ALCHEMY_ID,
         walletConnectProjectId: WALLETCONNECT_PROJECT_ID,
         appName: "Horsly",
-        chains: [sepolia],
+        chains: [bscTestnet],
     })
 );const queryClient = new QueryClient();
 

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const mainUrl = "https://innoventure-api.vercel.app";
+const mainUrl = "http://localhost:3000/";
 const API = axios.create({ baseURL: mainUrl });
 
 // Adding Authorization header with token from localStorage

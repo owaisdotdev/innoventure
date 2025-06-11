@@ -24,7 +24,7 @@ import {
 import Layout from "./Layout";
 import { ethers } from "ethers";
 import ChatBox from "@/components/ChatBox";
-import ChatIcon from "@/components/ChatIcon"; 
+import ChatIcon from "@/components/ChatIcon";
 import { ABI } from "../../abi.js";
 
 const ProjectDetails = () => {
@@ -37,7 +37,7 @@ const ProjectDetails = () => {
     const [investment, setInvestment] = useState(null);
     const [expandedMilestone, setExpandedMilestone] = useState(null);
     const [milestones, setMilestones] = useState([]);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
     const startupId = "675d8f1bdfaebd7bdfb533d2";
     const investorId = "675d8f1bdfaebd7bdfb533cc";
     const [milestoneForm, setMilestoneForm] = useState({
@@ -53,7 +53,7 @@ const ProjectDetails = () => {
         fetchInvestmentDetails(0);
     }, []);
 
-    const fetchInvestmentDetails = async (investmentId) => {
+    const fetchInvestmentDetails = async (investmentId = 0) => {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
@@ -91,7 +91,7 @@ const ProjectDetails = () => {
                     state: Number(m[6]),
                     submitted: m[7],
                     message: m[8],
-                    financialAnalysis:  m[9] ? JSON.parse(m[9]) : "",
+                    financialAnalysis: m[9] ? JSON.parse(m[9]) : "",
                 });
                 console.log({
                     title: m[0],
@@ -276,12 +276,12 @@ const ProjectDetails = () => {
                 ABI,
                 signer
             );
-            
+
             const tx = await contract.approveMilestone(
                 investmentId,
                 milestoneIndex
             );
-            console.log(tx)
+            console.log(tx);
             await tx.wait();
             alert("Milestone approved!");
             fetchInvestmentDetails();
@@ -762,10 +762,7 @@ const ProjectDetails = () => {
                                                     size={14}
                                                     className="mr-1"
                                                 />
-                                                {milestone.amount.replace(
-                                                    "$",
-                                                    ""
-                                                )}
+                                                {milestone.amount / 10**6}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-300">
                                                 <FaCalendarAlt
@@ -836,38 +833,93 @@ const ProjectDetails = () => {
                                                     </div>
 
                                                     <div className="mb-4 bg-gray-800 p-3 rounded border border-gray-600">
-    <h4 className="text-white font-semibold mb-2 flex items-center">
-        <FaChartLine className="mr-2 text-green-400" />
-        Financial Analysis
-    </h4>
-    <div className="text-gray-300 text-sm space-y-3">
-        <p>
-            {milestone.financialAnalysis?.summary}
-        </p>
-        
-        <div className="mt-2">
-            <h5 className="text-white text-xs uppercase tracking-wide mb-1">Key Metrics</h5>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-gray-850 p-2 rounded">
-                <span className="text-gray-400">Total Revenue:</span>
-                <span>{milestone.financialAnalysis?.keyMetrics.totalRevenue}</span>
-                <span className="text-gray-400">Total Expenses:</span>
-                <span>{milestone.financialAnalysis?.keyMetrics.totalExpenses}</span>
-                <span className="text-gray-400">Net Profit/Loss:</span>
-                <span>{milestone.financialAnalysis?.keyMetrics.netProfitOrLoss}</span>
-                <span className="text-gray-400">Profit Margin:</span>
-                <span>{milestone.financialAnalysis?.keyMetrics.profitMargin}</span>
-            </div>
-        </div>
-        
-        <div className="mt-2">
-            <h5 className="text-white text-xs uppercase tracking-wide mb-1">Highlights</h5>
-            <ul className="list-disc list-inside space-y-1 pl-1">
-            {milestone.financialAnalysis?.highlights.map(m =><li>{m}</li> )}
+                                                        <h4 className="text-white font-semibold mb-2 flex items-center">
+                                                            <FaChartLine className="mr-2 text-green-400" />
+                                                            Financial Analysis
+                                                        </h4>
+                                                        <div className="text-gray-300 text-sm space-y-3">
+                                                            <p>
+                                                                {
+                                                                    milestone
+                                                                        .financialAnalysis
+                                                                        ?.summary
+                                                                }
+                                                            </p>
 
-            </ul>
-        </div>
-    </div>
-</div>
+                                                            <div className="mt-2">
+                                                                <h5 className="text-white text-xs uppercase tracking-wide mb-1">
+                                                                    Key Metrics
+                                                                </h5>
+                                                                <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-gray-850 p-2 rounded">
+                                                                    <span className="text-gray-400">
+                                                                        Total
+                                                                        Revenue:
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            milestone
+                                                                                .financialAnalysis
+                                                                                ?.keyMetrics
+                                                                                .totalRevenue
+                                                                        }
+                                                                    </span>
+                                                                    <span className="text-gray-400">
+                                                                        Total
+                                                                        Expenses:
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            milestone
+                                                                                .financialAnalysis
+                                                                                ?.keyMetrics
+                                                                                .totalExpenses
+                                                                        }
+                                                                    </span>
+                                                                    <span className="text-gray-400">
+                                                                        Net
+                                                                        Profit/Loss:
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            milestone
+                                                                                .financialAnalysis
+                                                                                ?.keyMetrics
+                                                                                .netProfitOrLoss
+                                                                        }
+                                                                    </span>
+                                                                    <span className="text-gray-400">
+                                                                        Profit
+                                                                        Margin:
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            milestone
+                                                                                .financialAnalysis
+                                                                                ?.keyMetrics
+                                                                                .profitMargin
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="mt-2">
+                                                                <h5 className="text-white text-xs uppercase tracking-wide mb-1">
+                                                                    Highlights
+                                                                </h5>
+                                                                <ul className="list-disc list-inside space-y-1 pl-1">
+                                                                    {milestone.financialAnalysis?.highlights.map(
+                                                                        (m) => (
+                                                                            <li>
+                                                                                {
+                                                                                    m
+                                                                                }
+                                                                            </li>
+                                                                        )
+                                                                    )}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                     <div className="flex space-x-3">
                                                         <button

@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const devUrl = "http://localhost:3001/";
-const mainUrl = "http://localhost:3000/";
+const devUrl = "http://localhost:3000/";
+// const mainUrl = "http://localhost:3000/";
 
-const API = axios.create({ baseURL: mainUrl });
+const API = axios.create({ baseURL: devUrl });
 
 API.interceptors.request.use((req) => {
     req.headers.Authorization = `Bearer ${localStorage.getItem("token")}`;
