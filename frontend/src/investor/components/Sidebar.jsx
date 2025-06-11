@@ -364,20 +364,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                     </a>
                     <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
                       <ul className={`pl-8 mt-1 ${!open && "hidden"}`}>
-                        <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/financial-reports"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">Financial Reports</span>
-                          </NavLink>
-                        </li>
+
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
@@ -392,20 +379,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             <span className="text-sm font-medium">Active Projects</span>
                           </NavLink>
                         </li>
-                        <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/portfolio-insights"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">Portfolio Insights</span>
-                          </NavLink>
-                        </li>
+         
                       </ul>
                     </div>
                     <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
@@ -427,7 +401,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investor/market-analysis"
+                            to="/investor/analysis"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -438,20 +412,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                             <span className="text-sm font-medium">Market Analysis</span>
                           </NavLink>
                         </li>
-                        <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/portfolio-insights"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">Portfolio Insights</span>
-                          </NavLink>
-                        </li>
+    
                       </ul>
                     </div>
                   </React.Fragment>
@@ -499,7 +460,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                         <li className="mb-1 last:mb-0">
                           <NavLink
                             end
-                            to="/investor/my-contracts"
+                            to="/investor/contracts"
                             className={({ isActive }) =>
                               "block transition duration-150 truncate " +
                               (isActive
@@ -511,32 +472,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen, variant = "default" }) {
                           </NavLink>
                         </li>
                         <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/create"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">Create Contract</span>
-                          </NavLink>
+
                         </li>
                         <li className="mb-1 last:mb-0">
-                          <NavLink
-                            end
-                            to="/investor/templates"
-                            className={({ isActive }) =>
-                              "block transition duration-150 truncate " +
-                              (isActive
-                                ? "text-violet-500"
-                                : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
-                            }
-                          >
-                            <span className="text-sm font-medium">Templates</span>
-                          </NavLink>
+
                         </li>
                       </ul>
                     </div>

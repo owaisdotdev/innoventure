@@ -37,7 +37,7 @@ const FydpsList = () => {
   };
 
   return (
-    
+    <Layout>
       <div className="px-6 py-4">
         <h1 className="text-xl text-gray-800 font-bold mb-4">Recommended FYDPs</h1>
 
@@ -91,6 +91,7 @@ const FydpsList = () => {
           </div>
         )}
       </div>
+      </Layout>
   );
 };
 
